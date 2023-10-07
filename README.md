@@ -1,33 +1,31 @@
+### Como utilizar esta plantilla
+
+Para utilizar la plantilla se debe utilizar una version mas baja de node.js
+
+Para utilizar varias versiones de node se puede utilizar nvm, que es un manejador de versiones de node
+
+https://github.com/coreybutler/nvm-windows/releases/download/1.1.7/nvm-setup.zip
+
+La versión que me funciono correctamente es la 16.14.0
+
+Para instalar una versión con nvm se utiliza el comando asi:
+
+- nvm install 16.14.0
+
+Y para ver las versiones que se tengan instaladas de node es con el siguiente comando:
+
+- nvm list
+
+Para seleccionar otra versión para utilizar de node es el comando:
+
+- nvm use 16.14.0
+
 <p align="center">
     <h1>Windmill Dashboard Next.js Typescript</h1>
     <a href="https://windmill-dashboard-nextjs-typescript.vercel.app/example">
       <img alt="Windmill Dashboard React" width="600" src=".github/windmill-dashboard-thumbnail.jpg">
     </a><br>
 </p>
-
-See the [Original Project by @estevanmaito](https://github.com/estevanmaito/windmill-dashboard-react/)
-
-With help from other contributors :
-- [Typescript version by @neutralboy](https://github.com/neutralboy/windmill-dashboard-react-ts)
-- [Nextjs version by @Aldhanekaa](https://github.com/Aldhanekaa/windmill-dashboard-nextjs)
-
-
-🚀 [See it live](https://windmill-dashboard-nextjs-typescript.vercel.app/example)
-
-This is not a template. This is a complete application, built on top of React, with all tiny details taken care of so you just need to bring the data to feed it.
-
-Accessibility is a priority in my projects and I think it should be in yours too, so this was developed listening to real screen readers, focus traps and keyboard navigation are available everywhere.
-
-## 📦 Features
-
-- 🦮 Throughly accessible (developed using screen readers)
-- 🌗 Dark theme enabled (load even different images based on theme)
-- 🧩 Multiple (custom) components
-- ⚡ Code splitting
-- Tailwind CSS
-- [Windmill React UI](https://windmillui.com/react-ui)
-- Heroicons
-- Chart.js
 
 ## 📚 Docs
 
@@ -42,6 +40,7 @@ All components and containers are saved in folder [example](example)
 ### Routing
 
 Change default redirecting when hit the `/` or `home` in file [next.config.js](next.config.js)
+
 ```js
   async redirects() {
     return [
@@ -93,6 +92,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Getting Started
 
 First, install dependencies :
+
 ```bash
 npm install
 # or
