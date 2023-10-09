@@ -1,11 +1,16 @@
 import React, { useState, ChangeEvent } from "react";
 import { ICrearServicios } from "../../utils/interfaces/servicios";
-import { Input, Label } from "@roketid/windmill-react-ui";
+import { Input, Label, HelperText } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
-
 import Layout from "example/containers/Layout";
+import {
+  successAlert,
+  errorAlert,
+  warningAlert,
+} from "../../components/alerts";
+import { ToastContainer } from "react-toastify";
 
 function RegistrarServicioPage() {
   const [servicioData, setServicioData] = useState<ICrearServicios>({
@@ -21,6 +26,14 @@ function RegistrarServicioPage() {
     });
   };
 
+  const clearData = () => {
+    setServicioData({
+      ...servicioData,
+      nombre: "",
+      imagenUrl: null,
+    });
+  };
+
   const registrarServicio = () => {
     fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
       method: "POST",
@@ -30,9 +43,13 @@ function RegistrarServicioPage() {
       body: JSON.stringify(servicioData),
     })
       .then((response) => {
-        console.log(response);
+        if (response.ok) {
+          successAlert("Éxito al registrar los datos");
+        } else {
+          throw new Error("Error al cambiar los datos del servicio");
+        }
       })
-      .catch(() => alert("Ocurrio un error al registrar los datos"));
+      .catch(() => errorAlert("Error al registrar los datos"));
   };
 
   return (
@@ -44,6 +61,7 @@ function RegistrarServicioPage() {
         <Label>
           <span>Nombre del servicio</span>
           <Input
+            value={servicioData.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange(e, "nombre")}
@@ -53,6 +71,9 @@ function RegistrarServicioPage() {
         <Label className="mt-4">
           <span>Url de la imagen de referencia del servicio</span>
           <Input
+            value={
+              servicioData.imagenUrl === null ? "" : servicioData.imagenUrl
+            }
             className="mt-1"
             placeholder="Escriba aquí la url de la imagen"
             onChange={(e) => handleChange(e, "imagenUrl")}
@@ -66,7 +87,9 @@ function RegistrarServicioPage() {
         </div>
 
         <div>
-          <Button size="large">Limpiar campos</Button>
+          <Button size="large" onClick={clearData}>
+            Limpiar campos
+          </Button>
         </div>
 
         <div>
@@ -75,6 +98,7 @@ function RegistrarServicioPage() {
           </Button>
         </div>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }
