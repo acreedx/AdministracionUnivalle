@@ -1,3 +1,4 @@
+"use client"
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -19,11 +20,13 @@ import {
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 
-import response, { ICajasData } from "utils/demo/cajasData";
+
 import Layout from "example/containers/Layout";
 import { route } from "next/dist/server/router";
+import response, { ICafeteriaData } from "utils/demo/cafeteriaData";
 
 const response2 = response.concat([]);
+
 
 function Cafeteria() {
 
@@ -32,8 +35,8 @@ function Cafeteria() {
   const [pageTable1, setPageTable1] = useState(1);
   const [pageTable2, setPageTable2] = useState(1);
 
-  const [dataTable1, setDataTable1] = useState<ICajasData[]>([]);
-  const [dataTable2, setDataTable2] = useState<ICajasData[]>([]);
+  const [dataTable1, setDataTable1] = useState<ICafeteriaData[]>([]);
+  const [dataTable2, setDataTable2] = useState<ICafeteriaData[]>([]);
 
   const resultsPerPage = 10;
   const totalResults = response.length;
@@ -70,7 +73,6 @@ function Cafeteria() {
 
       <div>
         <Button > <Link href={'/servicios/cafeteria/create'}>Crear</Link></Button>
-
       </div>
 
       <TableContainer className="mb-8 mt-4">
@@ -85,44 +87,44 @@ function Cafeteria() {
             </tr>
           </TableHeader>
           <TableBody>
-            {dataTable2.map((servicio, i) => (
+            {dataTable2.map((menu, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                      <p className="font-semibold">{menu.Titulo}</p>
                     </div>
                   </div>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{servicio.status}</Badge>
+                  <Badge type={"neutral"}>{menu.Descripcion_1}</Badge>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{servicio.status}</Badge>
+                  <Badge type={"neutral"}>{menu.Descripcion_2}</Badge>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{servicio.status}</Badge>
+                  <Badge type={"neutral"}>{menu.archivo}</Badge>
                 </TableCell>
 
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Button layout="link" size="small" aria-label="Edit">
-                      <EditIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+
+
+                    <Link
+                      href={`/servicios/cafeteria/[id]/[Titulo]`}
+                      as={`/servicios/cafeteria/${menu.Id}/${menu.Titulo}`}
+                    >
+                      <Button layout="link" size="small" aria-label="Edit">
+                        <EditIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
+                    </Link>
+
                     <Button layout="link" size="small" aria-label="Delete">
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
-                    <Link
-                      href={`/administracion/cajas/[id]/[name]`}
-                      as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Ver">
-                        <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
                   </div>
                 </TableCell>
 
@@ -130,6 +132,8 @@ function Cafeteria() {
             ))}
           </TableBody>
         </Table>
+
+
         <TableFooter>
           <Pagination
             totalResults={totalResults}
