@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import Link from "next/link";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -17,28 +17,26 @@ import {
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 
-import { IRequirementData } from "utils/demo/requirementData";
 import Layout from "example/containers/Layout";
 
-import response, { ICajasData } from "utils/demo/cajasData";
-
+import response, { IRequirementData } from "utils/demo/requirementData";
 const response2 = response.concat([]);
 
 function Requisitos() {
   const router = useRouter();
   const { id, name } = router.query;
-  useEffect(() => {
+  /*useEffect(() => {
     async () => {
       const response = await fetch(
         `https://localhost:7066/api/Requisitos/getRequisitosByServiceId/${id}`
       );
       var data: ICajasData[] = await response.json();
     };
-  });
+  });*/
   const [pageTable1, setPageTable1] = useState(1);
   const [pageTable2, setPageTable2] = useState(1);
-  const [dataTable1, setDataTable1] = useState<ICajasData[]>([]);
-  const [dataTable2, setDataTable2] = useState<ICajasData[]>([]);
+  const [dataTable1, setDataTable1] = useState<IRequirementData[]>([]);
+  const [dataTable2, setDataTable2] = useState<IRequirementData[]>([]);
 
   const resultsPerPage = 10;
   const totalResults = response.length;
@@ -78,8 +76,9 @@ function Requisitos() {
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Descripción requisito</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Acciones</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
@@ -88,23 +87,24 @@ function Requisitos() {
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{requirement.name}</p>
+                      <p className="font-semibold">{requirement.description}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge type={"neutral"}>{requirement.name}</Badge>
+                  <Badge type={"neutral"}>{requirement.status}</Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Button layout="link" size="small" aria-label="Edit">
-                      <EditIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                    <Link 
+                      href={`/administracion/cajas/requisitos/editar/[id]`}
+                      as={`/administracion/cajas/requisitos/editar/${requirement.id}`}>
+                              <Button layout="link" size="small" aria-label="Edit">
+                                <EditIcon className="w-5 h-5" aria-hidden="true" />
+                              </Button>
+                    </Link>
                     <Button layout="link" size="small" aria-label="Delete">
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                    <Button layout="link" size="small" aria-label="Ver">
-                      <MenuIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   </div>
                 </TableCell>
@@ -112,6 +112,13 @@ function Requisitos() {
             ))}
           </TableBody>
         </Table>
+      <div className="my-4">
+        <Link 
+            href={`/administracion/cajas/requisitos/crear/[id]`}
+            as={`/administracion/cajas/requisitos/crear/${id}`}>
+          <Button size="regular">Añadir nuevo requisito</Button>
+          </Link>
+        </div>
         <TableFooter>
           <Pagination
             totalResults={totalResults}

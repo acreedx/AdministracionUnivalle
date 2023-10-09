@@ -33,9 +33,18 @@ const routes: IRoute[] = [
     exact: true,
   },
   {
-    path: "/administracion/cajas",
     icon: "FormsIcon",
     name: "Cajas",
+    routes: [
+      {
+        path: "/administracion/cajas",
+        name: "Listar",
+      },
+      {
+        path: "/administracion/cajas/crear",
+        name: "Crear",
+      },
+    ],
   },
   {
     icon: "PagesIcon",
