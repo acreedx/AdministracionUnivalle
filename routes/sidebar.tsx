@@ -90,9 +90,15 @@ const routes: IRoute[] = [
     ],
   },
   {
-    path: "/bienestarUniversitario", // the url
-    icon: "HomeIcon", // the component being exported from icons/index.js
-    name: "Bienestar Universitario", // name that appear in Sidebar
+    path: "/bienestarUniversitario",
+    icon: "HomeIcon",
+    name: "Bienestar Universitario",
+    routes: [
+      {
+        path: "/bienestarUniversitario/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
     exact: true,
   },
 ];
