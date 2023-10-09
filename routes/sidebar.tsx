@@ -95,6 +95,10 @@ const routes: IRoute[] = [
     name: "Bienestar Universitario",
     routes: [
       {
+        path: "/bienestarUniversitario",
+        name: "Listar Servicios",
+      },
+      {
         path: "/bienestarUniversitario/registrar",
         name: "Registrar Servicio",
       },

@@ -18,36 +18,23 @@ import {
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon } from "icons";
 
-import response, { ITableData } from "utils/demo/tableData";
+import  { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
+import Link from "next/link";
 // make a copy of the data, for the second table
-const response2 = response.concat([]);
 
 function BienestarUniversitario() {
-  /**
-   * DISCLAIMER: This code could be badly improved, but for the sake of the example
-   * and readability, all the logic for both table are here.
-   * You would be better served by dividing each table in its own
-   * component, like Table(?) and TableWithActions(?) hiding the
-   * presentation details away from the page view.
-   */
+
 
   // setup pages control for every table
-  const [pageTable1, setPageTable1] = useState(1);
   const [pageTable2, setPageTable2] = useState(1);
 
   // setup data for every table
-  const [dataTable1, setDataTable1] = useState<ITableData[]>([]);
-  const [dataTable2, setDataTable2] = useState<ITableData[]>([]);
+  const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
 
   // pagination setup
   const resultsPerPage = 10;
-  const totalResults = response.length;
 
-  // pagination change control
-  function onPageChangeTable1(p: number) {
-    setPageTable1(p);
-  }
 
   // pagination change control
   function onPageChangeTable2(p: number) {
@@ -56,88 +43,78 @@ function BienestarUniversitario() {
 
   // on page change, load new sliced data
   // here you would make another server request for new data
-  useEffect(() => {
-    setDataTable1(
-      response.slice(
-        (pageTable1 - 1) * resultsPerPage,
-        pageTable1 * resultsPerPage
-      )
-    );
-  }, [pageTable1]);
+
 
   // on page change, load new sliced data
   // here you would make another server request for new data
-  useEffect(() => {
-    setDataTable2(
-      response2.slice(
-        (pageTable2 - 1) * resultsPerPage,
-        pageTable2 * resultsPerPage
-      )
-    );
-  }, [pageTable2]);
+ useEffect(() => {
+    const getData = async () => {
+      const query = await fetch('http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1');
+      const response:any= await query.json();
+      setUserInfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
+    }
+    getData();
+  }, []);
 
   return (
     <Layout>
       <PageTitle>Bienestar Universitario</PageTitle>
 
-      <SectionTitle>Table with actions</SectionTitle>
+      <SectionTitle>Servicio</SectionTitle>
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>Client</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Servicio</TableCell>
+              <TableCell>Modulo</TableCell>
+              <TableCell>Estado</TableCell>
+              <TableCell>Acciones</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
-            {dataTable2.map((user, i) => (
-              <TableRow key={i}>
+            
+            {
+              dataTable2.map((datos:any, i) => (
+              <TableRow key={datos}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <Avatar
                       className="hidden mr-3 md:block"
-                      src={user.avatar}
-                      alt="User avatar"
+                      src={datos.imagen}
                     />
                     <div>
-                      <p className="font-semibold">{user.name}</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {user.job}
-                      </p>
+                      
+                      <p className="font-semibold">{datos.nombre}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">$ {user.amount}</span>
+                  <span className="text-sm">{datos.modulo}</span>
                 </TableCell>
-                <TableCell>
-                  <Badge type={user.status}>{user.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">
-                    {new Date(user.date).toLocaleDateString()}
-                  </span>
-                </TableCell>
+                 <TableCell>
+                  <Badge></Badge>
+                </TableCell> 
                 <TableCell>
                   <div className="flex items-center space-x-4">
+                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
                     <Button layout="link" size="small" aria-label="Edit">
                       <EditIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
+                    </Link>
+                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
                     <Button layout="link" size="small" aria-label="Delete">
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
+                     </Link>
                   </div>
                 </TableCell>
               </TableRow>
-            ))}
+              ))}
           </TableBody>
         </Table>
         <TableFooter>
           <Pagination
-            totalResults={totalResults}
+            totalResults={dataTable2.length}
             resultsPerPage={resultsPerPage}
             onChange={onPageChangeTable2}
             label="Table navigation"
