@@ -6,6 +6,12 @@ import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import Layout from "example/containers/Layout";
 import { useRouter } from "next/router";
+import {
+  successAlert,
+  errorAlert,
+  warningAlert,
+} from "../../../components/alerts";
+import { ToastContainer } from "react-toastify";
 
 export async function getServerSideProps(context: any) {
   return {
@@ -18,6 +24,11 @@ function EditarServicioPage() {
     nombre: "",
     imagenUrl: null,
   });
+  const [servicioBkData, setServicioBkData] = useState<IEditarServicio>({
+    nombre: "",
+    imagenUrl: null,
+  });
+
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
@@ -31,19 +42,22 @@ function EditarServicioPage() {
         throw new Error("Error al obtener los datos del servicio.");
       }
       const resData = await res.json();
-      console.log(resData);
+
+      setServicioBkData({
+        nombre: resData.data.nombre,
+        imagenUrl: resData.data.imagenUrl,
+      });
       setServicioData({
         nombre: resData.data.nombre,
         imagenUrl: resData.data.imagenUrl,
       });
     } catch (error) {
-      console.error(error);
+      errorAlert("Ocurrió un error al traer los datos");
     }
   }
 
   useEffect(() => {
     cargarDatosServicio(numId);
-    console.log(servicioData);
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
@@ -53,21 +67,36 @@ function EditarServicioPage() {
     });
   };
 
+  const clearData = () => {
+    setServicioData(servicioBkData);
+  };
+
   const editarServicio = (id: number) => {
-    fetch(
-      `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(servicioData),
-      }
-    )
-      .then((response) => {
-        console.log(response);
-      })
-      .catch(() => alert("Ocurrio un error al tratar de editar los datos"));
+    if (
+      servicioData.nombre !== servicioBkData.nombre ||
+      servicioData.imagenUrl !== servicioBkData.imagenUrl
+    ) {
+      fetch(
+        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+    } else {
+      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+    }
   };
 
   return (
@@ -103,7 +132,9 @@ function EditarServicioPage() {
         </div>
 
         <div>
-          <Button size="large">Reestablecer datos</Button>
+          <Button size="large" onClick={clearData}>
+            Reestablecer datos
+          </Button>
         </div>
 
         <div>
@@ -112,6 +143,7 @@ function EditarServicioPage() {
           </Button>
         </div>
       </div>
+      <ToastContainer />
     </Layout>
   );
 }
