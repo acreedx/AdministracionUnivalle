@@ -3,6 +3,7 @@ import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import CTA from "example/components/CTA";
+import { Input, HelperText, Label, Select, Textarea } from '@roketid/windmill-react-ui'
 import {
   Table,
   TableHeader,
@@ -23,6 +24,23 @@ import Layout from "example/containers/Layout";
 
 const response2 = response.concat([]);
 
+      /*<Label>
+          <span>Horarios de atención</span>
+          <Input className="mt-1" placeholder="Jane Doe" />
+      </Label>
+      <Label>
+          <span>Ubicación</span>
+          <Input className="mt-1" placeholder="Jane Doe" />
+      </Label>
+      <Label>
+          <span>Imagen</span>
+          <Input className="mt-1" placeholder="Jane Doe" />
+      </Label>
+      <Label>
+          <span>Video de referencia</span>
+          <Input className="mt-1" placeholder="Jane Doe" />
+      </Label>*/
+      
 function Cajas() {
   const ModuleId = 2;
   const [pageTable1, setPageTable1] = useState(1);
@@ -33,7 +51,13 @@ function Cajas() {
 
   const resultsPerPage = 10;
   const totalResults = response.length;
-
+useEffect(() => {
+        fetch(`http://swapi.co/api/people/1/`)
+        .then(res => res.json())
+        .then((res) => {
+          console.log(res);
+        });
+      });
   function onPageChangeTable1(p: number) {
     setPageTable1(p);
   }
@@ -65,11 +89,14 @@ function Cajas() {
       <PageTitle>Cajas</PageTitle>
 
       <SectionTitle>Listado de servicios de cajas</SectionTitle>
-      <TableContainer className="mb-8">
+      <TableContainer className="my-8">
         <Table>
           <TableHeader>
             <tr>
               <TableCell>Servicio</TableCell>
+              <TableCell>Ubicación</TableCell>
+              <TableCell>Encargado</TableCell>
+              <TableCell>Telefono de Referencia</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Actions</TableCell>
             </tr>
@@ -85,13 +112,39 @@ function Cajas() {
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{servicio.ubicacion}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{servicio.encharged}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{servicio.cellphone}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
                   <Badge type={"neutral"}>{servicio.status}</Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
+                    <Link
+                      href={`/administracion/cajas/editar/[id]`}
+                      as={`/administracion/cajas/editar/${servicio.id}`}
+                    >
                     <Button layout="link" size="small" aria-label="Edit">
                       <EditIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
+                    </Link>
                     <Button layout="link" size="small" aria-label="Delete">
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
