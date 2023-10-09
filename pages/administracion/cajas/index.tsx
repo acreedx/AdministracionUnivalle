@@ -51,13 +51,18 @@ function Cajas() {
 
   const resultsPerPage = 10;
   const totalResults = response.length;
-useEffect(() => {
-        fetch(`http://swapi.co/api/people/1/`)
+  const url = "https://localhost:7066/api/Servicios/getServicioByModule/";
+  const moduleName = "Cajas";
+  useEffect(() => {
+    async function doFetch() {
+        //fetch(`${url}${moduleName}`)
+        fetch(`https://localhost:7066/api/Servicios/getServicioByModule/Cajas`)
         .then(res => res.json())
-        .then((res) => {
-          console.log(res);
-        });
-      });
+        .then((res) => console.log(res.data[0])
+        );
+    }
+    doFetch();
+  }, []);
   function onPageChangeTable1(p: number) {
     setPageTable1(p);
   }

@@ -6,7 +6,17 @@ interface ICajasData {
   cellphone: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
-
+function convertirJson(data: any) {
+    const convertedData : ICajasData = {
+      id: data.id,
+      name: data.name,
+      ubicacion: data.ubicaciones[0].description,
+      encharged: data.referencia[0].nombre,
+      cellphone: data.referencia[0].numerocel,
+      status: data.estado ? "success" : "danger"
+    };
+    return convertedData;
+}
 const tableData: ICajasData[] = [
   {
     id: 6,
@@ -37,3 +47,4 @@ const tableData: ICajasData[] = [
 
 export default tableData;
 export type { ICajasData };
+export type { convertirJson };
