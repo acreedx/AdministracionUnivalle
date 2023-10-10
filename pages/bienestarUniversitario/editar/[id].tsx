@@ -247,7 +247,7 @@ async function cargarDatosUbicacion(id: number) {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-    } else {
+      } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
@@ -263,8 +263,28 @@ const editarUbicacion = async (id: number) => {
       if(ubicaionVideo!=null){
         ubicacionData.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
       }
-      fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+      if(ubicacionBkData.descripcion==null && ubicacionBkData.imagen==null && ubicacionBkData.video==null){
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicacion`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicacion/${id}`,
         {
           method: "PUT",
           headers: {
@@ -281,6 +301,8 @@ const editarUbicacion = async (id: number) => {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }
+      
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
@@ -289,17 +311,17 @@ const editarUbicacion = async (id: number) => {
     if (
       carreraData.nombre !== carreraData.nombre
     ) {
-      fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+      if(carreraBkData.nombre==null){
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Carreras/addCarrera`,
         {
-          method: "PUT",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(servicioData),
         }
-      )
-        .then((response) => {
+      ).then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
           } else {
@@ -307,6 +329,25 @@ const editarUbicacion = async (id: number) => {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+         fetch(
+        `http://apisistemaunivalle.somee.com/api/Carreras/updateCarrera/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        }
+      ).then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
@@ -315,8 +356,28 @@ const editarUbicacion = async (id: number) => {
     if (
       requisitosData.descripcion !== requisitosData.descripcion
     ) {
-      fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+      if(requisitosBkData.descripcion==null){
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
         {
           method: "PUT",
           headers: {
@@ -333,17 +394,40 @@ const editarUbicacion = async (id: number) => {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }
+      
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
+
   const editarReferencias = async (id: number) => {
     if (
       referenciaData.nombre !== referenciaData.nombre ||
       referenciaData.numeroCel !== referenciaData.numeroCel
     ) {
-      fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+      if(refereciaBkData.nombre==null && refereciaBkData.numeroCel==null){
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${id}`,
         {
           method: "PUT",
           headers: {
@@ -360,6 +444,7 @@ const editarUbicacion = async (id: number) => {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
@@ -404,7 +489,7 @@ const editarUbicacion = async (id: number) => {
             className="mt-1" 
             rows={3} 
             placeholder="Ingresa los requisitos del servicio." 
-            onChange={(e) => handleChange1(e, "Requisitos.descripcion")}
+            onChange={(e) => handleChange1(e, "descripcion")}
           />
         </Label>
         <div className=" mt-4">
@@ -421,7 +506,7 @@ const editarUbicacion = async (id: number) => {
             value={carreraData.nombre === null ? "" : carreraData.nombre}
             className="mt-1"
             placeholder="Escriba el nombre de la carrera."
-            onChange={(e) => handleChange(e, "Carrera.nombre")}
+            onChange={(e) => handleChange2(e, "nombre")}
           />
         </Label>
         <div className=" mt-4">
@@ -438,7 +523,7 @@ const editarUbicacion = async (id: number) => {
             value={referenciaData.nombre === null ? "" : referenciaData.nombre}
             className="mt-1"
             placeholder="Escriba el nombre del contacto."
-            onChange={(e) => handleChange(e, "Referenia.nombre")}
+            onChange={(e) => handleChange3(e, "nombre")}
           />
         </Label>
          <Label className="mt-4">
@@ -447,7 +532,7 @@ const editarUbicacion = async (id: number) => {
             value={referenciaData.numeroCel === null ? "" : referenciaData.numeroCel}
             className="mt-1"
             placeholder="Escriba el numero del contacto."
-            onChange={(e) => handleChange(e, "Referencia.numeroCel")}
+            onChange={(e) => handleChange3(e, "numeroCel")}
           />
         </Label>
         <div className=" mt-4">
@@ -465,7 +550,7 @@ const editarUbicacion = async (id: number) => {
             value={ubicacionData.descripcion === null ? "" : ubicacionData.descripcion}
             className="mt-1"
             placeholder="Ingrese la ubicación del servicio"
-            onChange={(e) => handleChange(e, "Ubicacion.descripcion")}
+            onChange={(e) => handleChange4(e, "descripcion")}
           />
         </Label>
 

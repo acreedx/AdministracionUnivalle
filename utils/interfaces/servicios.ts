@@ -7,16 +7,25 @@ export interface ICrearServicios {
     descripcion:string | null;
     imagen: string | null;
     video: string | null;
+    serviciosId:number;
   };
   RequisitosAdd:{
     descripcion: string |null;
+    serviciosId: number;
+    pasos:[
+      {
+        nombre: string | null;
+      }
+    ]
   };
   CarreraAdd:{
     nombre: string | null;
+    serviciosId: number;
   };
   ReferenciaAdd:{
     nombre: string | null;
     numeroCel: string | null;
+    serviciosId: number;
   };
 }
 

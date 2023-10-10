@@ -19,49 +19,60 @@ function RegistrarServicioPage() {
   const [ubicaionVideo,setUVideo]:any = useState(null);
 
   const [servicioData, setServicioData] = useState<ICrearServicios>({
-    nombre: "",
-    moduloId: 1,
-    imagenUrl: "",
-    UbicacionAdd: {
-      descripcion: "",
-      imagen: "",
-      video: "",
-    },
-    RequisitosAdd: {
-      descripcion: "",
-    },
-    CarreraAdd: {
       nombre: "",
-    },
-    ReferenciaAdd: {
-      nombre: "",
-      numeroCel: "",
-    },
+      moduloId: 1,
+      imagenUrl: "",
+      UbicacionAdd: {
+        descripcion: "",
+        imagen: "",
+        video: "",
+        serviciosId: 0,
+      },
+      RequisitosAdd: {
+        descripcion: "",
+        serviciosId:0,
+        pasos:[
+          {
+            nombre:null
+          }
+        ],
+      },
+      CarreraAdd: {
+        nombre: "",
+        serviciosId:0,
+      },
+      ReferenciaAdd: {
+        nombre: "",
+        numeroCel: "",
+        serviciosId:0,
+      },
   });
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string, servicio:string) => {
-    setServicioData({
-      ...servicioData,
-      [servicio]:{
-        [campo]:e.target.value
-      }
-    });
-    
-  };
+const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string, servicio: string) => {
+  setServicioData((prevData:any) => ({
+    ...prevData,
+    [servicio]: {
+      ...prevData[servicio],
+      [campo]: e.target.value,
+    },
+  }));
+  console.log(servicioData)
+};
   const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, campo: string, servicio:string) => {
-    setServicioData({
-      ...servicioData,
-      [servicio]:{
-        [campo]:e.target.value
-      }
-    });
+    setServicioData((prevData:any) => ({
+    ...prevData,
+    [servicio]: {
+      ...prevData[servicio],
+      [campo]: e.target.value,
+    },
+  }));
+  console.log(servicioData)
   };
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setServicioData({
-      ...servicioData,
-      [campo]:e.target.value
-    });
-    servicioData.nombre;
+    setServicioData((prevData:any) => ({
+    ...prevData,
+      [campo]: e.target.value,
+  }));
+  console.log(servicioData)
   };
   const clearData = () => {
     setServicioData({
@@ -73,21 +84,31 @@ function RegistrarServicioPage() {
         descripcion: "",
         imagen: "",
         video: "",
+        serviciosId:0,
       },
       RequisitosAdd: {
         descripcion: "",
+        serviciosId:0,
+        pasos:[
+          {
+            nombre:null
+          }
+        ],
       },
       CarreraAdd: {
         nombre: "",
+        serviciosId:0,
       },
       ReferenciaAdd: {
         nombre: "",
         numeroCel: "",
+        serviciosId:0,
       },
     });
   };
   
   const registrarServicio = () => {
+    console.log(servicioData);
     fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails", {
       method: "POST",
       headers: {
@@ -119,7 +140,10 @@ const subirArchivos = async () =>{
     if(ubicaionVideo!=null){
      servicioData.UbicacionAdd.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
     }
-    console.log(servicioData);
+    servicioData.CarreraAdd.serviciosId=0;
+    servicioData.ReferenciaAdd.serviciosId=0;
+    servicioData.UbicacionAdd.serviciosId=0;
+    servicioData.RequisitosAdd.serviciosId=0;
     registrarServicio();
   }
 
@@ -171,33 +195,32 @@ const subirArchivos = async () =>{
             value={servicioData.CarreraAdd.nombre === null ? "" : servicioData.CarreraAdd.nombre}
             className="mt-1"
             placeholder="Escriba el nombre de la carrera."
-            onChange={(e) => console.log(handleChange(e, "nombre","CarreraAdd"))}
+            onChange={(e) => handleChange(e, "nombre","CarreraAdd")}
           />
         </Label>
       </div>
-       <SectionTitle>Contactos de referencia</SectionTitle>
+       <SectionTitle>Contacto de Referencia</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
-          <span>Nombre del Contacto</span>
+          <span>Nombre</span>
            <Input
             value={servicioData.ReferenciaAdd.nombre === null ? "" : servicioData.ReferenciaAdd.nombre}
             className="mt-1"
-            placeholder="Escriba el nombre del contacto."
-            onChange={(e) => console.log(handleChange(e, "nombre","ReferenciaAdd"))}
+            placeholder="Escriba el nombre del contacto"
+            onChange={(e) => handleChange(e, "nombre","ReferenciaAdd")}
           />
         </Label>
-         <Label className="mt-4">
-          <span>Número del Contacto</span>
+        <Label className="mt-4">
+          <span>Numero de Contacto</span>
            <Input
             value={servicioData.ReferenciaAdd.numeroCel === null ? "" : servicioData.ReferenciaAdd.numeroCel}
             className="mt-1"
-            placeholder="Escriba el numero del contacto."
+            placeholder="Escriba el número de celular del contacto"
             onChange={(e) => handleChange(e, "numeroCel","ReferenciaAdd")}
           />
         </Label>
       </div>
       <SectionTitle>Ubicación</SectionTitle>
-
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Ubicación</span>
