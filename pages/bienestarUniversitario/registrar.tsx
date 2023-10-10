@@ -105,7 +105,7 @@ const subirArchivos = async () =>{
     servicioData.Ubicacion.video =  null;
     servicioData.Ubicacion.imagen = null;
     servicioData.Servicio.imagenUrl= null;
-    if(serviceImg!=null)
+    if(serviceImg != null)
     {
       servicioData.Servicio.imagenUrl= await uploadFile(serviceImg,"servicios/");
     } 
