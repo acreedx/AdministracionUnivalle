@@ -2,27 +2,22 @@ export interface ICrearServicios {
   nombre: string;
   moduloId: number;
   imagenUrl: string | null;
-  
-  UbicacionAdd:{
-    descripcion:string | null;
+
+  UbicacionAdd: {
+    descripcion: string | null;
     imagen: string | null;
     video: string | null;
-    serviciosId:number;
-  };
-  RequisitosAdd:{
-    descripcion: string |null;
     serviciosId: number;
-    pasos:[
-      {
-        nombre: string | null;
-      }
-    ]
   };
-  CarreraAdd:{
+  RequisitosAdd: {
+    descripcion: string | null;
+    serviciosId: number;
+  };
+  CarreraAdd: {
     nombre: string | null;
     serviciosId: number;
   };
-  ReferenciaAdd:{
+  ReferenciaAdd: {
     nombre: string | null;
     numeroCel: string | null;
     serviciosId: number;
@@ -35,13 +30,13 @@ export interface IEditarServicio {
 }
 
 export interface IEditarUbicacion {
-  descripcion:string | null;
+  descripcion: string | null;
   imagen: string | null;
   video: string | null;
 }
 
-export interface IEditarRequisitos{
-  descripcion: string |null;
+export interface IEditarRequisitos {
+  descripcion: string | null;
 }
 
 export interface IEditarCarrera {
@@ -50,16 +45,16 @@ export interface IEditarCarrera {
 
 export interface IEditarReferencia {
   nombre: string | null;
-  numeroCel: string | null
+  numeroCel: string | null;
 }
 
-export interface IListarServicios{
+export interface IListarServicios {
   data: [
     {
-      identificador:number;
-      nombre:string | null;
-      modulo:string | null;
-      imagen:string;
+      identificador: number;
+      nombre: string | null;
+      modulo: string | null;
+      imagen: string;
     }
-  ]
+  ];
 }
