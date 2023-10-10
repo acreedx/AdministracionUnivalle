@@ -6,17 +6,25 @@ interface ICajasData {
   cellphone: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
-function convertirJson(data: any) {
-    const convertedData : ICajasData = {
-      id: data.id,
-      name: data.name,
-      ubicacion: data.ubicaciones[0].description,
-      encharged: data.referencia[0].nombre,
-      cellphone: data.referencia[0].numerocel,
-      status: data.estado ? "success" : "danger"
-    };
-    return convertedData;
+function convertJSONService(data: any) {
+  const convertedData: ICajasData = {
+    id: data.id,
+    name: data.nombre,
+    ubicacion: data.ubicaciones[0].descripcion,
+    encharged: data.referencia[0].nombre,
+    cellphone: data.referencia[0].numerocel,
+    status: data.estado == true ? "success" : "danger",
+  };
+  return convertedData;
 }
+function convertJSONListService(data: any) {
+  const convertedListData: ICajasData[] = [];
+  data.forEach((e: any) => {
+    convertedListData.push(convertJSONService(e));
+  });
+  return convertedListData;
+}
+
 const tableData: ICajasData[] = [
   {
     id: 6,
@@ -26,7 +34,7 @@ const tableData: ICajasData[] = [
     cellphone: "1234567",
     status: "neutral",
   },
-  
+
   {
     id: 7,
     name: "Cobro de Trámites",
@@ -47,4 +55,4 @@ const tableData: ICajasData[] = [
 
 export default tableData;
 export type { ICajasData };
-export type { convertirJson };
+export { convertJSONService, convertJSONListService };

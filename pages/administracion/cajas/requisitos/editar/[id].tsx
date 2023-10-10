@@ -1,21 +1,62 @@
-import React from 'react'
-
-import { Input, HelperText, Label, Select, Textarea } from '@roketid/windmill-react-ui'
-import PageTitle from 'example/components/Typography/PageTitle'
-
+import React, { useState, useEffect } from "react";
+import { Input, Label } from "@roketid/windmill-react-ui";
+import PageTitle from "example/components/Typography/PageTitle";
 import { useRouter } from "next/router";
-import Layout from 'example/containers/Layout'
+import Layout from "example/containers/Layout";
+import Link from "next/link";
+import URL from "utils/demo/api";
+import { Button } from "@roketid/windmill-react-ui";
+import { GetServerSidePropsContext } from "next";
 
-function CrearRequisito() {
+interface props {
+  id: number;
+}
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { id } = context.query;
+  return {
+    props: {
+      id,
+    },
+  };
+}
+
+function CrearRequisito({ id }: props) {
+  const route = "Requisitos/getRequisitosById/";
   const router = useRouter();
-  const { id } = router.query;
+  const [requirement, setrequirement] = useState("");
+  useEffect(() => {
+    async function doFetch() {
+      fetch(`${URL.baseUrl}${route}${id}`)
+        .then((res) => res.json())
+        .then((res) => setrequirement(res.data[0].descripcion));
+    }
+    doFetch();
+  }, []);
+
   return (
     <Layout>
       <PageTitle>Editar un requisito</PageTitle>
+
+      <div className="mb-4">
+        <Link href="#">
+          <Button size="small" onClick={() => router.back()}>
+            <span className="mr-2" aria-hidden="true">
+              {"←"}
+            </span>
+            Volver
+          </Button>
+        </Link>
+      </div>
+
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Descripción del requisito</span>
-          <Input className="mt-1" placeholder={id?.toString()}/>
+          <Input
+            className="mt-1"
+            placeholder="Ingrese la descripcion de este requisito"
+            value={requirement}
+            onChange={(e) => setrequirement(e.target.value)}
+          />
         </Label>
         <Label className="mt-4">
           <div className="relative text-gray-500 focus-within:text-purple-600">
@@ -30,7 +71,7 @@ function CrearRequisito() {
         </Label>
       </div>
     </Layout>
-  )
+  );
 }
 
-export default CrearRequisito
+export default CrearRequisito;

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import CTA from "example/components/CTA";
-import { Input, HelperText, Label, Select, Textarea } from '@roketid/windmill-react-ui'
 import {
   Table,
   TableHeader,
@@ -13,81 +11,43 @@ import {
   TableFooter,
   TableContainer,
   Badge,
-  Avatar,
   Button,
   Pagination,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
-
-import response, { ICajasData } from "utils/demo/cajasData";
+import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
+import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
-const response2 = response.concat([]);
-
-      /*<Label>
-          <span>Horarios de atención</span>
-          <Input className="mt-1" placeholder="Jane Doe" />
-      </Label>
-      <Label>
-          <span>Ubicación</span>
-          <Input className="mt-1" placeholder="Jane Doe" />
-      </Label>
-      <Label>
-          <span>Imagen</span>
-          <Input className="mt-1" placeholder="Jane Doe" />
-      </Label>
-      <Label>
-          <span>Video de referencia</span>
-          <Input className="mt-1" placeholder="Jane Doe" />
-      </Label>*/
-      
 function Cajas() {
-  const ModuleId = 2;
-  const [pageTable1, setPageTable1] = useState(1);
-  const [pageTable2, setPageTable2] = useState(1);
-
-  const [dataTable1, setDataTable1] = useState<ICajasData[]>([]);
-  const [dataTable2, setDataTable2] = useState<ICajasData[]>([]);
-
-  const resultsPerPage = 10;
-  const totalResults = response.length;
-  const url = "https://localhost:7066/api/Servicios/getServicioByModule/";
+  const route = "Servicios/getServicioByModule/";
   const moduleName = "Cajas";
+  const resultsPerPage = 10;
   useEffect(() => {
     async function doFetch() {
-        //fetch(`${url}${moduleName}`)
-        fetch(`https://localhost:7066/api/Servicios/getServicioByModule/Cajas`)
-        .then(res => res.json())
-        .then((res) => console.log(res.data[0])
-        );
+      fetch(`${URL.baseUrl}${route}${moduleName}`)
+        .then((res) => res.json())
+        .then((res) => setServices(convertJSONListService(res.data)));
     }
     doFetch();
   }, []);
-  function onPageChangeTable1(p: number) {
-    setPageTable1(p);
-  }
+
+  const [pageTable, setPageTable] = useState(1);
+  const [services, setServices] = useState<ICajasData[]>([]);
+  const totalResults = services.length;
 
   function onPageChangeTable2(p: number) {
-    setPageTable2(p);
+    setPageTable(p);
   }
 
   useEffect(() => {
-    setDataTable1(
-      response.slice(
-        (pageTable1 - 1) * resultsPerPage,
-        pageTable1 * resultsPerPage
+    setServices(
+      services.slice(
+        (pageTable - 1) * resultsPerPage,
+        pageTable * resultsPerPage
       )
     );
-  }, [pageTable1]);
-
-  useEffect(() => {
-    setDataTable2(
-      response2.slice(
-        (pageTable2 - 1) * resultsPerPage,
-        pageTable2 * resultsPerPage
-      )
-    );
-  }, [pageTable2]);
+  }, [pageTable]);
 
   return (
     <Layout>
@@ -107,7 +67,7 @@ function Cajas() {
             </tr>
           </TableHeader>
           <TableBody>
-            {dataTable2.map((servicio, i) => (
+            {services.map((servicio, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
@@ -138,7 +98,11 @@ function Cajas() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge type={"neutral"}>{servicio.status}</Badge>
+                  <Badge
+                    type={servicio.status == "success" ? "success" : "danger"}
+                  >
+                    {servicio.status == "success" ? "Activo" : "Inactivo"}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
@@ -146,9 +110,9 @@ function Cajas() {
                       href={`/administracion/cajas/editar/[id]`}
                       as={`/administracion/cajas/editar/${servicio.id}`}
                     >
-                    <Button layout="link" size="small" aria-label="Edit">
-                      <EditIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                      <Button layout="link" size="small" aria-label="Edit">
+                        <EditIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
                     </Link>
                     <Button layout="link" size="small" aria-label="Delete">
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
