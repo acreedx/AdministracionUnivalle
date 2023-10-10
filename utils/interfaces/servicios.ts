@@ -5,19 +5,19 @@ export interface ICrearServicios {
     imagenUrl: string | null;
   };
   Ubicacion:{
-    Descripcion:string | null;
-    Imagen: string | null;
-    Video: string | null;
+    descripcion:string | null;
+    imagen: string | null;
+    video: string | null;
   };
   Requisitos:{
-    Descripcion: string | null;
+    descripcion: string |null;
   };
   Carrera:{
-    Nombre: string | null;
+    nombre: string | null;
   };
   Referencia:{
-    Nombre: string | null;
-    NumeroCel: string | null
+    nombre: string | null;
+    numeroCel: string | null
   };
 }
 
@@ -26,6 +26,24 @@ export interface IEditarServicio {
   imagenUrl: string | null;
 }
 
+export interface IEditarUbicacion {
+  descripcion:string | null;
+  imagen: string | null;
+  video: string | null;
+}
+
+export interface IEditarRequisitos{
+  descripcion: string |null;
+}
+
+export interface IEditarCarrera {
+  nombre: string | null;
+}
+
+export interface IEditarReferencia {
+  nombre: string | null;
+  numeroCel: string | null
+}
 
 export interface IListarServicios{
   data: [
