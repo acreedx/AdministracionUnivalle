@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import { ICrearServicios } from "../../utils/interfaces/servicios";
-import { Input, Label, HelperText } from "@roketid/windmill-react-ui";
+import { Input, Label, HelperText,Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -13,10 +13,27 @@ import {
 import { ToastContainer } from "react-toastify";
 
 function RegistrarServicioPage() {
-  const [servicioData, setServicioData] = useState<ICrearServicios>({
-    nombre: "",
-    moduloId: 1,
-    imagenUrl: null,
+ const [servicioData, setServicioData] = useState<ICrearServicios>({
+    Servicio: {
+      nombre: "",
+      moduloId: 1,
+      imagenUrl: null,
+    },
+    Ubicacion: {
+      Descripcion: null,
+      Imagen: null,
+      Video: null,
+    },
+    Requisitos: {
+      Descripcion: null,
+    },
+    Carrera: {
+      Nombre: null,
+    },
+    Referencia: {
+      Nombre: null,
+      NumeroCel: null,
+    },
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
@@ -29,8 +46,26 @@ function RegistrarServicioPage() {
   const clearData = () => {
     setServicioData({
       ...servicioData,
+      Servicio: {
       nombre: "",
+      moduloId: 1,
       imagenUrl: null,
+    },
+    Ubicacion: {
+      Descripcion: null,
+      Imagen: null,
+      Video: null,
+    },
+    Requisitos: {
+      Descripcion: null,
+    },
+    Carrera: {
+      Nombre: null,
+    },
+    Referencia: {
+      Nombre: null,
+      NumeroCel: null,
+    },
     });
   };
 
@@ -55,13 +90,13 @@ function RegistrarServicioPage() {
   return (
     <Layout>
       <PageTitle>Registrar servicio - Bienestar Universitario</PageTitle>
-      <SectionTitle>Rellene los siguientes campos</SectionTitle>
+      <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Nombre del servicio</span>
           <Input
-            value={servicioData.nombre}
+            value={servicioData.Servicio.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange(e, "nombre")}
@@ -69,18 +104,87 @@ function RegistrarServicioPage() {
         </Label>
 
         <Label className="mt-4">
-          <span>Url de la imagen de referencia del servicio</span>
+          <span>Imagen de referencia para el servicio</span>
           <Input
-            value={
-              servicioData.imagenUrl === null ? "" : servicioData.imagenUrl
-            }
+            type="file"
             className="mt-1"
-            placeholder="Escriba aquí la url de la imagen"
-            onChange={(e) => handleChange(e, "imagenUrl")}
+            placeholder="Imagen para el servicio"
+            
           />
         </Label>
       </div>
+      <SectionTitle>Requisitos</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label className="mt-4">
+          <span>Descripción</span>
+          <Textarea className="mt-1" rows={3} placeholder="Ingresa los requisitos del servicio." />
+        </Label>
+      </div>
+       <SectionTitle>Carrera</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label className="mt-4">
+          <span>Nombre</span>
+           <Input
+            value={servicioData.nombre}
+            className="mt-1"
+            placeholder="Escriba el nombre de la carrera."
+            onChange={(e) => handleChange(e, "nombre")}
+          />
+        </Label>
+      </div>
+       <SectionTitle>Contactos de referencia</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label className="mt-4">
+          <span>Nombre del Contacto</span>
+           <Input
+            value={servicioData.nombre}
+            className="mt-1"
+            placeholder="Escriba el nombre de la carrera."
+            onChange={(e) => handleChange(e, "nombre")}
+          />
+        </Label>
+         <Label className="mt-4">
+          <span>Número del Contacto</span>
+           <Input
+            value={servicioData.nombre}
+            className="mt-1"
+            placeholder="Escriba el nombre de la carrera."
+            onChange={(e) => handleChange(e, "nombre")}
+          />
+        </Label>
+      </div>
+      <SectionTitle>Ubicación</SectionTitle>
 
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label>
+          <span>Ubicación</span>
+          <Input
+            value={servicioData.nombre}
+            className="mt-1"
+            placeholder="Ingrese la ubicación del servicio"
+            onChange={(e) => handleChange(e, "nombre")}
+          />
+        </Label>
+
+        <Label className="mt-4">
+          <span>Imagen de la ubicación del servicio</span>
+          <Input
+            type="file"
+            className="mt-1"
+            placeholder="Imagen para ubicación"
+            
+          />
+        </Label>
+        <Label className="mt-4">
+          <span>Video de la ubicación del servicio</span>
+          <Input
+            type="file"
+            className="mt-1"
+            placeholder="Imagen para ubicación"
+            
+          />
+        </Label>
+      </div>
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
           <Button size="large">Volver</Button>
