@@ -53,7 +53,11 @@ function Requisitos({ id, name }: props) {
     async function doFetch() {
       fetch(`${URL.baseUrl}${route}${id}`)
         .then((res) => res.json())
-        .then((res) => setRequirements(convertJSONListRequirement(res.data)));
+        .then((res) =>
+          res.data != null
+            ? setRequirements(convertJSONListRequirement(res.data))
+            : console.log("No se encontraron requisitos")
+        );
     }
     doFetch();
   }, []);

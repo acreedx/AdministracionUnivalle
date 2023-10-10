@@ -49,9 +49,7 @@ function EditarServicio({ id }: props) {
   const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
   const updateReferencesRoute = "Referencia/UpdateReferences/";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     await fetch(`${URL.baseUrl}${updateServiceRoute}${id}`, {
       method: "PUT",
       headers: {
@@ -62,30 +60,36 @@ function EditarServicio({ id }: props) {
         imagenUrl: "",
       }),
     });
-    await fetch(`${URL.baseUrl}${updateUbicacionRoute}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        descripcion: ubicacion,
-        imagen: "",
-        video: "",
-        serviciosId: id,
-        estado: service?.status == "success" ? true : false,
-      }),
-    });
-    await fetch(`${URL.baseUrl}${updateReferencesRoute}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: encharged,
-        numerocel: cellphone,
-        serviciosId: id,
-      }),
-    });
+    await fetch(
+      `${URL.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          descripcion: ubicacion,
+          imagen: "",
+          video: "",
+          serviciosId: id,
+          estado: service?.status == "success" ? true : false,
+        }),
+      }
+    );
+    await fetch(
+      `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: encharged,
+          numerocel: cellphone,
+          serviciosId: id,
+        }),
+      }
+    );
     router.back();
   };
 
@@ -99,10 +103,7 @@ function EditarServicio({ id }: props) {
   }, [service]);
 
   const handleAlertConfirm = () => {
-    const form = document.getElementById("miFormulario") as HTMLFormElement;
-    if (form) {
-      form.submit();
-    }
+    handleSubmit();
   };
 
   const handleAlertCancel = () => {

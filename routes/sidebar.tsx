@@ -35,7 +35,7 @@ const routes: IRoute[] = [
   {
     path: "/example/forms",
     icon: "FormsIcon",
-    name: "Forms",
+    name: "Cajas",
     routes: [
       {
         path: "/administracion/cajas",

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -19,8 +20,12 @@ import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
 import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
+import SweetAlert from "react-bootstrap-sweetalert";
 function Cajas() {
+  const router = useRouter();
+
   const route = "Servicios/getServicioByModule/";
+  const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Cajas";
   const resultsPerPage = 10;
   useEffect(() => {
@@ -32,6 +37,8 @@ function Cajas() {
     doFetch();
   }, []);
 
+  const [selectedService, setSelectedService] = useState<number>(0);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
   const [pageTable, setPageTable] = useState(1);
   const [services, setServices] = useState<ICajasData[]>([]);
   const totalResults = services.length;
@@ -49,6 +56,23 @@ function Cajas() {
     );
   }, [pageTable]);
 
+  const handleSubmit = async () => {
+    await fetch(`${URL.baseUrl}${deleteServiceRoute}${selectedService}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    router.reload();
+  };
+
+  const handleAlertConfirm = () => {
+    handleSubmit();
+  };
+
+  const handleAlertCancel = () => {
+    setShowAlert(false);
+  };
   return (
     <Layout>
       <PageTitle>Cajas</PageTitle>
@@ -114,9 +138,31 @@ function Cajas() {
                         <EditIcon className="w-5 h-5" aria-hidden="true" />
                       </Button>
                     </Link>
-                    <Button layout="link" size="small" aria-label="Delete">
+                    <Button
+                      layout="link"
+                      size="small"
+                      aria-label="Delete"
+                      type={"button"}
+                      onClick={() => {
+                        setShowAlert(true);
+                        setSelectedService(servicio.id);
+                      }}
+                    >
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
+                    {showAlert && (
+                      <SweetAlert
+                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                        title="Atención"
+                        confirmBtnText="Confirmar"
+                        cancelBtnText="Cancelar"
+                        showCancel
+                        onConfirm={handleAlertConfirm}
+                        onCancel={handleAlertCancel}
+                      >
+                        Confirma todos los datos del nuevo servicio?
+                      </SweetAlert>
+                    )}
                     <Link
                       href={`/administracion/cajas/[id]/[name]`}
                       as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
