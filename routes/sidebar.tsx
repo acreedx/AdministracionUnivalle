@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-      ? pathname.indexOf(route.path) === 0
-      : false;
+    ? pathname.indexOf(route.path) === 0
+    : false;
 }
 
 const routes: IRoute[] = [
@@ -33,8 +33,9 @@ const routes: IRoute[] = [
     exact: true,
   },
   {
+    path: "/example/forms",
     icon: "FormsIcon",
-    name: "Cajas",
+    name: "Forms",
     routes: [
       {
         path: "/administracion/cajas",
@@ -63,7 +64,6 @@ const routes: IRoute[] = [
         path: "/example/forgot-password",
         name: "Forgot password",
       },
-
     ],
   },
   {
@@ -122,6 +122,22 @@ const routes: IRoute[] = [
         name: "Blank",
       },
     ],
+  },
+  {
+    path: "/bienestarUniversitario",
+    icon: "HomeIcon",
+    name: "Bienestar Universitario",
+    routes: [
+      {
+        path: "/bienestarUniversitario",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/bienestarUniversitario/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
   },
 ];
 
