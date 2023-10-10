@@ -31,7 +31,7 @@ function BienestarUniversitario() {
 
   // setup data for every table
   const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
-
+  const [TotalResult,setTotal]= useState(Number);
   // pagination setup
   const resultsPerPage = 10;
 
@@ -51,10 +51,11 @@ function BienestarUniversitario() {
     const getData = async () => {
       const query = await fetch('http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1');
       const response:any= await query.json();
+      setTotal(response.data.length);
       setUserInfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
     }
     getData();
-  }, []);
+  }, [pageTable2]);
 
   return (
     <Layout>
@@ -114,7 +115,7 @@ function BienestarUniversitario() {
         </Table>
         <TableFooter>
           <Pagination
-            totalResults={dataTable2.length}
+            totalResults={TotalResult}
             resultsPerPage={resultsPerPage}
             onChange={onPageChangeTable2}
             label="Table navigation"

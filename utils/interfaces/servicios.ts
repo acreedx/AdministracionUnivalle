@@ -1,23 +1,22 @@
 export interface ICrearServicios {
-  Servicio:{
-    nombre: string;
-    moduloId: number;
-    imagenUrl: string | null;
-  };
-  Ubicacion:{
+  nombre: string;
+  moduloId: number;
+  imagenUrl: string | null;
+  
+  UbicacionAdd:{
     descripcion:string | null;
     imagen: string | null;
     video: string | null;
   };
-  Requisitos:{
+  RequisitosAdd:{
     descripcion: string |null;
   };
-  Carrera:{
+  CarreraAdd:{
     nombre: string | null;
   };
-  Referencia:{
+  ReferenciaAdd:{
     nombre: string | null;
-    numeroCel: string | null
+    numeroCel: string | null;
   };
 }
 

@@ -14,30 +14,28 @@ import { ToastContainer } from "react-toastify";
 import {uploadFile} from "../../firebase/config"
 function RegistrarServicioPage() {
 
-  const [serviceImg,setImg]:any = useState(null)
-  const [ubicacionImg,setUImg]:any = useState(null)
-  const [ubicaionVideo,setUVideo]:any = useState(null)
+  const [serviceImg,setImg]:any = useState(null);
+  const [ubicacionImg,setUImg]:any = useState(null);
+  const [ubicaionVideo,setUVideo]:any = useState(null);
 
   const [servicioData, setServicioData] = useState<ICrearServicios>({
-    Servicio: {
+    nombre: "",
+    moduloId: 1,
+    imagenUrl: "",
+    UbicacionAdd: {
+      descripcion: "",
+      imagen: "",
+      video: "",
+    },
+    RequisitosAdd: {
+      descripcion: "",
+    },
+    CarreraAdd: {
       nombre: "",
-      moduloId: 1,
-      imagenUrl: null,
     },
-    Ubicacion: {
-      descripcion: null,
-      imagen: null,
-      video: null,
-    },
-    Requisitos: {
-      descripcion: null,
-    },
-    Carrera: {
-      nombre: null,
-    },
-    Referencia: {
-      nombre: null,
-      numeroCel: null,
+    ReferenciaAdd: {
+      nombre: "",
+      numeroCel: "",
     },
   });
 
@@ -48,6 +46,7 @@ function RegistrarServicioPage() {
         [campo]:e.target.value
       }
     });
+    
   };
   const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, campo: string, servicio:string) => {
     setServicioData({
@@ -57,27 +56,31 @@ function RegistrarServicioPage() {
       }
     });
   };
-
+  const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    setServicioData({
+      ...servicioData,
+      [campo]:e.target.value
+    });
+    servicioData.nombre;
+  };
   const clearData = () => {
     setServicioData({
       ...servicioData,
-        Servicio: {
-        nombre: "",
-        moduloId: 1,
-        imagenUrl: null,
-      },
-      Ubicacion: {
+      nombre: "",
+      moduloId: 1,
+      imagenUrl: "",
+      UbicacionAdd: {
         descripcion: "",
-        imagen: null,
-        video: null,
+        imagen: "",
+        video: "",
       },
-      Requisitos: {
+      RequisitosAdd: {
         descripcion: "",
       },
-      Carrera: {
+      CarreraAdd: {
         nombre: "",
       },
-      Referencia: {
+      ReferenciaAdd: {
         nombre: "",
         numeroCel: "",
       },
@@ -85,7 +88,7 @@ function RegistrarServicioPage() {
   };
   
   const registrarServicio = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -102,21 +105,22 @@ function RegistrarServicioPage() {
       .catch(() => errorAlert("Error al registrar los datos"));
   };
 const subirArchivos = async () =>{
-    servicioData.Ubicacion.video =  null;
-    servicioData.Ubicacion.imagen = null;
-    servicioData.Servicio.imagenUrl= null;
+    servicioData.UbicacionAdd.video =  null;
+    servicioData.UbicacionAdd.imagen = null;
+    servicioData.imagenUrl= null;
     if(serviceImg != null)
     {
-      servicioData.Servicio.imagenUrl= await uploadFile(serviceImg,"servicios/");
+      servicioData.imagenUrl= await uploadFile(serviceImg,"servicios/");
     } 
     if(ubicacionImg!=null){
-      servicioData.Ubicacion.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
+      servicioData.UbicacionAdd.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
 
     }
     if(ubicaionVideo!=null){
-     servicioData.Ubicacion.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
+     servicioData.UbicacionAdd.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
     }
-    //registrarServicio();
+    console.log(servicioData);
+    registrarServicio();
   }
 
   return (
@@ -128,17 +132,17 @@ const subirArchivos = async () =>{
         <Label>
           <span>Nombre del servicio</span>
           <Input
-            value={servicioData.Servicio.nombre}
+            value={servicioData.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
-            onChange={(e) => handleChange(e, "nombre","Servicio")}
+            onChange={(e) => handleChange2(e, "nombre")}
           />
         </Label>
 
         <Label className="mt-4">
           <span>Imagen de referencia para el servicio</span>
           <Input
-            value={servicioData.Servicio.imagenUrl === null ? "" : servicioData.Servicio.imagenUrl}
+            //value={servicioData.imagenUrl === null ? "" : servicioData.imagenUrl}
             type="file"
             className="mt-1"
             placeholder="Imagen para el servicio"
@@ -151,11 +155,11 @@ const subirArchivos = async () =>{
         <Label >
           <span>Descripción</span>
           <Textarea 
-          value={servicioData.Requisitos.descripcion === null ? "" : servicioData.Requisitos.descripcion}
+          value={servicioData.RequisitosAdd.descripcion === null ? "" : servicioData.RequisitosAdd.descripcion}
           className="mt-1" 
           rows={3} 
           placeholder="Ingresa los requisitos del servicio." 
-          onChange={(e) => handleChange1(e, "descripcion","Requisitos")}
+          onChange={(e) => handleChange1(e, "descripcion","RequisitosAdd")}
           />
         </Label>
       </div>
@@ -164,10 +168,10 @@ const subirArchivos = async () =>{
         <Label>
           <span>Nombre</span>
            <Input
-            value={servicioData.Carrera.nombre === null ? "" : servicioData.Carrera.nombre}
+            value={servicioData.CarreraAdd.nombre === null ? "" : servicioData.CarreraAdd.nombre}
             className="mt-1"
             placeholder="Escriba el nombre de la carrera."
-            onChange={(e) => console.log(handleChange(e, "nombre","Carrera"))}
+            onChange={(e) => console.log(handleChange(e, "nombre","CarreraAdd"))}
           />
         </Label>
       </div>
@@ -176,19 +180,19 @@ const subirArchivos = async () =>{
         <Label>
           <span>Nombre del Contacto</span>
            <Input
-            value={servicioData.Referencia.nombre === null ? "" : servicioData.Referencia.nombre}
+            value={servicioData.ReferenciaAdd.nombre === null ? "" : servicioData.ReferenciaAdd.nombre}
             className="mt-1"
             placeholder="Escriba el nombre del contacto."
-            onChange={(e) => handleChange(e, "nombre","Referencia")}
+            onChange={(e) => console.log(handleChange(e, "nombre","ReferenciaAdd"))}
           />
         </Label>
          <Label className="mt-4">
           <span>Número del Contacto</span>
            <Input
-            value={servicioData.Referencia.numeroCel === null ? "" : servicioData.Referencia.numeroCel}
+            value={servicioData.ReferenciaAdd.numeroCel === null ? "" : servicioData.ReferenciaAdd.numeroCel}
             className="mt-1"
             placeholder="Escriba el numero del contacto."
-            onChange={(e) => handleChange(e, "numeroCel","Referencia")}
+            onChange={(e) => handleChange(e, "numeroCel","ReferenciaAdd")}
           />
         </Label>
       </div>
@@ -198,17 +202,17 @@ const subirArchivos = async () =>{
         <Label>
           <span>Ubicación</span>
           <Input
-            value={servicioData.Ubicacion.descripcion === null ? "" : servicioData.Ubicacion.descripcion}
+            value={servicioData.UbicacionAdd.descripcion === null ? "" : servicioData.UbicacionAdd.descripcion}
             className="mt-1"
             placeholder="Ingrese la ubicación del servicio"
-            onChange={(e) => handleChange(e, "descripcion","Ubicacion")}
+            onChange={(e) => handleChange(e, "descripcion","UbicacionAdd")}
           />
         </Label>
 
         <Label className="mt-4">
           <span>Imagen de la ubicación del servicio</span>
           <Input
-            value={servicioData.Ubicacion.imagen === null ? "" : servicioData.Ubicacion.imagen}
+            //value={servicioData.Ubicacion.imagen === null ? "" : servicioData.Ubicacion.imagen}
             type="file"
             className="mt-1"
             placeholder="Imagen para ubicación"
@@ -218,7 +222,7 @@ const subirArchivos = async () =>{
         <Label className="mt-4">
           <span>Video de la ubicación del servicio</span>
           <Input
-            value={servicioData.Ubicacion.video === null ? "" : servicioData.Ubicacion.video}
+            //value={servicioData.Ubicacion.video === null ? "" : servicioData.Ubicacion.video}
             type="file"
             className="mt-1"
             placeholder="Imagen para ubicación"
