@@ -1,6 +1,6 @@
 import React, { useState, ChangeEvent } from "react";
 import { ICrearServicios } from "../../utils/interfaces/servicios";
-import { Input, Label, HelperText } from "@roketid/windmill-react-ui";
+import { Input, Label, HelperText,Textarea, Alert } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -11,31 +11,84 @@ import {
   warningAlert,
 } from "../../components/alerts";
 import { ToastContainer } from "react-toastify";
-
+import {uploadFile} from "../../firebase/config"
 function RegistrarServicioPage() {
+
+  const [serviceImg,setImg]:any = useState(null);
+  const [ubicacionImg,setUImg]:any = useState(null);
+  const [ubicaionVideo,setUVideo]:any = useState(null);
+
   const [servicioData, setServicioData] = useState<ICrearServicios>({
     nombre: "",
     moduloId: 1,
-    imagenUrl: null,
+    imagenUrl: "",
+    UbicacionAdd: {
+      descripcion: "",
+      imagen: "",
+      video: "",
+    },
+    RequisitosAdd: {
+      descripcion: "",
+    },
+    CarreraAdd: {
+      nombre: "",
+    },
+    ReferenciaAdd: {
+      nombre: "",
+      numeroCel: "",
+    },
   });
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string, servicio:string) => {
     setServicioData({
       ...servicioData,
-      [campo]: e.target.value,
+      [servicio]:{
+        [campo]:e.target.value
+      }
+    });
+    
+  };
+  const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, campo: string, servicio:string) => {
+    setServicioData({
+      ...servicioData,
+      [servicio]:{
+        [campo]:e.target.value
+      }
     });
   };
-
+  const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    setServicioData({
+      ...servicioData,
+      [campo]:e.target.value
+    });
+    servicioData.nombre;
+  };
   const clearData = () => {
     setServicioData({
       ...servicioData,
       nombre: "",
-      imagenUrl: null,
+      moduloId: 1,
+      imagenUrl: "",
+      UbicacionAdd: {
+        descripcion: "",
+        imagen: "",
+        video: "",
+      },
+      RequisitosAdd: {
+        descripcion: "",
+      },
+      CarreraAdd: {
+        nombre: "",
+      },
+      ReferenciaAdd: {
+        nombre: "",
+        numeroCel: "",
+      },
     });
   };
-
+  
   const registrarServicio = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -51,11 +104,29 @@ function RegistrarServicioPage() {
       })
       .catch(() => errorAlert("Error al registrar los datos"));
   };
+const subirArchivos = async () =>{
+    servicioData.UbicacionAdd.video =  null;
+    servicioData.UbicacionAdd.imagen = null;
+    servicioData.imagenUrl= null;
+    if(serviceImg != null)
+    {
+      servicioData.imagenUrl= await uploadFile(serviceImg,"servicios/");
+    } 
+    if(ubicacionImg!=null){
+      servicioData.UbicacionAdd.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
+
+    }
+    if(ubicaionVideo!=null){
+     servicioData.UbicacionAdd.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
+    }
+    console.log(servicioData);
+    registrarServicio();
+  }
 
   return (
     <Layout>
       <PageTitle>Registrar servicio - Bienestar Universitario</PageTitle>
-      <SectionTitle>Rellene los siguientes campos</SectionTitle>
+      <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
@@ -64,23 +135,101 @@ function RegistrarServicioPage() {
             value={servicioData.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
-            onChange={(e) => handleChange(e, "nombre")}
+            onChange={(e) => handleChange2(e, "nombre")}
           />
         </Label>
 
         <Label className="mt-4">
-          <span>Url de la imagen de referencia del servicio</span>
+          <span>Imagen de referencia para el servicio</span>
           <Input
-            value={
-              servicioData.imagenUrl === null ? "" : servicioData.imagenUrl
-            }
+            //value={servicioData.imagenUrl === null ? "" : servicioData.imagenUrl}
+            type="file"
             className="mt-1"
-            placeholder="Escriba aquí la url de la imagen"
-            onChange={(e) => handleChange(e, "imagenUrl")}
+            placeholder="Imagen para el servicio"
+            onChange={e => setImg(e.target.files?.[0] || null)}
           />
         </Label>
       </div>
+      <SectionTitle>Requisitos</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label >
+          <span>Descripción</span>
+          <Textarea 
+          value={servicioData.RequisitosAdd.descripcion === null ? "" : servicioData.RequisitosAdd.descripcion}
+          className="mt-1" 
+          rows={3} 
+          placeholder="Ingresa los requisitos del servicio." 
+          onChange={(e) => handleChange1(e, "descripcion","RequisitosAdd")}
+          />
+        </Label>
+      </div>
+       <SectionTitle>Carrera</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label>
+          <span>Nombre</span>
+           <Input
+            value={servicioData.CarreraAdd.nombre === null ? "" : servicioData.CarreraAdd.nombre}
+            className="mt-1"
+            placeholder="Escriba el nombre de la carrera."
+            onChange={(e) => console.log(handleChange(e, "nombre","CarreraAdd"))}
+          />
+        </Label>
+      </div>
+       <SectionTitle>Contactos de referencia</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label>
+          <span>Nombre del Contacto</span>
+           <Input
+            value={servicioData.ReferenciaAdd.nombre === null ? "" : servicioData.ReferenciaAdd.nombre}
+            className="mt-1"
+            placeholder="Escriba el nombre del contacto."
+            onChange={(e) => console.log(handleChange(e, "nombre","ReferenciaAdd"))}
+          />
+        </Label>
+         <Label className="mt-4">
+          <span>Número del Contacto</span>
+           <Input
+            value={servicioData.ReferenciaAdd.numeroCel === null ? "" : servicioData.ReferenciaAdd.numeroCel}
+            className="mt-1"
+            placeholder="Escriba el numero del contacto."
+            onChange={(e) => handleChange(e, "numeroCel","ReferenciaAdd")}
+          />
+        </Label>
+      </div>
+      <SectionTitle>Ubicación</SectionTitle>
 
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label>
+          <span>Ubicación</span>
+          <Input
+            value={servicioData.UbicacionAdd.descripcion === null ? "" : servicioData.UbicacionAdd.descripcion}
+            className="mt-1"
+            placeholder="Ingrese la ubicación del servicio"
+            onChange={(e) => handleChange(e, "descripcion","UbicacionAdd")}
+          />
+        </Label>
+
+        <Label className="mt-4">
+          <span>Imagen de la ubicación del servicio</span>
+          <Input
+            //value={servicioData.Ubicacion.imagen === null ? "" : servicioData.Ubicacion.imagen}
+            type="file"
+            className="mt-1"
+            placeholder="Imagen para ubicación"
+            onChange={e => setUImg(e.target.files?.[0] || null)}
+          />
+        </Label>
+        <Label className="mt-4">
+          <span>Video de la ubicación del servicio</span>
+          <Input
+            //value={servicioData.Ubicacion.video === null ? "" : servicioData.Ubicacion.video}
+            type="file"
+            className="mt-1"
+            placeholder="Imagen para ubicación"
+            onChange={e => setUVideo(e.target.files?.[0] || null)}
+          />
+        </Label>
+      </div>
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
           <Button size="large">Volver</Button>
@@ -93,7 +242,7 @@ function RegistrarServicioPage() {
         </div>
 
         <div>
-          <Button size="large" onClick={registrarServicio}>
+          <Button size="large" onClick={subirArchivos}>
             Registrar
           </Button>
         </div>
