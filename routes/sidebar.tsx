@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-    ? pathname.indexOf(route.path) === 0
-    : false;
+      ? pathname.indexOf(route.path) === 0
+      : false;
 }
 
 const routes: IRoute[] = [
@@ -44,6 +44,40 @@ const routes: IRoute[] = [
       {
         path: "/administracion/cajas/crear",
         name: "Crear",
+      },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Tramites",
+    routes: [
+      {
+        path: "/administracion/tramites",
+        name: "Listar",
+      },
+      {
+        path: "/administracion/tramites/crear",
+        name: "Crear",
+      },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Tipos de tramites",
+    routes: [
+      {
+        path: "/administracion/tramites/categorias",
+        name: "Listar",
+      },
+      {
+        path: "/administracion/tramites/categorias/crear",
+        name: "Crear",
+      },
+      {
+        path: "/administracion/tramites/categorias/inactivos",
+        name: "Listar Deshabilitados",
       },
     ],
   },
