@@ -15,9 +15,9 @@ import {
   Button,
   Pagination,
 } from "@roketid/windmill-react-ui";
-
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
-import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
+//import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
+import { ITramitesData, convertJSONListService } from "utils/demo/tramitesData";
 import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
@@ -27,7 +27,7 @@ function Tramites() {
 
   const route = "Servicios/getServicioByModule/";
   const deleteServiceRoute = "Servicios/deleteServicio/";
-  const moduleName = "Cajas";
+  const moduleName = "Tramites";
   const resultsPerPage = 10;
   useEffect(() => {
     async function doFetch() {
@@ -41,7 +41,7 @@ function Tramites() {
   const [selectedService, setSelectedService] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [pageTable, setPageTable] = useState(1);
-  const [services, setServices] = useState<ICajasData[]>([]);
+  const [services, setServices] = useState<ITramitesData[]>([]);
   const totalResults = services.length;
 
   function onPageChangeTable2(p: number) {
@@ -76,17 +76,17 @@ function Tramites() {
   };
   return (
     <Layout>
-      <PageTitle>Cajas</PageTitle>
+      <PageTitle>Tramites</PageTitle>
 
-      <SectionTitle>Listado de servicios de cajas</SectionTitle>
+      <SectionTitle>Listado de tramites</SectionTitle>
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Ubicación</TableCell>
+              <TableCell>Nombre</TableCell>
               <TableCell>Encargado</TableCell>
               <TableCell>Telefono de Referencia</TableCell>
+              <TableCell>Duracion del tramite</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Actions</TableCell>
             </tr>
@@ -101,13 +101,7 @@ function Tramites() {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.ubicacion}</p>
-                    </div>
-                  </div>
-                </TableCell>
+
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
