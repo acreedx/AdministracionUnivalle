@@ -12,9 +12,19 @@ function CrearTramite() {
 
   const [name, setname] = useState("");
 
+  // ! Requisitos
   const [requisitos, setRequisitos] = useState<string[]>(['']);
+  // ! Paso requisito
+  const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
+
   const agregarRequisito = () => {
     setRequisitos([...requisitos, '']);
+    setPasoRequisitos([...pasoRequisito, []]);
+  }
+  const agregarPasoRequisito = (requisitoIndex: number) => {
+    const nuevosPasosRequisitos = [...pasoRequisito];
+    nuevosPasosRequisitos[requisitoIndex].push("");
+    setPasoRequisitos(nuevosPasosRequisitos);
   }
 
   const handleRequisitoChange = (e: any, index: any) => {
@@ -22,6 +32,13 @@ function CrearTramite() {
     nuevosRequisistos[index] = e.target.value;
     setRequisitos(nuevosRequisistos);
   };
+
+  const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
+    const nuevosPasosRequisitos = [...pasoRequisito];
+    nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
+    setPasoRequisitos([...nuevosPasosRequisitos]);
+  };
+
 
   const [encharged, setencharged] = useState("");
 
@@ -101,32 +118,60 @@ function CrearTramite() {
                 <PlusIcon />
               </button>
             </div>
-            {requisitos.map((requisito, index) => (
-              <div key={index} className="flex items-center ">
-                <button
-                  className="text-white px-2 py-1 rounded-full -mr-2"
-                  type="button"
-                  onClick={agregarRequisito}
-                >
 
-                  <PlusIcon />
-                </button>
+            {requisitos.map((requisito, requisitoIndex) => (
+              <div key={requisitoIndex}>
+                <div className="flex">
+                  <button
+                    className="text-white px-2 py-1 rounded-full -mr-2"
+                    type="button"
+                    onClick={() => agregarPasoRequisito(requisitoIndex)}
+                  >
+                    <PlusIcon />
+                  </button>
 
-                <button
-                  className="text-white px-2 py-1 rounded-full mr-2"
-                  type="button"
-                  onClick={agregarRequisito}
-                >
 
-                  <MinusIcon />
-                </button>
-                <Input
-                  className="mt-1"
-                  placeholder="Ingresa el requisito"
-                  value={requisito}
-                  onChange={(e) => handleRequisitoChange(e, index)}
-                />
+                  <button
+                    className="text-white px-2 py-1 rounded-full mr-2"
+                    type="button"
+                    onClick={agregarRequisito}
+                  >
+                    <MinusIcon />
+                  </button>
+
+                  <Input
+                    className="mt-1 mb-1"
+                    placeholder="Ingresa el requisito"
+                    value={requisito}
+                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
+                  />
+
+                </div>
+                {
+                  pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
+                    <div className="flex items-center ml-20">
+                      <button
+                        className="text-white px-2 py-1 rounded-full mr-2"
+                        type="button"
+                        onClick={agregarRequisito}
+                      >
+                        <MinusIcon />
+                      </button>
+
+                      <Input
+                        key={pasoIndex}
+                        className="mt-1 mb-1"
+                        placeholder="Ingresa el paso del requisito"
+                        value={pasoRequisito}
+                        onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
+                      />
+
+                    </div>
+
+                  ))
+                }
               </div>
+
             ))}
 
           </Label>
@@ -173,7 +218,7 @@ function CrearTramite() {
           </Label>
         </form>
       </div>
-    </Layout>
+    </Layout >
   );
 }
 
