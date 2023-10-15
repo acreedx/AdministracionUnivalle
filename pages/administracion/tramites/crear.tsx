@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Input, Label } from "@roketid/windmill-react-ui";
+import { Input, Label, Select } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
-import Button from "@roketid/windmill-react-ui";
-import { DangerIcon } from "@roketid/windmill-react-ui/dist/Alert";
 import { PlusIcon, MinusIcon } from "icons";
+
+
 function CrearTramite() {
 
   const [name, setname] = useState("");
@@ -100,14 +100,14 @@ function CrearTramite() {
   };
   return (
     <Layout>
-      <PageTitle>Crear un nuevo servicio</PageTitle>
+      <PageTitle>Crear un tramite</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <form id="miFormulario" onSubmit={handleSubmit}>
           <Label>
             <span>Nombre del servicio</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el nombre del servicio"
+              placeholder="Ingresa el nombre del tramite"
               onChange={(e) => setname(e.target.value)}
             />
           </Label>
@@ -179,7 +179,7 @@ function CrearTramite() {
             <span>Encargado</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el encargado del servicio"
+              placeholder="Ingresa el encargado del tramite"
               onChange={(e) => setencharged(e.target.value)}
             />
           </Label>
@@ -187,9 +187,19 @@ function CrearTramite() {
             <span>Teléfono de referencia</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el teléfono de referencia"
+              placeholder="Ingresa el teléfono de referencia del encargado"
               onChange={(e) => setcellphone(e.target.value)}
             />
+          </Label>
+
+          <Label className="mt-4">
+            <span>Tipo de tramite</span>
+            <Select className="mt-1">
+              <option>$1,000</option>
+              <option>$5,000</option>
+              <option>$10,000</option>
+              <option>$25,000</option>
+            </Select>
           </Label>
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
