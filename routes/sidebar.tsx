@@ -143,6 +143,26 @@ const routes: IRoute[] = [
     ],
     exact: true,
   },
+   {
+    path: "/gabineteMedico",
+    icon: "HomeIcon",
+    name: "Gabinete Medico",
+    routes: [
+      {
+        path: "/gabineteMedico/paginaPrincipal/2",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/gabineteMedico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/gabineteMedico/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
 ];
 
 export type { IRoute };
