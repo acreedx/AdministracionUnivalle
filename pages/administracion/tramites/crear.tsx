@@ -20,20 +20,22 @@ function CrearTramite() {
 
   const agregarRequisito = () => {
     setRequisitos([...requisitos, '']);
-    setPasoRequisitos([...pasoRequisito, []]);
+    //   setPasoRequisitos([...pasoRequisito, []]);
   }
 
   const agregarPasoRequisito = (requisitoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
-    nuevosPasosRequisitos[requisitoIndex].push("");
 
+    if (nuevosPasosRequisitos[requisitoIndex]) {
+      nuevosPasosRequisitos[requisitoIndex].push("");
+    } else {
+      // Si no existe el requisito, agrega un nuevo requisito y un nuevo paso
+      nuevosPasosRequisitos[requisitoIndex] = [""];
+    }
 
     setPasoRequisitos(nuevosPasosRequisitos);
-
-
     console.log('Requisitos actualizados:', nuevosPasosRequisitos);
   }
-
   const eliminarRequisito = (requisitoIndex: number) => {
     console.log('Índice de requisito a eliminar:', requisitoIndex);
 
@@ -46,6 +48,7 @@ function CrearTramite() {
     setRequisitos(nuevosRequisitos);
     setPasoRequisitos(nuevosPasosRequisitos);
   };
+
 
   const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
     console.log('Índice de PASOrequisito a eliminar:', pasoIndex);
@@ -64,9 +67,8 @@ function CrearTramite() {
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
-    setPasoRequisitos([...nuevosPasosRequisitos]);
+    setPasoRequisitos(nuevosPasosRequisitos);
   };
-
 
   const [encharged, setencharged] = useState("");
 
@@ -111,26 +113,30 @@ function CrearTramite() {
 
   //Added requeriment
   const createRequisitoRoute = "Requisitos/addRequisito";
-
   const createRequisitos = async (serviceId: number) => {
     for (const requisito of requisitos) {
-      console.log("Requisito a crear:", requisito, "id", serviceId);
       {/* ${URL.baseUrl}${createRequisitoRoute} */ }
-      const newRequisitoResponse = await fetch(``, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descripcion: requisito,
-          serviciosId: serviceId,
-          pasos: [],
-          estado: true,
-        }),
-      });
-      console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
+      if (requisito.trim() !== '') { // Verificar si el requisito no está vacío ni contiene solo espacios en blanco
+        console.log("Requisito a crear:", requisito, "id", serviceId);
+
+        // Enviar la solicitud solo si el requisito no está vacío
+        const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            descripcion: requisito,
+            serviciosId: serviceId,
+            pasos: [],
+            estado: true,
+          }),
+        });
+        console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
+      }
     }
   };
+
 
   const handleAlertConfirm = () => {
     // handleSubmit();
@@ -163,8 +169,7 @@ function CrearTramite() {
             </div>
 
             {requisitos.map((requisito, requisitoIndex) => (
-              <div key={requisitoIndex} className={requisitoIndex == requisitos.length - 1 ? 'hidden' : ''}
-              >
+              <div key={requisitoIndex} className={requisitoIndex === requisitos.length - 1 ? 'hidden' : ''}>
                 <div className="flex">
                   <button
                     className="text-white px-2 py-1 rounded-full -mr-2"
@@ -173,7 +178,6 @@ function CrearTramite() {
                   >
                     <PlusIcon />
                   </button>
-
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
@@ -181,24 +185,21 @@ function CrearTramite() {
                   >
                     <MinusIcon />
                   </button>
-
                   <Input
-                    className="mt-1 mb-1 "
+                    className="mt-1 mb-1"
                     placeholder="Ingresa el requisito"
                     value={requisito}
                     onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
                     key={`requisito-${requisitoIndex}`}
                   />
                 </div>
-                {pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
+                {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
-
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
                       onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
                     >
-
                       <MinusIcon />
                     </button>
                     <Input
