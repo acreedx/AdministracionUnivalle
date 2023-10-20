@@ -13,47 +13,47 @@ function CrearTramite() {
   const [name, setname] = useState("");
 
   // ! Requisitos
-  const [requisitos, setRequisitos] = useState<string[]>([]);
+  const [requisitos, setRequisitos] = useState<string[]>(['']);
   // ! Paso requisito
-  const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([]);
+  const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
 
 
   const agregarRequisito = () => {
-    console.log('Requisitos antes de agregar:', requisitos);
-    console.log('Pasos de requisito antes de agregar:', pasoRequisito);
-
-    if (requisitos.length === 0) {
-      setRequisitos(['']);
-      setPasoRequisitos([[]]);
-    } else {
-      setRequisitos([...requisitos, '']);
-      setPasoRequisitos([...pasoRequisito, []]);
-    }
-
-    console.log('Requisitos actualizados:', requisitos);
-    console.log('Pasos de requisito actualizados:', pasoRequisito);
+    setRequisitos([...requisitos, '']);
+    setPasoRequisitos([...pasoRequisito, []]);
   }
+
   const agregarPasoRequisito = (requisitoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex].push("");
 
+
     setPasoRequisitos(nuevosPasosRequisitos);
+
+
+    console.log('Requisitos actualizados:', nuevosPasosRequisitos);
   }
 
   const eliminarRequisito = (requisitoIndex: number) => {
     console.log('Índice de requisito a eliminar:', requisitoIndex);
 
-    const nuevosRequisitos = requisitos.slice();
+    const nuevosRequisitos = [...requisitos];
     nuevosRequisitos.splice(requisitoIndex, 1);
 
-    const nuevosPasosRequisitos = pasoRequisito.slice();
+    const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos.splice(requisitoIndex, 1);
 
     setRequisitos(nuevosRequisitos);
     setPasoRequisitos(nuevosPasosRequisitos);
   };
 
+  const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
+    console.log('Índice de PASOrequisito a eliminar:', pasoIndex);
+    const nuevosPasosRequisitos = [...pasoRequisito];
 
+    nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
+    setPasoRequisitos(nuevosPasosRequisitos);
+  };
 
   const handleRequisitoChange = (e: any, index: any) => {
     const nuevosRequisistos = [...requisitos];
@@ -73,53 +73,68 @@ function CrearTramite() {
   const [cellphone, setcellphone] = useState("");
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
+
+
   const router = useRouter();
+
+  // Added Service 
   const createServiceRoute = "Servicios/addServicio";
-  const createUbicacionRoute = "Ubicaciones/addUbicaciones";
-  const createReferencesRoute = "Referencia/addReferences";
-  const moduleId = 2;
+  const moduleId = 3;
+
   const handleSubmit = async () => {
-    const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: name,
-        moduloId: moduleId,
-        imagenUrl: "",
-      }),
-    });
-    const dataNewService = await newService.json();
-    const newServiceId = dataNewService.data.id;
-    await fetch(`${URL.baseUrl}${createUbicacionRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        descripcion: location,
-        imagen: "",
-        video: "",
-        serviciosId: newServiceId,
-        estado: true,
-      }),
-    });
-    await fetch(`${URL.baseUrl}${createReferencesRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: encharged,
-        numerocel: cellphone,
-        serviciosId: newServiceId,
-        estado: true,
-      }),
-    });
-    router.back();
+    try {
+      // Paso 1: Crear el servicio (tramite)
+
+      /*
+      const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: name,
+          moduloId: moduleId,
+          imagenUrl: "",
+        }),
+      });
+      const dataNewService = await newService.json();
+      const newServiceId = dataNewService.data.id;
+*/
+
+      await createRequisitos(27);
+
+
+    } catch (error) {
+      console.error("Error al crear el servicio y requisitos:", error);
+    }
   };
+
+  //Added requeriment
+  const createRequisitoRoute = "Requisitos/addRequisito";
+
+  const createRequisitos = async (serviceId: number) => {
+    for (const requisito of requisitos) {
+      console.log("Requisito a crear:", requisito, "id", serviceId);
+      {/* ${URL.baseUrl}${createRequisitoRoute} */ }
+      const newRequisitoResponse = await fetch(``, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          descripcion: requisito,
+          serviciosId: serviceId,
+          pasos: [],
+          estado: true,
+        }),
+      });
+      console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
+    }
+  };
+
   const handleAlertConfirm = () => {
+    // handleSubmit();
+    setShowAlert(false);
     handleSubmit();
   };
 
@@ -170,27 +185,28 @@ function CrearTramite() {
                   <Input
                     className="mt-1 mb-1 "
                     placeholder="Ingresa el requisito"
-
                     value={requisito}
                     onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
-                    key={`requisito-${requisitoIndex}`} // Agrega una clave única
+                    key={`requisito-${requisitoIndex}`}
                   />
                 </div>
                 {pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
+
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
-                      onClick={() => console.log("test")}
+                      onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
                     >
+
                       <MinusIcon />
                     </button>
                     <Input
-                      key={`pasoRequisito-${pasoIndex}`} // Agrega una clave única
                       className="mt-1 mb-1"
                       placeholder="Ingresa el paso del requisito"
                       value={pasoRequisito}
                       onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
+                      key={`pasoRequisito-${requisitoIndex}-${pasoIndex}`}
                     />
                   </div>
                 ))}
