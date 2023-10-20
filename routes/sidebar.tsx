@@ -129,7 +129,11 @@ const routes: IRoute[] = [
     name: "Bienestar Universitario",
     routes: [
       {
-        path: "/bienestarUniversitario",
+        path: "/bienestarUniversitario/paginaPrincipal/1",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/bienestarUniversitario/listarServicios",
         name: "Listar Servicios",
       },
       {

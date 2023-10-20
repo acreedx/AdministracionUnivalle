@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent } from "react";
-import { ICrearServicios } from "../../utils/interfaces/servicios";
+import { ICrearServicios } from "../../../utils/interfaces/servicios";
 import {
   Input,
   Label,
@@ -15,9 +15,9 @@ import {
   successAlert,
   errorAlert,
   warningAlert,
-} from "../../components/alerts";
+} from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
-import { uploadFile } from "../../firebase/config";
+import { uploadFile } from "../../../firebase/config";
 function RegistrarServicioPage() {
   const [serviceImg, setImg]: any = useState(null);
   const [ubicacionImg, setUImg]: any = useState(null);
