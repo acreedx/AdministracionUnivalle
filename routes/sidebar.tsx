@@ -125,7 +125,7 @@ const routes: IRoute[] = [
   },
   {
     path: "/bienestarUniversitario",
-    icon: "HomeIcon",
+    icon: "BienestarIcon",
     name: "Bienestar Universitario",
     routes: [
       {
@@ -138,6 +138,66 @@ const routes: IRoute[] = [
       },
       {
         path: "/bienestarUniversitario/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
+   {
+    path: "/gabineteMedico",
+    icon: "MedicineIcon",
+    name: "Gabinete Medico",
+    routes: [
+      {
+        path: "/gabineteMedico/paginaPrincipal/2",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/gabineteMedico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/gabineteMedico/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/gabinetePsicoPedagogico",
+    icon: "MindIcon",
+    name: "Gabinete Psico-Pedagogico",
+    routes: [
+      {
+        path: "/gabinetePsicoPedagogico/paginaPrincipal/3",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/gabinetePsicoPedagogico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/gabinetePsicoPedagogico/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/consultorioOdontologico",
+    icon: "DentistIcon",
+    name: "Consultorio Odontologico",
+    routes: [
+      {
+        path: "/consultorioOdontologico/paginaPrincipal/4",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/consultorioOdontologico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/consultorioOdontologico/registrar",
         name: "Registrar Servicio",
       },
     ],

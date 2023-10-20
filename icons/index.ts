@@ -26,8 +26,16 @@ import DropdownIcon from './dropdown.svg'
 import OutlinePersonIcon from './outlinePerson.svg'
 import OutlineCogIcon from './outlineCog.svg'
 import OutlineLogoutIcon from './outlineLogout.svg'
+import BienestarIcon from './bienestar.svg'
+import MedicineIcon from './medicine.svg'
+import DentistIcon from './dentist.svg'
+import MindIcon from './mind.svg'
 
 export {
+  BienestarIcon,
+  MindIcon,
+  MedicineIcon,
+  DentistIcon,
   ButtonsIcon,
   CardsIcon,
   ChartsIcon,

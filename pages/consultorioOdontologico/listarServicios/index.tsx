@@ -59,7 +59,7 @@ function BienestarUniversitario() {
 
   return (
     <Layout>
-      <PageTitle>Listar Servicios - Bienestar Universitario</PageTitle>
+      <PageTitle>Listar Servicios - Consultorio Odontologico</PageTitle>
 
       <SectionTitle>Servicio</SectionTitle>
       <TableContainer className="mb-8">
