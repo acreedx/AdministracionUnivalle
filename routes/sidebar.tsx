@@ -125,7 +125,7 @@ const routes: IRoute[] = [
   },
   {
     path: "/bienestarUniversitario",
-    icon: "HomeIcon",
+    icon: "BienestarIcon",
     name: "Bienestar Universitario",
     routes: [
       {
@@ -145,7 +145,7 @@ const routes: IRoute[] = [
   },
    {
     path: "/gabineteMedico",
-    icon: "HomeIcon",
+    icon: "MedicineIcon",
     name: "Gabinete Medico",
     routes: [
       {
@@ -165,7 +165,7 @@ const routes: IRoute[] = [
   },
   {
     path: "/gabinetePsicoPedagogico",
-    icon: "HomeIcon",
+    icon: "MindIcon",
     name: "Gabinete Psico-Pedagogico",
     routes: [
       {
@@ -185,7 +185,7 @@ const routes: IRoute[] = [
   },
   {
     path: "/consultorioOdontologico",
-    icon: "HomeIcon",
+    icon: "DentistIcon",
     name: "Consultorio Odontologico",
     routes: [
       {
