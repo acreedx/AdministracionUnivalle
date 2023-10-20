@@ -87,7 +87,7 @@ function CrearTramite() {
     try {
       // Paso 1: Crear el servicio (tramite)
 
-      /*
+
       const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
         method: "POST",
         headers: {
@@ -101,9 +101,9 @@ function CrearTramite() {
       });
       const dataNewService = await newService.json();
       const newServiceId = dataNewService.data.id;
-*/
 
-      await createRequisitos(27);
+
+      await createRequisitos(newServiceId);
 
 
     } catch (error) {
@@ -116,7 +116,7 @@ function CrearTramite() {
   const createRequisitos = async (serviceId: number) => {
     for (const requisito of requisitos) {
       {/* ${URL.baseUrl}${createRequisitoRoute} */ }
-      if (requisito.trim() !== '') { // Verificar si el requisito no está vacío ni contiene solo espacios en blanco
+      if (requisito.trim() !== '') {
         console.log("Requisito a crear:", requisito, "id", serviceId);
 
         // Enviar la solicitud solo si el requisito no está vacío
