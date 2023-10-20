@@ -163,6 +163,46 @@ const routes: IRoute[] = [
     ],
     exact: true,
   },
+  {
+    path: "/gabinetePsicoPedagogico",
+    icon: "HomeIcon",
+    name: "Gabinete Psico-Pedagogico",
+    routes: [
+      {
+        path: "/gabinetePsicoPedagogico/paginaPrincipal/3",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/gabinetePsicoPedagogico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/gabinetePsicoPedagogico/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/consultorioOdontologico",
+    icon: "HomeIcon",
+    name: "Consultorio Odontologico",
+    routes: [
+      {
+        path: "/consultorioOdontologico/paginaPrincipal/4",
+        name: "Pagina Principal",
+      },
+      {
+        path: "/consultorioOdontologico/listarServicios",
+        name: "Listar Servicios",
+      },
+      {
+        path: "/consultorioOdontologico/registrar",
+        name: "Registrar Servicio",
+      },
+    ],
+    exact: true,
+  },
 ];
 
 export type { IRoute };
