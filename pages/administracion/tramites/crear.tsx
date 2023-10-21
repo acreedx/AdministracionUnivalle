@@ -19,6 +19,7 @@ function CrearTramite() {
 
 
   const agregarRequisito = () => {
+    console.log("Se agrego nuevo requisito")
     setRequisitos([...requisitos, '']);
     //   setPasoRequisitos([...pasoRequisito, []]);
   }
@@ -26,35 +27,43 @@ function CrearTramite() {
   const agregarPasoRequisito = (requisitoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
 
-    if (nuevosPasosRequisitos[requisitoIndex]) {
-      nuevosPasosRequisitos[requisitoIndex].push("");
-    } else {
-      // Si no existe el requisito, agrega un nuevo requisito y un nuevo paso
-      nuevosPasosRequisitos[requisitoIndex] = [""];
+    if (!nuevosPasosRequisitos[requisitoIndex]) {
+      nuevosPasosRequisitos[requisitoIndex] = [];
     }
+
+    nuevosPasosRequisitos[requisitoIndex].push("");
 
     setPasoRequisitos(nuevosPasosRequisitos);
     console.log('Requisitos actualizados:', nuevosPasosRequisitos);
-  }
-  const eliminarRequisito = (requisitoIndex: number) => {
-    console.log('Índice de requisito a eliminar:', requisitoIndex);
+  };
 
+  const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
+    console.log('Índice de requisito:', requisitoIndex, 'Índice de PASOrequisito a eliminar:', pasoIndex);
+
+    const nuevosPasosRequisitos = [...pasoRequisito];
+    nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
+
+    // ! Verificar si es el último pasoRequisito en el requisito
+    if (nuevosPasosRequisitos[requisitoIndex].length === 0 || pasoIndex === nuevosPasosRequisitos[requisitoIndex].length) {
+      // ! eliminar el ultimo requisito si se elimina el ultimo pasoRequisito
+      const nuevosRequisitos = [...requisitos];
+      nuevosRequisitos.splice(requisitoIndex, 1);
+      nuevosPasosRequisitos.splice(requisitoIndex, 1);
+      setRequisitos(nuevosRequisitos);
+    } else {
+      setPasoRequisitos(nuevosPasosRequisitos);
+    }
+
+    console.log(nuevosPasosRequisitos);
+  };
+  const eliminarRequisito = (requisitoIndex: number) => {
+    console.log("Indice de requisito a eliminar", requisitoIndex)
     const nuevosRequisitos = [...requisitos];
     nuevosRequisitos.splice(requisitoIndex, 1);
-
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos.splice(requisitoIndex, 1);
 
     setRequisitos(nuevosRequisitos);
-    setPasoRequisitos(nuevosPasosRequisitos);
-  };
-
-
-  const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
-    console.log('Índice de PASOrequisito a eliminar:', pasoIndex);
-    const nuevosPasosRequisitos = [...pasoRequisito];
-
-    nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
     setPasoRequisitos(nuevosPasosRequisitos);
   };
 
@@ -85,8 +94,6 @@ function CrearTramite() {
 
   const handleSubmit = async () => {
     try {
-      // Paso 1: Crear el servicio (tramite)
-
 
       const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
         method: "POST",
