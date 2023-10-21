@@ -38,7 +38,7 @@ function CrearTramite() {
   };
 
   const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
-    console.log('Índice de requisito:', requisitoIndex, 'Índice de PASOrequisito a eliminar:', pasoIndex);
+    console.log('Índice de requisito:', requisitoIndex, 'Índice de PASO requisito a eliminar:', pasoIndex);
 
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
@@ -90,6 +90,7 @@ function CrearTramite() {
 
   // Added Service 
   const createServiceRoute = "Servicios/addServicio";
+  const createReferenceRoute = "Referencia/addReferences";
   const moduleId = 3;
 
   const handleSubmit = async () => {
@@ -109,8 +110,8 @@ function CrearTramite() {
       const dataNewService = await newService.json();
       const newServiceId = dataNewService.data.id;
 
-
       await createRequisitos(newServiceId);
+
 
 
     } catch (error) {
@@ -122,9 +123,10 @@ function CrearTramite() {
   const createRequisitoRoute = "Requisitos/addRequisito";
   const createRequisitos = async (serviceId: number) => {
     for (const requisito of requisitos) {
-      {/* ${URL.baseUrl}${createRequisitoRoute} */ }
       if (requisito.trim() !== '') {
-        console.log("Requisito a crear:", requisito, "id", serviceId);
+        const nuevosPasos = pasoRequisito[requisitos.indexOf(requisito)].map((nombre) => ({ nombre }));
+
+        console.log("Requisito a crear:", requisito, "Pasos:", nuevosPasos, "id", serviceId);
 
         // Enviar la solicitud solo si el requisito no está vacío
         const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
@@ -135,7 +137,7 @@ function CrearTramite() {
           body: JSON.stringify({
             descripcion: requisito,
             serviciosId: serviceId,
-            pasos: [],
+            pasos: nuevosPasos,
             estado: true,
           }),
         });
