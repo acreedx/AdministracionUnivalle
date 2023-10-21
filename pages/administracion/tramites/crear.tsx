@@ -83,6 +83,9 @@ function CrearTramite() {
 
   const [cellphone, setcellphone] = useState("");
 
+  const [processingTime, setprocessingTime] = useState("");
+
+
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
 
@@ -91,6 +94,7 @@ function CrearTramite() {
   // Added Service 
   const createServiceRoute = "Servicios/addServicio";
   const createReferenceRoute = "Referencia/addReferences";
+  const createDurationServiceRoute = "Tramites/addTramite";
   const moduleId = 3;
 
   const handleSubmit = async () => {
@@ -112,7 +116,42 @@ function CrearTramite() {
 
       await createRequisitos(newServiceId);
 
+      await fetch(`${URL.baseUrl}${createReferenceRoute}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: encharged,
+          numerocel: cellphone,
+          serviciosId: newServiceId,
+          estado: true,
+        }),
+      });
 
+      await fetch(`${URL.baseUrl}${createReferenceRoute}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: encharged,
+          numerocel: cellphone,
+          serviciosId: newServiceId,
+          estado: true,
+        }),
+      });
+
+      await fetch(`${URL.baseUrl}${createDurationServiceRoute}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          tiempotramite: processingTime,
+          serviciosId: newServiceId,
+        }),
+      });
 
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
@@ -162,7 +201,7 @@ function CrearTramite() {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <form id="miFormulario" onSubmit={handleSubmit}>
           <Label>
-            <span>Nombre del servicio</span>
+            <span>Nombre del tramite</span>
             <Input
               className="mt-1"
               placeholder="Ingresa el nombre del tramite"
@@ -223,11 +262,21 @@ function CrearTramite() {
               </div>
             ))}
           </Label>
+
+          <Label className="mt-4">
+            <span>Duracion del tramite</span>
+            <Input
+              className="mt-1"
+              placeholder="Ingresa la duracion del tramite"
+              onChange={(e) => setprocessingTime(e.target.value)}
+            />
+          </Label>
+
           <Label className="mt-4">
             <span>Encargado</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el encargado del tramite"
+              placeholder="Ingresa el nombre completo del encargado"
               onChange={(e) => setencharged(e.target.value)}
             />
           </Label>
@@ -241,7 +290,7 @@ function CrearTramite() {
           </Label>
 
           <Label className="mt-4">
-            <span>Tipo de tramite</span>
+            <span>Seleccione una categoria de tramite</span>
             <Select className="mt-1">
               <option>$1,000</option>
               <option>$5,000</option>
