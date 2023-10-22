@@ -4,7 +4,7 @@ interface ITramitesData {
   enchargedId: number;
   encharged: string;
   cellphone: string;
-  duration: string;
+  //duration: string;
   //  category: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
@@ -12,12 +12,17 @@ function convertJSONService(data: any) {
   const convertedData: ITramitesData = {
     id: data.id,
     name: data.nombre,
-    enchargedId: data.referencia[0].id,
-    encharged: data.referencia[0].nombre,
-    cellphone: data.referencia[0].numerocel,
-    duration: data.referencia[0].duracion,
-    //  locationId: data.ubicaciones[0].id,
-    // location: data.ubicaciones[0].descripcion,
+    enchargedId:
+      data.referencia && data.referencia[0]
+        ? data.referencia[0].enchargedId
+        : null,
+    encharged:
+      data.referencia && data.referencia[0] ? data.referencia[0].nombre : null,
+    cellphone:
+      data.referencia && data.referencia[0]
+        ? data.referencia[0].numerocel
+        : null,
+    // duration: data.referencia[0].duracion,
     //category: data.categorias[0].nombre,
     status: data.estado == true ? "success" : "danger",
   };

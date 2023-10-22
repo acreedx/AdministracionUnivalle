@@ -37,6 +37,8 @@ function CrearTramite() {
     console.log('Requisitos actualizados:', nuevosPasosRequisitos);
   };
 
+
+
   const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
     console.log('Índice de requisito:', requisitoIndex, 'Índice de PASO requisito a eliminar:', pasoIndex);
 
@@ -84,6 +86,22 @@ function CrearTramite() {
   const [cellphone, setcellphone] = useState("");
 
   const [processingTime, setprocessingTime] = useState("");
+
+  const [locations, setLocations] = useState<string[]>(['']);
+
+
+  const agregarLocation = () => {
+    setLocations([...locations, '']);
+  }
+  const eliminarLocation = (locationIndex: number) => {
+
+    const nuevasLocation = [...locations];
+    nuevasLocation.splice(locationIndex, 1);
+    console.log("location a eliminar: ", locationIndex)
+    setLocations(nuevasLocation);
+  }
+
+
 
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -297,6 +315,54 @@ function CrearTramite() {
               <option>$10,000</option>
               <option>$25,000</option>
             </Select>
+          </Label>
+
+
+          {/* *Ubicaciones */}
+          <Label className="mt-4">
+            <div className="flex items-center mt-4">
+              <span className="mr-2">Ubicaciones</span>
+              <button type="button" onClick={agregarLocation}>
+                <PlusIcon />
+              </button>
+            </div>
+
+            {locations.map((location, locationIndex) => (
+              <div key={locationIndex} className={locationIndex === locations.length - 1 ? 'hidden' : ''}>
+                <div className="flex">
+                  <button
+                    className="text-white px-2 py-1 rounded-full mr-2"
+                    type="button"
+                    onClick={() => eliminarLocation(locationIndex)}
+                  >
+                    <MinusIcon />
+                  </button>
+                  <Input
+                    className="mt-1 mb-1"
+                    placeholder="Ingrese la ubicación del servicio"
+                  />
+                </div>
+
+                <div className="flex justify-center space-x-20 mb-2">
+                  <Label className="mt-4">
+                    <span>Imagen de la ubicación del lugar</span>
+                    <Input
+                      type="file"
+                      className="mt-1"
+                      placeholder="Imagen para ubicación"
+                    />
+                  </Label>
+                  <Label className="mt-4">
+                    <span>Croquis de la ubicación del lugar</span>
+                    <Input
+                      type="file"
+                      className="mt-1"
+                      placeholder="Imagen para ubicación"
+                    />
+                  </Label>
+                </div>
+              </div>
+            ))}
           </Label>
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
