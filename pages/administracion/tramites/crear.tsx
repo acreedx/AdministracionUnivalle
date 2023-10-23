@@ -147,19 +147,6 @@ function CrearTramite() {
         }),
       });
 
-      await fetch(`${URL.baseUrl}${createReferenceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: newServiceId,
-          estado: true,
-        }),
-      });
-
       await fetch(`${URL.baseUrl}${createDurationServiceRoute}`, {
         method: "POST",
         headers: {

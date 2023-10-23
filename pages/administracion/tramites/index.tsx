@@ -25,7 +25,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 function Tramites() {
   const router = useRouter();
 
-  const route = "Servicios/getServicioByModule/";
+  const route = "Servicios/getTramiteByModule/";
   const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Tramites";
   const resultsPerPage = 10;
@@ -117,6 +117,13 @@ function Tramites() {
                   </div>
                 </TableCell>
                 <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{servicio.duration}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
                   <Badge
                     type={servicio.status == "success" ? "success" : "danger"}
                   >
@@ -126,8 +133,8 @@ function Tramites() {
                 <TableCell>
                   <div className="flex items-center space-x-4">
                     <Link
-                      href={`/administracion/cajas/editar/[id]`}
-                      as={`/administracion/cajas/editar/${servicio.id}`}
+                      href={`/administracion/tramites/editar/[id]`}
+                      as={`/administracion/tramites/editar/${servicio.id}`}
                     >
                       <Button layout="link" size="small" aria-label="Edit">
                         <EditIcon className="w-5 h-5" aria-hidden="true" />

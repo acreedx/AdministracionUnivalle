@@ -4,7 +4,8 @@ interface ITramitesData {
   enchargedId: number;
   encharged: string;
   cellphone: string;
-  //duration: string;
+  durationId: number;
+  duration: string;
   //  category: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
@@ -22,7 +23,10 @@ function convertJSONService(data: any) {
       data.referencia && data.referencia[0]
         ? data.referencia[0].numerocel
         : null,
-    // duration: data.referencia[0].duracion,
+    durationId:
+      data.tramite && data.tramite[0] ? data.tramite[0].identificador : null,
+    duration:
+      data.tramite && data.tramite[0] ? data.tramite[0].tiempoTramite : null,
     //category: data.categorias[0].nombre,
     status: data.estado == true ? "success" : "danger",
   };
