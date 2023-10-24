@@ -133,6 +133,14 @@ const routes: IRoute[] = [
         name: "Pagina Principal",
       },
       {
+        path: "/bienestarUniversitario/listarObjPerdidos/",
+        name: "Listar Objetos Perdidos",
+      },
+      {
+        path: "/bienestarUniversitario/agregarObjPerdido",
+        name: "Agregar Objeto Perdido",
+      },
+      {
         path: "/bienestarUniversitario/listarServicios",
         name: "Listar Servicios",
       },
@@ -143,7 +151,7 @@ const routes: IRoute[] = [
     ],
     exact: true,
   },
-   {
+  {
     path: "/gabineteMedico",
     icon: "MedicineIcon",
     name: "Gabinete Medico",
