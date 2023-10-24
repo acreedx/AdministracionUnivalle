@@ -64,6 +64,14 @@ function ObjetosPerdidos() {
         Listado de objetos perdidos - Bienestar Universitario
       </PageTitle>
 
+      <div className="mb-8">
+        <Button size="large">
+          <Link href={"/bienestarUniversitario/agregarObjPerdido"}>
+            Agregar Objeto Perdido
+          </Link>
+        </Button>
+      </div>
+
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>
@@ -86,7 +94,7 @@ function ObjetosPerdidos() {
                         size="large"
                       />
                     ) : (
-                      <span className="w-full text-center">-</span>
+                      <span className="text-center">-</span>
                     )}
                   </div>
                 </TableCell>
@@ -96,7 +104,11 @@ function ObjetosPerdidos() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge></Badge>
+                  <div>
+                    <p className="font-semibold">
+                      {datos.estado ? "Activo" : "Inactivo"}
+                    </p>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">

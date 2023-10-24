@@ -1,4 +1,4 @@
-import React, { useState, useRef, ChangeEvent } from "react";
+import React, { useState, useRef, ChangeEvent, useEffect } from "react";
 import { Input, Label } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -12,15 +12,25 @@ import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
 import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
+import { useRouter } from "next/router";
+
+export async function getServerSideProps(context: any) {
+  return {
+    props: {},
+  };
+}
 
 function AgregarObjPerdidoPage() {
+  const router = useRouter();
+  const { id } = router.query;
+  const numId = parseInt(id as string, 10);
   const inputFileImg: any = useRef(null);
   const [objPerImg, setImg]: any = useState(null);
   const [objPerData, setObjPerData] = useState<IObjetosPerdidos>({
     titulo: "",
     archivo: "",
   });
-  const [objPerDataBk, setObjPerDataBk] = useState<IObjetosPerdidos>({
+  const [objPerBkData, setObjPerBkData] = useState<IObjetosPerdidos>({
     titulo: "",
     archivo: "",
   });
@@ -39,7 +49,7 @@ function AgregarObjPerdidoPage() {
         titulo: resData.data.nombre,
         archivo: resData.data.imagenUrl,
       });
-      setObjPerDataBk({
+      setObjPerBkData({
         titulo: resData.data.nombre,
         archivo: resData.data.imagenUrl,
       });
@@ -56,51 +66,52 @@ function AgregarObjPerdidoPage() {
     console.log(objPerData);
   };
 
-  const registrarServicio = () => {
-    console.log(objPerData);
-    fetch(
-      "http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(objPerData),
+  const editarServicio = async (id: number) => {
+    if (
+      objPerData.titulo !== objPerBkData.titulo ||
+      objPerData.archivo !== objPerBkData.archivo
+    ) {
+      if (objPerData.archivo != null) {
+        objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
       }
-    )
-      .then((response) => {
-        if (response.ok) {
-          successAlert("Éxito al registrar los datos");
-        } else {
-          throw new Error("Error al cambiar los datos del servicio");
+      fetch(
+        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(objPerData),
         }
-      })
-      .catch(() => errorAlert("Error al registrar los datos"));
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+    } else {
+      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+    }
   };
 
   const clearImg = () => {
     if (inputFileImg.current) {
-      inputFileImg.current.value = "";
+      inputFileImg.current.value = objPerBkData.archivo;
     }
   };
 
   const clearData = () => {
-    setObjPerData({
-      ...objPerData,
-      titulo: "",
-      archivo: "",
-    });
-    setImg(null);
+    setObjPerData(objPerBkData);
+    setImg(objPerImg);
     clearImg();
   };
 
-  const subirArchivos = async () => {
-    objPerData.archivo = "";
-    if (objPerImg != null) {
-      objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
-    }
-    registrarServicio();
-  };
+  useEffect(() => {
+    cargarDatosObj(numId);
+  }, []);
 
   return (
     <Layout>
@@ -146,8 +157,8 @@ function AgregarObjPerdidoPage() {
         </div>
 
         <div>
-          <Button size="large" onClick={subirArchivos}>
-            Registrar
+          <Button size="large" onClick={() => editarServicio(numId)}>
+            Editar
           </Button>
         </div>
       </div>

@@ -130,7 +130,7 @@ const routes: IRoute[] = [
     routes: [
       {
         path: "/bienestarUniversitario/paginaPrincipal/1",
-        name: "Pagina Principal",
+        name: "Datos Generales",
       },
       {
         path: "/bienestarUniversitario/listarObjPerdidos/",
@@ -158,7 +158,7 @@ const routes: IRoute[] = [
     routes: [
       {
         path: "/gabineteMedico/paginaPrincipal/2",
-        name: "Pagina Principal",
+        name: "Datos Generales",
       },
       {
         path: "/gabineteMedico/listarServicios",
@@ -198,7 +198,7 @@ const routes: IRoute[] = [
     routes: [
       {
         path: "/consultorioOdontologico/paginaPrincipal/4",
-        name: "Pagina Principal",
+        name: "Datos Generales",
       },
       {
         path: "/consultorioOdontologico/listarServicios",
