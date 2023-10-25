@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useRef } from "react";
 import { ICrearServicios } from "../../../utils/interfaces/servicios";
 import {
   Input,
@@ -18,6 +18,7 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
+import Link from "next/link";
 function RegistrarServicioPage() {
   const [serviceImg, setImg]: any = useState(null);
   const [ubicacionImg, setUImg]: any = useState(null);
@@ -167,6 +168,7 @@ function RegistrarServicioPage() {
           <span>Nombre del servicio</span>
           <Input
             value={servicioData.nombre}
+            maxLength={50}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange2(e, "nombre")}
@@ -179,6 +181,7 @@ function RegistrarServicioPage() {
             //value={servicioData.imagenUrl === null ? "" : servicioData.imagenUrl}
             type="file"
             className="mt-1"
+            accept="image/png, image/jpeg"
             placeholder="Imagen para el servicio"
             onChange={(e) => setImg(e.target.files?.[0] || null)}
           />
@@ -196,6 +199,7 @@ function RegistrarServicioPage() {
             }
             className="mt-1"
             rows={3}
+            maxLength={250}
             placeholder="Ingresa los requisitos del servicio."
             onChange={(e) => handleChange1(e, "descripcion", "RequisitosAdd")}
           />
@@ -212,6 +216,7 @@ function RegistrarServicioPage() {
                 : servicioData.CarreraAdd.nombre
             }
             className="mt-1"
+            maxLength={50}
             placeholder="Escriba el nombre de la carrera."
             onChange={(e) => handleChange(e, "nombre", "CarreraAdd")}
           />
@@ -228,6 +233,7 @@ function RegistrarServicioPage() {
                 : servicioData.ReferenciaAdd.nombre
             }
             className="mt-1"
+            maxLength={100}
             placeholder="Escriba el nombre del contacto"
             onChange={(e) => handleChange(e, "nombre", "ReferenciaAdd")}
           />
@@ -240,6 +246,7 @@ function RegistrarServicioPage() {
                 ? ""
                 : servicioData.ReferenciaAdd.numeroCel
             }
+            maxLength={25}
             className="mt-1"
             placeholder="Escriba el número de celular del contacto"
             onChange={(e) => handleChange(e, "numeroCel", "ReferenciaAdd")}
@@ -256,6 +263,7 @@ function RegistrarServicioPage() {
                 ? ""
                 : servicioData.UbicacionAdd.descripcion
             }
+            maxLength={100}
             className="mt-1"
             placeholder="Ingrese la ubicación del servicio"
             onChange={(e) => handleChange(e, "descripcion", "UbicacionAdd")}
@@ -269,6 +277,7 @@ function RegistrarServicioPage() {
             type="file"
             className="mt-1"
             placeholder="Imagen para ubicación"
+            accept="image/png, image/jpeg"
             onChange={(e) => setUImg(e.target.files?.[0] || null)}
           />
         </Label>
@@ -278,14 +287,17 @@ function RegistrarServicioPage() {
             //value={servicioData.Ubicacion.video === null ? "" : servicioData.Ubicacion.video}
             type="file"
             className="mt-1"
-            placeholder="Imagen para ubicación"
+            accept="video/mp4,video/x-m4v,video/*"
+            placeholder="Video para ubicación"
             onChange={(e) => setUVideo(e.target.files?.[0] || null)}
           />
         </Label>
       </div>
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Button size="large">Volver</Button>
+          <Link href={"/bienestarUniversitario/listarServicios"}>
+            <Button size="large">Volver</Button>
+          </Link>
         </div>
 
         <div>

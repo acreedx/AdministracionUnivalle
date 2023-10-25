@@ -19,6 +19,8 @@ import { EditIcon, TrashIcon } from "icons";
 import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
+import { errorAlert } from "components/alerts";
+import { ToastContainer } from "react-toastify";
 // make a copy of the data, for the second table
 
 function ObjetosPerdidos() {
@@ -43,18 +45,27 @@ function ObjetosPerdidos() {
   // here you would make another server request for new data
   useEffect(() => {
     const getData = async () => {
-      const query = await fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
-      );
-      const response: any = await query.json();
-      setTotal(response.data.length);
-      setUserInfo(
-        response.data.slice(
-          (pageTable2 - 1) * resultsPerPage,
-          pageTable2 * resultsPerPage
-        )
-      );
+      try {
+        const query = await fetch(
+          "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+        );
+        const response: any = await query.json();
+        if (response.ok) {
+          setTotal(response.data.length);
+          setUserInfo(
+            response.data.slice(
+              (pageTable2 - 1) * resultsPerPage,
+              pageTable2 * resultsPerPage
+            )
+          );
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        errorAlert("Ocurrió un error al traer los datos");
+      }
     };
+
     getData();
   }, [pageTable2]);
 
@@ -65,86 +76,89 @@ function ObjetosPerdidos() {
       </PageTitle>
 
       <div className="mb-8">
-        <Button size="large">
-          <Link href={"/bienestarUniversitario/agregarObjPerdido"}>
-            Agregar Objeto Perdido
-          </Link>
-        </Button>
+        <Link href="/bienestarUniversitario/agregarObjPerdido">
+          <Button size="large">Agregar Objeto Perdido</Button>
+        </Link>
       </div>
 
-      <TableContainer className="mb-8">
-        <Table>
-          <TableHeader>
-            <tr>
-              <TableCell>Imagen</TableCell>
-              <TableCell>Objeto Perdido</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Acciones</TableCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-            {dataTable2.map((datos: any, i) => (
-              <TableRow key={datos.id}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    {datos.imagen ? (
-                      <Avatar
-                        className="hidden mr-3 md:block"
-                        src={datos.imagen}
-                        size="large"
-                      />
-                    ) : (
-                      <span className="text-center">-</span>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <p className="font-semibold">{datos.nombre}</p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div>
-                    <p className="font-semibold">
-                      {datos.estado ? "Activo" : "Inactivo"}
-                    </p>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-4">
-                    <Link
-                      href={{
-                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                      }}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
-                    <Link
-                      href={{
-                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                      }}
-                    >
-                      <Button layout="link" size="small" aria-label="Delete">
-                        <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TableFooter>
-          <Pagination
-            totalResults={TotalResult}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable2}
-            label="Table navigation"
-          />
-        </TableFooter>
-      </TableContainer>
+      {dataTable2.length > 0 ? (
+        <TableContainer className="mb-8">
+          <Table>
+            <TableHeader>
+              <tr>
+                <TableCell>Imagen</TableCell>
+                <TableCell>Objeto Perdido</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Acciones</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+              {dataTable2.map((datos: any, i) => (
+                <TableRow key={datos.id}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      {datos.archivo ? (
+                        <Avatar
+                          className="hidden mr-3 md:block"
+                          src={datos.archivo}
+                          size="large"
+                        />
+                      ) : (
+                        <span className="text-center">-</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="font-semibold">{datos.titulo}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p className="font-semibold">
+                        {datos.estado ? "Activo" : "Inactivo"}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-4">
+                      <Link
+                        href={{
+                          pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                        }}
+                      >
+                        <Button layout="link" size="small" aria-label="Edit">
+                          <EditIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      </Link>
+                      <Link
+                        href={{
+                          pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                        }}
+                      >
+                        <Button layout="link" size="small" aria-label="Delete">
+                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            <Pagination
+              totalResults={TotalResult}
+              resultsPerPage={resultsPerPage}
+              onChange={onPageChangeTable2}
+              label="Table navigation"
+            />
+          </TableFooter>
+        </TableContainer>
+      ) : (
+        <SectionTitle>No se encontraron datos</SectionTitle>
+      )}
+      <ToastContainer />
     </Layout>
   );
 }

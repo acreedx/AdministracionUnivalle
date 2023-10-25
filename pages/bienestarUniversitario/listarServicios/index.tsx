@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import CTA from "example/components/CTA";
@@ -17,50 +17,73 @@ import {
   Pagination,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon } from "icons";
-
-import  { IListarServicios } from "utils/interfaces/servicios";
+import SweetAlert from "react-bootstrap-sweetalert";
+import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
-// make a copy of the data, for the second table
 
 function BienestarUniversitario() {
-
-
-  // setup pages control for every table
+  const router = useRouter();
+  const [selectedService, setSelectedService] = useState<number>(0);
   const [pageTable2, setPageTable2] = useState(1);
 
-  // setup data for every table
   const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
-  const [TotalResult,setTotal]= useState(Number);
-  // pagination setup
+  const [TotalResult, setTotal] = useState(Number);
+
   const resultsPerPage = 10;
 
+  const [showAlert, setShowAlert] = useState<boolean>(false);
 
-  // pagination change control
   function onPageChangeTable2(p: number) {
     setPageTable2(p);
   }
 
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-
-
-  // on page change, load new sliced data
-  // here you would make another server request for new data
- useEffect(() => {
+  useEffect(() => {
     const getData = async () => {
-      const query = await fetch('http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1');
-      const response:any= await query.json();
+      const query = await fetch(
+        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+      );
+      const response: any = await query.json();
       setTotal(response.data.length);
-      setUserInfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
-    }
+      setUserInfo(
+        response.data.slice(
+          (pageTable2 - 1) * resultsPerPage,
+          pageTable2 * resultsPerPage
+        )
+      );
+    };
     getData();
   }, [pageTable2]);
+
+  const handleSubmit = async () => {
+    await fetch(
+      `http://apisistemaunivalle.somee.com/api/Servicios/deleteServicio/${selectedService}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    router.reload();
+  };
+
+  const handleAlertConfirm = () => {
+    handleSubmit();
+  };
+
+  const handleAlertCancel = () => {
+    setShowAlert(false);
+  };
 
   return (
     <Layout>
       <PageTitle>Listar Servicios - Bienestar Universitario</PageTitle>
-
+      <div className="mb-8">
+        <Link href="/bienestarUniversitario/registrar">
+          <Button size="large">Registrar servicio</Button>
+        </Link>
+      </div>
       <SectionTitle>Servicio</SectionTitle>
       <TableContainer className="mb-8">
         <Table>
@@ -73,10 +96,8 @@ function BienestarUniversitario() {
             </tr>
           </TableHeader>
           <TableBody>
-            
-            {
-              dataTable2.map((datos:any, i) => (
-              <TableRow key={datos}>
+            {dataTable2.map((datos: any, i) => (
+              <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <Avatar
@@ -84,7 +105,6 @@ function BienestarUniversitario() {
                       src={datos.imagen}
                     />
                     <div>
-                      
                       <p className="font-semibold">{datos.nombre}</p>
                     </div>
                   </div>
@@ -92,25 +112,65 @@ function BienestarUniversitario() {
                 <TableCell>
                   <span className="text-sm">{datos.modulo}</span>
                 </TableCell>
-                 <TableCell>
-                  <Badge></Badge>
-                </TableCell> 
+                <TableCell>
+                  <Badge type={datos.estado ? "success" : "danger"}>
+                    <p>{datos.estado ? "Activo" : "Inactivo"}</p>
+                  </Badge>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
-                    <Button layout="link" size="small" aria-label="Edit">
-                      <EditIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                    <Link
+                      href={{
+                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
+                      }}
+                    >
+                      <Button layout="link" size="small" aria-label="Edit">
+                        <EditIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
                     </Link>
-                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
-                    <Button layout="link" size="small" aria-label="Delete">
+                    <Button
+                      layout="link"
+                      size="small"
+                      aria-label="Delete"
+                      type={"button"}
+                      onClick={() => {
+                        setShowAlert(true);
+                        setSelectedService(datos.identificador);
+                      }}
+                    >
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
-                     </Link>
+                    {showAlert && (
+                      <SweetAlert
+                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                        title="Atención"
+                        customButtons={
+                          <React.Fragment>
+                            <Button
+                              onClick={handleAlertCancel}
+                              className="mx-2 bg-red-600"
+                            >
+                              Cancelar
+                            </Button>
+                            <Button
+                              onClick={handleAlertConfirm}
+                              className="mx-2 bg-green-600"
+                            >
+                              Confirmar
+                            </Button>
+                          </React.Fragment>
+                        }
+                        onConfirm={handleAlertConfirm}
+                        onCancel={handleAlertCancel}
+                        focusCancelBtn
+                      >
+                        ¿Está seguro de eliminar este registro?
+                      </SweetAlert>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>
-              ))}
+            ))}
           </TableBody>
         </Table>
         <TableFooter>

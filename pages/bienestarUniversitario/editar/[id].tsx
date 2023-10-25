@@ -1,10 +1,11 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
-import { 
+import {
   IEditarServicio,
   IEditarUbicacion,
   IEditarReferencia,
   IEditarCarrera,
-  IEditarRequisitos } from "../../../utils/interfaces/servicios";
+  IEditarRequisitos,
+} from "../../../utils/interfaces/servicios";
 import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -17,7 +18,8 @@ import {
   warningAlert,
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
-import {uploadFile} from "../../../firebase/config"
+import { uploadFile } from "../../../firebase/config";
+import Link from "next/link";
 
 export async function getServerSideProps(context: any) {
   return {
@@ -26,9 +28,9 @@ export async function getServerSideProps(context: any) {
 }
 
 function EditarServicioPage() {
-  const [serviceImg,setImg]:any = useState(null)
-  const [ubicacionImg,setUImg]:any = useState(null)
-  const [ubicaionVideo,setUVideo]:any = useState(null)
+  const [serviceImg, setImg]: any = useState(null);
+  const [ubicacionImg, setUImg]: any = useState(null);
+  const [ubicaionVideo, setUVideo]: any = useState(null);
   const [servicioData, setServicioData] = useState<IEditarServicio>({
     nombre: "",
     imagenUrl: null,
@@ -40,12 +42,12 @@ function EditarServicioPage() {
   const [ubicacionData, setUbicacionData] = useState<IEditarUbicacion>({
     descripcion: null,
     imagen: null,
-    video:null,
+    video: null,
   });
   const [ubicacionBkData, setUbicacionBkData] = useState<IEditarUbicacion>({
     descripcion: null,
     imagen: null,
-    video:null,
+    video: null,
   });
   const [requisitosData, setRequisitosData] = useState<IEditarRequisitos>({
     descripcion: null,
@@ -93,7 +95,7 @@ function EditarServicioPage() {
       errorAlert("Ocurrió un error al traer los datos");
     }
   }
-async function cargarDatosUbicacion(id: number) {
+  async function cargarDatosUbicacion(id: number) {
     try {
       const res = await fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
@@ -106,12 +108,12 @@ async function cargarDatosUbicacion(id: number) {
       setUbicacionBkData({
         descripcion: resData.data.descripcion,
         imagen: resData.data.imagen,
-        video:resData.data.video,
+        video: resData.data.video,
       });
       setUbicacionData({
         descripcion: resData.data.descripcion,
         imagen: resData.data.imagen,
-        video:resData.data.video,
+        video: resData.data.video,
       });
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
@@ -149,11 +151,11 @@ async function cargarDatosUbicacion(id: number) {
 
       setReferenciaBkData({
         nombre: resData.data.nombre,
-        numeroCel:resData.data.numeroCel,
+        numeroCel: resData.data.numeroCel,
       });
       setReferenciaData({
         nombre: resData.data.nombre,
-        numeroCel:resData.data.numeroCel,
+        numeroCel: resData.data.numeroCel,
       });
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
@@ -193,12 +195,15 @@ async function cargarDatosUbicacion(id: number) {
       [campo]: e.target.value,
     });
   };
-  const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, campo: string) => {
-      setRequisitosData({
-        ...requisitosData,
-        [campo]: e.target.value,
-      });
-    };
+  const handleChange1 = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    campo: string
+  ) => {
+    setRequisitosData({
+      ...requisitosData,
+      [campo]: e.target.value,
+    });
+  };
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setCarreraData({
       ...carreraData,
@@ -226,8 +231,8 @@ async function cargarDatosUbicacion(id: number) {
       servicioData.nombre !== servicioBkData.nombre ||
       servicioData.imagenUrl !== servicioBkData.imagenUrl
     ) {
-      if(serviceImg!=null){
-        servicioData.imagenUrl = await uploadFile(serviceImg,"servicios/");
+      if (serviceImg != null) {
+        servicioData.imagenUrl = await uploadFile(serviceImg, "servicios/");
       }
       fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
@@ -247,155 +252,158 @@ async function cargarDatosUbicacion(id: number) {
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      } else {
+    } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
-const editarUbicacion = async (id: number) => {
+  const editarUbicacion = async (id: number) => {
     if (
-      ubicacionData.descripcion !== ubicacionData.descripcion || 
-      ubicacionData.imagen !== ubicacionData.imagen || 
+      ubicacionData.descripcion !== ubicacionData.descripcion ||
+      ubicacionData.imagen !== ubicacionData.imagen ||
       ubicacionData.video !== ubicacionData.video
     ) {
-      if(ubicacionImg!=null){
-        ubicacionData.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
+      if (ubicacionImg != null) {
+        ubicacionData.imagen = await uploadFile(
+          ubicacionImg,
+          "ubicaciones/imagenes/"
+        );
       }
-      if(ubicaionVideo!=null){
-        ubicacionData.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
+      if (ubicaionVideo != null) {
+        ubicacionData.video = await uploadFile(
+          ubicaionVideo,
+          "ubicaciones/videos/"
+        );
       }
-      if(ubicacionBkData.descripcion==null && ubicacionBkData.imagen==null && ubicacionBkData.video==null){
+      if (
+        ubicacionBkData.descripcion == null &&
+        ubicacionBkData.imagen == null &&
+        ubicacionBkData.video == null
+      ) {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicacion`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicacion`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      } else {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicacion/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicacion/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
-      
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
   const editarCarrera = async (id: number) => {
-    if (
-      carreraData.nombre !== carreraData.nombre
-    ) {
-      if(carreraBkData.nombre==null){
-        fetch(
-        `http://apisistemaunivalle.somee.com/api/Carreras/addCarrera`,
-        {
+    if (carreraData.nombre !== carreraData.nombre) {
+      if (carreraBkData.nombre == null) {
+        fetch(`http://apisistemaunivalle.somee.com/api/Carreras/addCarrera`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(servicioData),
-        }
-      ).then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
         })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
-         fetch(
-        `http://apisistemaunivalle.somee.com/api/Carreras/updateCarrera/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      ).then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      } else {
+        fetch(
+          `http://apisistemaunivalle.somee.com/api/Carreras/updateCarrera/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
   const editarRequisitos = async (id: number) => {
-    if (
-      requisitosData.descripcion !== requisitosData.descripcion
-    ) {
-      if(requisitosBkData.descripcion==null){
+    if (requisitosData.descripcion !== requisitosData.descripcion) {
+      if (requisitosBkData.descripcion == null) {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      } else {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
-      
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
@@ -406,44 +414,44 @@ const editarUbicacion = async (id: number) => {
       referenciaData.nombre !== referenciaData.nombre ||
       referenciaData.numeroCel !== referenciaData.numeroCel
     ) {
-      if(refereciaBkData.nombre==null && refereciaBkData.numeroCel==null){
+      if (refereciaBkData.nombre == null && refereciaBkData.numeroCel == null) {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      } else {
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+          `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
@@ -470,8 +478,9 @@ const editarUbicacion = async (id: number) => {
           <Input
             type="file"
             className="mt-1"
+            accept="image/png, image/jpeg"
             placeholder="Imagen para el servicio"
-            onChange={e => setImg(e.target.files?.[0] || null)}
+            onChange={(e) => setImg(e.target.files?.[0] || null)}
           />
         </Label>
         <div className=" mt-4">
@@ -484,11 +493,15 @@ const editarUbicacion = async (id: number) => {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
           <span>Descripción</span>
-          <Textarea 
-            value={requisitosData.descripcion === null ? "" : requisitosData.descripcion}
-            className="mt-1" 
-            rows={3} 
-            placeholder="Ingresa los requisitos del servicio." 
+          <Textarea
+            value={
+              requisitosData.descripcion === null
+                ? ""
+                : requisitosData.descripcion
+            }
+            className="mt-1"
+            rows={3}
+            placeholder="Ingresa los requisitos del servicio."
             onChange={(e) => handleChange1(e, "descripcion")}
           />
         </Label>
@@ -498,11 +511,11 @@ const editarUbicacion = async (id: number) => {
           </Button>
         </div>
       </div>
-       <SectionTitle>Carrera</SectionTitle>
+      <SectionTitle>Carrera</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
           <span>Nombre</span>
-           <Input
+          <Input
             value={carreraData.nombre === null ? "" : carreraData.nombre}
             className="mt-1"
             placeholder="Escriba el nombre de la carrera."
@@ -515,21 +528,23 @@ const editarUbicacion = async (id: number) => {
           </Button>
         </div>
       </div>
-       <SectionTitle>Contactos de referencia</SectionTitle>
+      <SectionTitle>Contactos de referencia</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
           <span>Nombre del Contacto</span>
-           <Input
+          <Input
             value={referenciaData.nombre === null ? "" : referenciaData.nombre}
             className="mt-1"
             placeholder="Escriba el nombre del contacto."
             onChange={(e) => handleChange3(e, "nombre")}
           />
         </Label>
-         <Label className="mt-4">
+        <Label className="mt-4">
           <span>Número del Contacto</span>
-           <Input
-            value={referenciaData.numeroCel === null ? "" : referenciaData.numeroCel}
+          <Input
+            value={
+              referenciaData.numeroCel === null ? "" : referenciaData.numeroCel
+            }
             className="mt-1"
             placeholder="Escriba el numero del contacto."
             onChange={(e) => handleChange3(e, "numeroCel")}
@@ -547,7 +562,11 @@ const editarUbicacion = async (id: number) => {
         <Label>
           <span>Ubicación</span>
           <Input
-            value={ubicacionData.descripcion === null ? "" : ubicacionData.descripcion}
+            value={
+              ubicacionData.descripcion === null
+                ? ""
+                : ubicacionData.descripcion
+            }
             className="mt-1"
             placeholder="Ingrese la ubicación del servicio"
             onChange={(e) => handleChange4(e, "descripcion")}
@@ -559,8 +578,9 @@ const editarUbicacion = async (id: number) => {
           <Input
             type="file"
             className="mt-1"
+            accept="image/png, image/jpeg"
             placeholder="Imagen para ubicación"
-            onChange={e => setUImg(e.target.files?.[0] || null)}
+            onChange={(e) => setUImg(e.target.files?.[0] || null)}
           />
         </Label>
         <Label className="mt-4">
@@ -568,11 +588,12 @@ const editarUbicacion = async (id: number) => {
           <Input
             type="file"
             className="mt-1"
+            accept="video/mp4,video/x-m4v,video/*"
             placeholder="Imagen para ubicación"
-            onChange={e => setUVideo(e.target.files?.[0] || null)}
+            onChange={(e) => setUVideo(e.target.files?.[0] || null)}
           />
         </Label>
-         <div className=" mt-4">
+        <div className=" mt-4">
           <Button size="large" onClick={() => editarUbicacion(numId)}>
             Editar
           </Button>
@@ -580,7 +601,9 @@ const editarUbicacion = async (id: number) => {
       </div>
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Button size="large">Volver</Button>
+          <Link href={"/bienestarUniversitario/listarServicios"}>
+            <Button size="large">Volver</Button>
+          </Link>
         </div>
 
         <div>
@@ -588,8 +611,6 @@ const editarUbicacion = async (id: number) => {
             Limpiar campos
           </Button>
         </div>
-
-        
       </div>
       <ToastContainer />
     </Layout>
