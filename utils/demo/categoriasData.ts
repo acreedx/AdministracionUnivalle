@@ -20,7 +20,7 @@ function convertJSONListCategory(data: any) {
   });
   return convertedListData;
 }
-
+/*
 const tableData: ICategoriasData[] = [
   {
     id: 1,
@@ -42,7 +42,7 @@ const tableData: ICategoriasData[] = [
     status: "success",
   },
 ];
-
-export default tableData;
+*/
+//export default tableData;
 export type { ICategoriasData };
 export { convertJSONCategory, convertJSONListCategory };

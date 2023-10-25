@@ -15,7 +15,7 @@ function CrearCategoria() {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const router = useRouter();
 
-  const createCategoryRoute = "Category/AddCategory"
+  const createCategoryRoute = "Categoria/addCategoria"
 
   const handleSubmit = async () => {
     if (name == null || description == null) {
@@ -27,8 +27,8 @@ function CrearCategoria() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nombre: name,
-        description: description,
+        nombreCategoria: name,
+        descripcion: description,
       }),
     });
     router.back();

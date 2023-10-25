@@ -6,6 +6,9 @@ interface ITramitesData {
   cellphone: string;
   durationId: number;
   duration: string;
+  requerimentId: number;
+  requeriment: string;
+
   //  category: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
@@ -14,19 +17,24 @@ function convertJSONService(data: any) {
     id: data.id,
     name: data.nombre,
     enchargedId:
-      data.referencia && data.referencia[0]
-        ? data.referencia[0].enchargedId
-        : null,
+      data.referencia && data.referencia[0] ? data.referencia[0].id : null,
     encharged:
       data.referencia && data.referencia[0] ? data.referencia[0].nombre : null,
     cellphone:
       data.referencia && data.referencia[0]
         ? data.referencia[0].numerocel
         : null,
-    durationId:
-      data.tramite && data.tramite[0] ? data.tramite[0].identificador : null,
+    durationId: data.tramites && data.tramites[0] ? data.tramites[0].id : null,
     duration:
-      data.tramite && data.tramite[0] ? data.tramite[0].tiempoTramite : null,
+      data.tramites && data.tramites[0] ? data.tramites[0].tiempotramite : null,
+
+    requerimentId:
+      data.requisitos && data.requisitos[0] ? data.requisitos[0].id : null,
+
+    requeriment:
+      data.requisitos && data.requisitos[0]
+        ? data.requisitos[0].descripcion
+        : null,
     //category: data.categorias[0].nombre,
     status: data.estado == true ? "success" : "danger",
   };

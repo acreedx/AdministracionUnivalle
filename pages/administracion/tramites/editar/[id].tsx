@@ -141,6 +141,7 @@ function ModificarTramite({ id }: props) {
   const updateReferencesRoute = "Referencia/UpdateReferences/";
   const updateDurationServiceRoute = "Tramites/updateTramite/";
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
+  const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
 
   const moduleId = 3;
 
@@ -160,19 +161,23 @@ function ModificarTramite({ id }: props) {
       //   const dataNewService = await newService.json();
       //   const newServiceId = dataNewService.data.id;
 
-      //      await createRequisitos(newServiceId);
+      await updateRequisitos(id);
 
-      await fetch(`${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: id,
-        }),
-      });
+
+      await fetch(
+        `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nombre: encharged,
+            numerocel: cellphone,
+            serviciosId: id,
+          }),
+        }
+      );
 
       await fetch(`${URL.baseUrl}${updateDurationServiceRoute}${service?.durationId}`, {
         method: "PUT",
@@ -190,17 +195,14 @@ function ModificarTramite({ id }: props) {
     }
   };
 
-  const createRequisitos = async (serviceId: number) => {
+  const updateRequisitos = async (serviceId: number) => {
     for (const requisito of requisitos) {
       if (requisito.trim() !== '') {
         const nuevosPasos = pasoRequisito[requisitos.indexOf(requisito)].map((nombre) => ({ nombre }));
-
-        console.log("Requisito a crear:", requisito, "Pasos:", nuevosPasos, "id", serviceId);
-
         // Enviar la solicitud solo si el requisito no está vacío
-        /*
-        const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
-          method: "POST",
+
+        const updateRequisitoResponse = await fetch(`${URL.baseUrl}${updateRequisitoRoute}${service?.requerimentId}`, {
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -211,9 +213,9 @@ function ModificarTramite({ id }: props) {
             estado: true,
           }),
         });
-       
-        console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
-       */
+
+        console.log("Respuesta del servidor al crear el requisito:", updateRequisitoResponse);
+
       }
     }
   };
@@ -232,6 +234,43 @@ function ModificarTramite({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
+  const obtenerRequisitosDelServicio = async (serviceId: number) => {
+    try {
+      const response = await fetch(`${URL.baseUrl}${getRequisitosByID}${serviceId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else {
+        throw new Error("No se pudieron obtener los requisitos del servicio");
+      }
+    } catch (error) {
+      console.error(error);
+      return [];
+    }
+  };
+
+
+  useEffect(() => {
+    async function obtenerYConfigurarRequisitos() {
+      const requisitosDelServicio = await obtenerRequisitosDelServicio(id);
+
+      console.log("Datos de requisitosDelServicio:", requisitosDelServicio);
+
+      if (requisitosDelServicio.success === 1 && requisitosDelServicio.data.length > 0) {
+        const nuevosRequisitos = requisitosDelServicio.data[0].descripcion;
+        const nuevosPasosRequisitos = requisitosDelServicio.data[0].pasosRequisito.map(
+          (paso: any) => paso.nombre
+        );
+
+        setRequisitos([nuevosRequisitos]);
+        setPasoRequisitos([nuevosPasosRequisitos]);
+      }
+    }
+
+    obtenerYConfigurarRequisitos();
+  }, [id]);
+
+
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
@@ -258,15 +297,14 @@ function ModificarTramite({ id }: props) {
             </div>
 
             {requisitos.map((requisito, requisitoIndex) => (
-              <div key={requisitoIndex} className={requisitoIndex === requisitos.length - 1 ? 'hidden' : ''}>
+              <div key={requisitoIndex}>
                 <div className="flex">
-                  <button
-                    className="text-white px-2 py-1 rounded-full -mr-2"
-                    type="button"
-                    onClick={() => agregarPasoRequisito(requisitoIndex)}
-                  >
-                    <PlusIcon />
-                  </button>
+                  <Input
+                    className="mt-1 mb-1"
+                    placeholder="Ingresa el requisito"
+                    value={requisito}
+                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
+                  />
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
@@ -274,16 +312,15 @@ function ModificarTramite({ id }: props) {
                   >
                     <MinusIcon />
                   </button>
-                  <Input
-                    className="mt-1 mb-1"
-                    placeholder="Ingresa el requisito"
-                    value={requisito}
-                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
-                    key={`requisito-${requisitoIndex}`}
-                  />
                 </div>
-                {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
+                {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((paso, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
+                    <Input
+                      className="mt-1 mb-1"
+                      placeholder="Ingresa el paso del requisito"
+                      value={paso}
+                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
+                    />
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
@@ -291,13 +328,6 @@ function ModificarTramite({ id }: props) {
                     >
                       <MinusIcon />
                     </button>
-                    <Input
-                      className="mt-1 mb-1"
-                      placeholder="Ingresa el paso del requisito"
-                      value={pasoRequisito}
-                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
-                      key={`pasoRequisito-${requisitoIndex}-${pasoIndex}`}
-                    />
                   </div>
                 ))}
               </div>

@@ -24,8 +24,8 @@ import SweetAlert from "react-bootstrap-sweetalert";
 function Categorias() {
   const router = useRouter();
   // * Modificar ruta segun la api * 
-  const route = "Categorias/getCategory/";
-  const deleteCategoryRoute = "Servicios/deleteCategory/";
+  const route = "Categoria/getAllCategorias";
+  const deleteCategoryRoute = "Categoria/deleteCategoria/";
   const resultsPerPage = 10;
 
   useEffect(() => {
@@ -77,7 +77,7 @@ function Categorias() {
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
 
-      <SectionTitle>Listado de los tipos de tramites</SectionTitle>
+      <SectionTitle>Categorias de tramites</SectionTitle>
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
