@@ -7,7 +7,7 @@ import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
 import URL from "utils/demo/api";
-import { ICajasData, convertJSONService } from "utils/demo/cajasData";
+import { ICategoriasData, convertJSONCategory } from "utils/demo/categoriasData";
 import { GetServerSidePropsContext } from "next";
 
 interface props {
@@ -22,32 +22,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-function EditarServicio({ id }: props) {
-  const route = "Servicios/getServicioById/";
+function EditarCategoria({ id }: props) {
+  const route = "Categoria/getCategoriaById/";
   const router = useRouter();
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [service, setService] = useState<ICajasData>();
+  const [service, setService] = useState<ICategoriasData>();
 
   const [name, setname] = useState("");
-
-  const [ubicacion, setubicacion] = useState("");
-
-  const [encharged, setencharged] = useState("");
-
-  const [cellphone, setcellphone] = useState("");
+  const [description, setdescription] = useState("");
 
   useEffect(() => {
+
     async function doFetch() {
       fetch(`${URL.baseUrl}${route}${id}`)
         .then((res) => res.json())
-        .then((res) => setService(convertJSONService(res.data[0])));
+        .then((res) => {
+          setService(convertJSONCategory(res.data));
+        });
     }
     doFetch();
   }, []);
 
-  const updateServiceRoute = "Servicios/updateServicio/";
-  const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
-  const updateReferencesRoute = "Referencia/UpdateReferences/";
+  const updateServiceRoute = "Categoria/updateCategoria/";
 
   const handleSubmit = async () => {
     await fetch(`${URL.baseUrl}${updateServiceRoute}${id}`, {
@@ -56,51 +52,21 @@ function EditarServicio({ id }: props) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        nombre: name,
-        imagenUrl: "",
+        nombreCategoria: name,
+        descripcion: description,
       }),
     });
-    await fetch(
-      `${URL.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descripcion: ubicacion,
-          imagen: "",
-          video: "",
-          serviciosId: id,
-          estado: service?.status == "success" ? true : false,
-        }),
-      }
-    );
-    await fetch(
-      `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: id,
-        }),
-      }
-    );
+
     router.back();
   };
 
   useEffect(() => {
     if (service?.name) {
       setname(service!.name);
-      setubicacion(service!.ubicacion);
-      setencharged(service!.encharged);
-      setcellphone(service!.cellphone);
+      setdescription(service!.description);
     }
   }, [service]);
+
 
   const handleAlertConfirm = () => {
     handleSubmit();
@@ -112,7 +78,7 @@ function EditarServicio({ id }: props) {
 
   return (
     <Layout>
-      <PageTitle>Editar categoria</PageTitle>
+      <PageTitle>Editar Categoria </PageTitle>
       <div className="mb-4">
         <Link href={`/administracion/tramites/categorias`}>
           <Button size="small">
@@ -126,41 +92,25 @@ function EditarServicio({ id }: props) {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <form id="miFormulario" onSubmit={handleSubmit}>
           <Label>
-            <span>Nombre del servicio</span>
+            <span>Nombre de la categoria</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el nombre del servicio"
+              placeholder="Ingresa el nombre de la categoria"
               value={name}
               onChange={(e) => setname(e.target.value)}
             />
           </Label>
+
           <Label className="mt-4">
-            <span>Ubicación</span>
+            <span>Descripcion</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa la ubicación del servicio"
-              value={ubicacion}
-              onChange={(e) => setubicacion(e.target.value)}
+              placeholder="Ingresa la descripcion de la categoria"
+              value={description}
+              onChange={(e) => setdescription(e.target.value)}
             />
           </Label>
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el encargado del servicio"
-              value={encharged}
-              onChange={(e) => setencharged(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el teléfono de referencia"
-              value={cellphone}
-              onChange={(e) => setcellphone(e.target.value)}
-            />
-          </Label>
+
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
               <input
@@ -195,4 +145,4 @@ function EditarServicio({ id }: props) {
   );
 }
 
-export default EditarServicio;
+export default EditarCategoria;

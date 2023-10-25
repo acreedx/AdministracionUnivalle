@@ -24,7 +24,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 function Categorias() {
   const router = useRouter();
   // * Modificar ruta segun la api * 
-  const route = "Categoria/getAllCategorias";
+  const route = "Categoria/getActiveCategorias";
   const deleteCategoryRoute = "Categoria/deleteCategoria/";
   const resultsPerPage = 10;
 
@@ -58,7 +58,7 @@ function Categorias() {
 
   const handleSubmit = async () => {
     await fetch(`${URL.baseUrl}${deleteCategoryRoute}${selectedCategory}`, {
-      method: "DELETE",
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
@@ -82,6 +82,7 @@ function Categorias() {
         <Table>
           <TableHeader>
             <tr>
+              <TableCell>Id</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripcion</TableCell>
               <TableCell>Estado</TableCell>
@@ -91,6 +92,13 @@ function Categorias() {
           <TableBody>
             {services.map((categoria, i) => (
               <TableRow key={i}>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{categoria.id}</p>
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>

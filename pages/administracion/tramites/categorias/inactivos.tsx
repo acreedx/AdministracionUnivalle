@@ -15,32 +15,32 @@ import {
   Button,
   Pagination,
 } from "@roketid/windmill-react-ui";
-import { EditIcon, TrashIcon, MenuIcon } from "icons";
-import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
+import { RestoreIcon, ButtonsIcon } from "icons";
+import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
 import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
 import SweetAlert from "react-bootstrap-sweetalert";
-function Tramites() {
+function CategoriasInactivas() {
   const router = useRouter();
-
-  const route = "Servicios/getServicioByModule/";
-  const deleteServiceRoute = "Servicios/deleteServicio/";
-  const moduleName = "Tramites";
+  // * Modificar ruta segun la api * 
+  const route = "Categoria/getDeletedCategorias";
+  const restoreCategoryRoute = "Categoria/restoreCategoria/";
   const resultsPerPage = 10;
+
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${moduleName}`)
+      fetch(`${URL.baseUrl}${route}`)
         .then((res) => res.json())
-        .then((res) => setServices(convertJSONListService(res.data)));
+        .then((res) => setCategories(convertJSONListCategory(res.data)));
     }
     doFetch();
   }, []);
 
-  const [selectedService, setSelectedService] = useState<number>(0);
+  const [selectedCategory, setSelectedCategory] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [pageTable, setPageTable] = useState(1);
-  const [services, setServices] = useState<ICajasData[]>([]);
+  const [services, setCategories] = useState<ICategoriasData[]>([]);
   const totalResults = services.length;
 
   function onPageChangeTable2(p: number) {
@@ -48,7 +48,7 @@ function Tramites() {
   }
 
   useEffect(() => {
-    setServices(
+    setCategories(
       services.slice(
         (pageTable - 1) * resultsPerPage,
         pageTable * resultsPerPage
@@ -57,7 +57,7 @@ function Tramites() {
   }, [pageTable]);
 
   const handleSubmit = async () => {
-    await fetch(`${URL.baseUrl}${deleteServiceRoute}${selectedService}`, {
+    await fetch(`${URL.baseUrl}${restoreCategoryRoute}${selectedCategory}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -77,64 +77,55 @@ function Tramites() {
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
 
-      <SectionTitle>Listado de los tipos de tramites</SectionTitle>
+      <SectionTitle>Categorias de tramites</SectionTitle>
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
             <tr>
+              <TableCell>Id</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Descripcion</TableCell>
+              <TableCell>Estado</TableCell>
               <TableCell>Acciones</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
-            {services.map((servicio, i) => (
+            {services.map((categoria, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                      <p className="font-semibold">{categoria.id}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.ubicacion}</p>
+                      <p className="font-semibold">{categoria.name}</p>
                     </div>
                   </div>
                 </TableCell>
+
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.encharged}</p>
+                      <p className="font-semibold">{categoria.description}</p>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.cellphone}</p>
-                    </div>
-                  </div>
-                </TableCell>
+
                 <TableCell>
                   <Badge
-                    type={servicio.status == "success" ? "success" : "danger"}
+                    type={categoria.status == "success" ? "success" : "danger"}
                   >
-                    {servicio.status == "success" ? "Activo" : "Inactivo"}
+                    {categoria.status == "success" ? "Activo" : "Inactivo"}
                   </Badge>
                 </TableCell>
+
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Link
-                      href={`/administracion/cajas/editar/[id]`}
-                      as={`/administracion/cajas/editar/${servicio.id}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+
                     <Button
                       layout="link"
                       size="small"
@@ -142,14 +133,15 @@ function Tramites() {
                       type={"button"}
                       onClick={() => {
                         setShowAlert(true);
-                        setSelectedService(servicio.id);
+                        setSelectedCategory(categoria.id);
                       }}
                     >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                      <Badge className="w-5 h-5" aria-hidden="true" />
                     </Button>
+
                     {showAlert && (
                       <SweetAlert
-                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                        warning
                         title="Atención"
                         confirmBtnText="Confirmar"
                         cancelBtnText="Cancelar"
@@ -160,14 +152,7 @@ function Tramites() {
                         Confirma todos los datos del nuevo servicio?
                       </SweetAlert>
                     )}
-                    <Link
-                      href={`/administracion/cajas/[id]/[name]`}
-                      as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Ver">
-                        <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+
                   </div>
                 </TableCell>
               </TableRow>
@@ -187,4 +172,4 @@ function Tramites() {
   );
 }
 
-export default Tramites;
+export default CategoriasInactivas;

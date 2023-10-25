@@ -6,7 +6,7 @@ interface ICategoriasData {
 }
 function convertJSONCategory(data: any) {
   const convertedData: ICategoriasData = {
-    id: data.id,
+    id: data.idCategoria,
     name: data.nombre,
     description: data.descripcion,
     status: data.estado == true ? "success" : "danger",

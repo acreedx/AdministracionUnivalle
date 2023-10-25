@@ -28,6 +28,7 @@ import OutlineCogIcon from "./outlineCog.svg";
 import OutlineLogoutIcon from "./outlineLogout.svg";
 import PlusIcon from "./plus.svg";
 import MinusIcon from "./minus.svg";
+import RestoreIcon from "./restore.svg";
 
 export {
   ButtonsIcon,
@@ -60,6 +61,7 @@ export {
   OutlineLogoutIcon,
   PlusIcon,
   MinusIcon,
+  RestoreIcon,
 };
 
 interface IIcon {
