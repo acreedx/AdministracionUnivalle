@@ -49,8 +49,8 @@ function ObjetosPerdidos() {
         const query = await fetch(
           "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
         );
-        const response: any = await query.json();
-        if (response.ok) {
+        if (query.ok) {
+          const response: any = await query.json();
           setTotal(response.data.length);
           setUserInfo(
             response.data.slice(
@@ -110,14 +110,12 @@ function ObjetosPerdidos() {
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-semibold">{datos.titulo}</p>
+                      <p>{datos.titulo}</p>
                     </div>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <p className="font-semibold">
-                        {datos.estado ? "Activo" : "Inactivo"}
-                      </p>
+                      <p>{datos.estado ? "Activo" : "Inactivo"}</p>
                     </div>
                   </TableCell>
                   <TableCell>
