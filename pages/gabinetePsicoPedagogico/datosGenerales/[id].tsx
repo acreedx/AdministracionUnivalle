@@ -2,7 +2,7 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import { 
   IEditarServicio,
   IEditarUbicacion,
-  IEditarReferencia,
+  IEditarReferenciaArray,
   IEditarCarrera,
   IEditarRequisitosArray 
 } from "../../../utils/interfaces/servicios";
@@ -19,6 +19,7 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import {uploadFile} from "../../../firebase/config"
+import ReferenciaInputs from "../../../components/referenciasInput"
 
 export async function getServerSideProps(context: any) {
   return {
@@ -53,7 +54,11 @@ function EditarDatosGeneralesPage() {
       { 
         identificador:0,
         descripcion: null,
-        
+        pasosRequisito:
+        [ {
+            nombre:null
+          }
+        ]
       }
     ] 
   });
@@ -62,23 +67,34 @@ function EditarDatosGeneralesPage() {
       { 
         identificador:0,
         descripcion: null,
+        pasosRequisito:
+        [ {
+            nombre:null
+          }
+        ]
         
       }
     ] 
   });
-  const [referenciaData, setReferenciaData] = useState<IEditarReferencia>({
-    nombre: null,
-    numeroCel: null,
+  const [referenciaData, setReferenciaData] = useState<IEditarReferenciaArray>({
+    data:
+    [
+      {
+        id:0,
+        nombre: null,
+        numero: null,
+      } 
+    ]
   });
-  const [refereciaBkData, setReferenciaBkData] = useState<IEditarReferencia>({
-    nombre: null,
-    numeroCel: null,
-  });
-  const [carreraData, setCarreraData] = useState<IEditarCarrera>({
-    nombre: null,
-  });
-  const [carreraBkData, setCarreraBkData] = useState<IEditarCarrera>({
-    nombre: null,
+  const [refereciaBkData, setReferenciaBkData] = useState<IEditarReferenciaArray>({
+    data:
+    [
+      {
+        id:0,
+        nombre: null,
+        numero: null,
+      } 
+    ]
   });
   const router = useRouter();
   const { id } = router.query;
@@ -155,7 +171,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -163,43 +179,21 @@ async function cargarDatosUbicacion(id: number) {
       const resData = await res.json();
 
       setReferenciaBkData({
-        nombre: resData.data.nombre,
-        numeroCel:resData.data.numeroCel,
+        data:resData.data,
       });
       setReferenciaData({
-        nombre: resData.data.nombre,
-        numeroCel:resData.data.numeroCel,
+        data:resData.data,
       });
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
     }
   }
-  async function cargarDatosCarrera(id: number) {
-    try {
-      const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
-      );
-      if (!res.ok) {
-        throw new Error("Error al obtener los datos del servicio.");
-      }
-      const resData = await res.json();
 
-      setCarreraBkData({
-        nombre: resData.data.nombre,
-      });
-      setCarreraData({
-        nombre: resData.data.nombre,
-      });
-    } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
-    }
-  }
   useEffect(() => {
     cargarDatosServicio(numId);
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-    cargarDatosCarrera(numId);
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
@@ -225,17 +219,22 @@ async function cargarDatosUbicacion(id: number) {
       // });
       
   };
-  const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setCarreraData({
-      ...carreraData,
-      [campo]: e.target.value,
-    });
-  };
-  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setReferenciaData({
-      ...referenciaData,
-      [campo]: e.target.value,
-    });
+  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
+      setReferenciaData((prevData:any) => {
+      const newData = prevData.data.map((item:any) => {
+        if (item.id === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          return {
+            ...item,
+            [campo]: e.target.value,
+          };
+        }
+        return item;
+        });
+
+        return { data: newData };
+      });
+      console.log(referenciaData.data);
   };
   const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setUbicacionData({
@@ -333,51 +332,6 @@ const editarUbicacion = async (id: number) => {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
-  const editarCarrera = async (id: number) => {
-    if (
-      carreraData.nombre !== carreraData.nombre
-    ) {
-      if(carreraBkData.nombre==null){
-        fetch(
-        `http://apisistemaunivalle.somee.com/api/Carreras/addCarrera`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      ).then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
-         fetch(
-        `http://apisistemaunivalle.somee.com/api/Carreras/updateCarrera/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      ).then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }
-    } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    }
-  };
   const editarRequisitos = async (id: number) => {
     requisitosData.data.forEach(req => {
       if (
@@ -429,21 +383,27 @@ const editarUbicacion = async (id: number) => {
     });
     
   };
-
-  const editarReferencias = async (id: number) => {
+  const editarReferencias = async (idMod: number) => {
+    referenciaData.data.forEach(req => {
     if (
-      referenciaData.nombre !== referenciaData.nombre ||
-      referenciaData.numeroCel !== referenciaData.numeroCel
+      req.nombre !== req.nombre ||
+      req.numero !== req.numero
     ) {
-      if(refereciaBkData.nombre==null && refereciaBkData.numeroCel==null){
+      if(req.id<=0){
+        const postRef = {
+          nombre:req.nombre,
+          numerocel:req.numero,
+          serviciosId:null,
+          id_modulo:idMod
+        };
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia`,
+        `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia/`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(postRef),
         }
       )
         .then((response) => {
@@ -456,13 +416,13 @@ const editarUbicacion = async (id: number) => {
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }else{
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${id}`,
+        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${req.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(req),
         }
       )
         .then((response) => {
@@ -477,18 +437,38 @@ const editarUbicacion = async (id: number) => {
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
+  });
   };
   const [addRequisitos, setAddRequisitos] = useState(false);
-  const [inputs, setInputs]:any = useState([]);
+  const [inputsReq, setInputsReq]:any = useState([]);
+  const [inputsRef, setInputsRef]:any = useState([]);
 
   const handleAddRequisitos = () => {
     setAddRequisitos(true);
-    setInputs([...inputs, <Textarea 
-                  key={inputs.length}
+    setInputsReq([...inputsReq, <Textarea 
+                  key={inputsReq.length}
                   rows={3} 
                   placeholder="Ingresa los requisitos del servicio." 
                   onChange={(e) => handleChange1(e, 0 ,"descripcion")}
                 />]);
+  }
+  const handleAddReferencias = () => {
+    const newReference = {
+      id: (referenciaData.data.length+1) * -1,
+      nombre: "", 
+      numero: "", 
+    };
+    referenciaData.data.push(newReference);
+    setInputsRef([...inputsRef]);
+    console.log(referenciaData.data)
+  }
+  const handleDeleteReferencias = (id:number) => {
+    if(id<0){
+      referenciaData.data.pop();
+      setInputsRef([...inputsRef]);
+      console.log(referenciaData.data)
+    }
+    
   }
   return (
     <Layout>
@@ -524,21 +504,24 @@ const editarUbicacion = async (id: number) => {
       <SectionTitle>Requisitos</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
-          <span>Descripción</span>
+          
           {
-            requisitosData.data.map((req)=>(
+            requisitosData.data.map((req,index)=>(
               <div className="my-3" key={req.identificador}>
+                 <div className=" text-lg">Requisito {index+1}</div>
+                <span>Descripción</span>
                  <Textarea 
                   value={req.descripcion === null ? "" : req.descripcion}
                   rows={3} 
                   placeholder="Ingresa los requisitos del servicio." 
                   onChange={(e) => handleChange1(e, req.identificador,"descripcion")}
                 />
+                <hr className=" mt-3"/>
               </div>
             ))
           }
-         
-          {addRequisitos && inputs}
+          
+          {addRequisitos && inputsReq}
         </Label>
         <div className="flex flex-row-reverse ...">
           <div >
@@ -557,23 +540,25 @@ const editarUbicacion = async (id: number) => {
       <SectionTitle>Contactos de referencia</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
-          <span>Nombre del Contacto</span>
-           <Input
-            value={referenciaData.nombre === null ? "" : referenciaData.nombre}
-            className="mt-1"
-            placeholder="Escriba el nombre del contacto."
-            onChange={(e) => handleChange3(e, "nombre")}
-          />
+          
+          {
+            referenciaData.data.map((ref,index)=>(
+               <div className="my-3" key={ref.id}>
+                <ReferenciaInputs index={index} identificador={ref.id} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
+               </div>
+            ))
+          }
+      
+          {inputsRef}
+
         </Label>
-         <Label className="mt-4">
-          <span>Número del Contacto</span>
-           <Input
-            value={referenciaData.numeroCel === null ? "" : referenciaData.numeroCel}
-            className="mt-1"
-            placeholder="Escriba el numero del contacto."
-            onChange={(e) => handleChange3(e, "numeroCel")}
-          />
-        </Label>
+        <div className="flex flex-row-reverse ...">
+          <div >
+            <Button  size="small" onClick={handleAddReferencias}>
+                +
+            </Button>
+          </div>
+        </div>
         <div className=" mt-4">
           <Button size="large" onClick={() => editarReferencias(numId)}>
             Editar

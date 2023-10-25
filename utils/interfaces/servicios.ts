@@ -44,16 +44,30 @@ export interface IEditarRequisitosArray {
     {
       identificador:number,
       descripcion: string | null;
+      pasosRequisito:
+      [
+        {
+          nombre:string | null;
+        }
+      ]
     }  
   ]
-  
-  
 }
 
 export interface IEditarCarrera {
   nombre: string | null;
 }
-
+export interface IEditarReferenciaArray {
+  data:
+  [
+    {
+      id: number;
+      nombre: string | null;
+      numero: string | null;
+    }
+  ]
+ 
+}
 export interface IEditarReferencia {
   nombre: string | null;
   numeroCel: string | null;
