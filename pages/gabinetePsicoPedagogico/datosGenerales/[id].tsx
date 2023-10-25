@@ -80,7 +80,7 @@ function EditarDatosGeneralesPage() {
     data:
     [
       {
-        id:0,
+        identificador:0,
         nombre: null,
         numero: null,
       } 
@@ -90,7 +90,7 @@ function EditarDatosGeneralesPage() {
     data:
     [
       {
-        id:0,
+        identificador:0,
         nombre: null,
         numero: null,
       } 
@@ -103,7 +103,7 @@ function EditarDatosGeneralesPage() {
   async function cargarDatosServicio(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -222,7 +222,7 @@ async function cargarDatosUbicacion(id: number) {
   const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
       setReferenciaData((prevData:any) => {
       const newData = prevData.data.map((item:any) => {
-        if (item.id === id) {
+        if (item.identificador === id) {
           // Clona el objeto original y actualiza la propiedad especificada
           return {
             ...item,
@@ -384,18 +384,20 @@ const editarUbicacion = async (id: number) => {
     
   };
   const editarReferencias = async (idMod: number) => {
+    var count =0;
     referenciaData.data.forEach(req => {
     if (
-      req.nombre !== req.nombre ||
-      req.numero !== req.numero
+      req.nombre !== refereciaBkData.data[count].nombre ||
+      req.numero !== refereciaBkData.data[count].numero
     ) {
-      if(req.id<=0){
+      if(req.identificador<=0){
         const postRef = {
           nombre:req.nombre,
           numerocel:req.numero,
           serviciosId:null,
           id_modulo:idMod
         };
+        console.log(postRef)
         fetch(
         `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia/`,
         {
@@ -416,7 +418,7 @@ const editarUbicacion = async (id: number) => {
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }else{
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${req.id}`,
+        `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${req.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -437,6 +439,7 @@ const editarUbicacion = async (id: number) => {
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
+    count++;
   });
   };
   const [addRequisitos, setAddRequisitos] = useState(false);
@@ -454,7 +457,7 @@ const editarUbicacion = async (id: number) => {
   }
   const handleAddReferencias = () => {
     const newReference = {
-      id: (referenciaData.data.length+1) * -1,
+      identificador: (referenciaData.data.length+1) * -1,
       nombre: "", 
       numero: "", 
     };
@@ -477,7 +480,7 @@ const editarUbicacion = async (id: number) => {
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
-          <span>Nombre del servicio</span>
+          <span>Nombre del modulo</span>
           <Input
             value={servicioData.nombre}
             className="mt-1"
@@ -543,8 +546,8 @@ const editarUbicacion = async (id: number) => {
           
           {
             referenciaData.data.map((ref,index)=>(
-               <div className="my-3" key={ref.id}>
-                <ReferenciaInputs index={index} identificador={ref.id} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
+               <div className="my-3" key={ref.identificador}>
+                <ReferenciaInputs index={index} identificador={ref.identificador} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
                </div>
             ))
           }

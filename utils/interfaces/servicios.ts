@@ -61,7 +61,7 @@ export interface IEditarReferenciaArray {
   data:
   [
     {
-      id: number;
+      identificador: number;
       nombre: string | null;
       numero: string | null;
     }

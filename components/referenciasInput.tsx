@@ -35,7 +35,7 @@ const ReferenciaInputs: FC<ReferenciaInputsProps> = ({
         <Input
           value={valueContacto === null ? "" : valueContacto}
           placeholder="Escriba el número del contacto."
-          onChange={(e) => handle(e, identificador, "numerocel")}
+          onChange={(e) => handle(e, identificador, "numero")}
         />
         <div className=" mx-1" ></div>
         {isNuevoContacto? <Button size="small" onClick={()=>hadleDelete(identificador)}>-</Button>:null}
