@@ -1,9 +1,8 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import { 
-  IEditarServicio,
+  IEditarModulo,
   IEditarUbicacion,
   IEditarReferenciaArray,
-  IEditarCarrera,
   IEditarRequisitosArray 
 } from "../../../utils/interfaces/servicios";
 import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
@@ -31,13 +30,12 @@ function EditarDatosGeneralesPage() {
   const [serviceImg,setImg]:any = useState(null)
   const [ubicacionImg,setUImg]:any = useState(null)
   const [ubicaionVideo,setUVideo]:any = useState(null)
-  const [servicioData, setServicioData] = useState<IEditarServicio>({
-    nombre: "",
-    imagenUrl: null,
+
+  const [moduloData, setModuloData] = useState<IEditarModulo>({
+    nombremodulo: "",
   });
-  const [servicioBkData, setServicioBkData] = useState<IEditarServicio>({
-    nombre: "",
-    imagenUrl: null,
+  const [moduloBkData, setModuloBkData] = useState<IEditarModulo>({
+    nombremodulo: "",
   });
   const [ubicacionData, setUbicacionData] = useState<IEditarUbicacion>({
     descripcion: null,
@@ -100,24 +98,22 @@ function EditarDatosGeneralesPage() {
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
   
-  async function cargarDatosServicio(id: number) {
+  async function cargarDatosModulo(id: number) {
     try {
       const res = await fetch(
         `http://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
       );
       if (!res.ok) {
-        throw new Error("Error al obtener los datos del servicio.");
+        throw new Error("Error al obtener los datos del modulo.");
       }
       const resData = await res.json();
-
-      setServicioBkData({
-        nombre: resData.data.nombre,
-        imagenUrl: resData.data.imagenUrl,
+      setModuloBkData({
+        nombremodulo: resData.data.nombremodulo,
       });
-      setServicioData({
-        nombre: resData.data.nombre,
-        imagenUrl: resData.data.imagenUrl,
+      setModuloData({
+        nombremodulo: resData.data.nombremodulo,
       });
+      
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
     }
@@ -190,15 +186,15 @@ async function cargarDatosUbicacion(id: number) {
   }
 
   useEffect(() => {
-    cargarDatosServicio(numId);
+    cargarDatosModulo(numId);
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setServicioData({
-      ...servicioData,
+    setModuloData({
+      ...moduloData,
       [campo]: e.target.value,
     });
   };
@@ -243,17 +239,13 @@ async function cargarDatosUbicacion(id: number) {
     });
   };
   const clearData = () => {
-    setServicioData(servicioBkData);
+    setModuloData(moduloBkData);
   };
 
   const editarServicio = async (id: number) => {
     if (
-      servicioData.nombre !== servicioBkData.nombre ||
-      servicioData.imagenUrl !== servicioBkData.imagenUrl
+      moduloData.nombremodulo !== moduloData.nombremodulo
     ) {
-      if(serviceImg!=null){
-        servicioData.imagenUrl = await uploadFile(serviceImg,"servicios/");
-      }
       fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
         {
@@ -261,7 +253,7 @@ async function cargarDatosUbicacion(id: number) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(moduloData),
         }
       )
         .then((response) => {
@@ -296,7 +288,7 @@ const editarUbicacion = async (id: number) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(moduloData),
         }
       )
         .then((response) => {
@@ -315,7 +307,7 @@ const editarUbicacion = async (id: number) => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(moduloData),
         }
       )
         .then((response) => {
@@ -364,7 +356,7 @@ const editarUbicacion = async (id: number) => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(servicioData),
+            body: JSON.stringify(moduloData),
           }
         )
           .then((response) => {
@@ -482,20 +474,10 @@ const editarUbicacion = async (id: number) => {
         <Label>
           <span>Nombre del modulo</span>
           <Input
-            value={servicioData.nombre}
+            value={moduloData.nombremodulo}
             className="mt-1"
-            placeholder="Escriba aquí el nombre del servicio"
-            onChange={(e) => handleChange(e, "nombre")}
-          />
-        </Label>
-
-        <Label className="mt-4">
-          <span>Imagen de referencia para el servicio</span>
-          <Input
-            type="file"
-            className="mt-1"
-            placeholder="Imagen para el servicio"
-            onChange={e => setImg(e.target.files?.[0] || null)}
+            placeholder="Escriba aquí el nombre del modulo"
+            onChange={(e) => handleChange(e, "nombremodulo")}
           />
         </Label>
         <div className=" mt-4">

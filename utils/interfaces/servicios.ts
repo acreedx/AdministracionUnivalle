@@ -28,7 +28,9 @@ export interface IEditarServicio {
   nombre: string;
   imagenUrl: string | null;
 }
-
+export interface IEditarModulo{
+  nombremodulo: string;
+}
 export interface IEditarUbicacion {
   descripcion: string | null;
   imagen: string | null;
