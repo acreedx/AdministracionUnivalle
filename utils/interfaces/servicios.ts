@@ -39,6 +39,17 @@ export interface IEditarRequisitos {
   descripcion: string | null;
 }
 
+export interface IEditarRequisitosArray {
+  data:[
+    {
+      identificador:number,
+      descripcion: string | null;
+    }  
+  ]
+  
+  
+}
+
 export interface IEditarCarrera {
   nombre: string | null;
 }

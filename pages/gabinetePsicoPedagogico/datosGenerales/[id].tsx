@@ -4,7 +4,8 @@ import {
   IEditarUbicacion,
   IEditarReferencia,
   IEditarCarrera,
-  IEditarRequisitos } from "../../../utils/interfaces/servicios";
+  IEditarRequisitosArray 
+} from "../../../utils/interfaces/servicios";
 import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -25,7 +26,7 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-function EditarPaginaPrincipalPage() {
+function EditarDatosGeneralesPage() {
   const [serviceImg,setImg]:any = useState(null)
   const [ubicacionImg,setUImg]:any = useState(null)
   const [ubicaionVideo,setUVideo]:any = useState(null)
@@ -47,11 +48,23 @@ function EditarPaginaPrincipalPage() {
     imagen: null,
     video:null,
   });
-  const [requisitosData, setRequisitosData] = useState<IEditarRequisitos>({
-    descripcion: null,
+  const [requisitosData, setRequisitosData] = useState<IEditarRequisitosArray>({
+    data:[
+      { 
+        identificador:0,
+        descripcion: null,
+        
+      }
+    ] 
   });
-  const [requisitosBkData, setRequisitosBkData] = useState<IEditarRequisitos>({
-    descripcion: null,
+  const [requisitosBkData, setRequisitosBkData] = useState<IEditarRequisitosArray>({
+     data:[
+      { 
+        identificador:0,
+        descripcion: null,
+        
+      }
+    ] 
   });
   const [referenciaData, setReferenciaData] = useState<IEditarReferencia>({
     nombre: null,
@@ -70,7 +83,7 @@ function EditarPaginaPrincipalPage() {
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
-
+  
   async function cargarDatosServicio(id: number) {
     try {
       const res = await fetch(
@@ -120,7 +133,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByServiceId/1`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -128,14 +141,16 @@ async function cargarDatosUbicacion(id: number) {
       const resData = await res.json();
 
       setRequisitosBkData({
-        descripcion: resData.data.descripcion,
+        data: resData.data,
       });
       setRequisitosData({
-        descripcion: resData.data.descripcion,
+        data: resData.data,
       });
+      
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
     }
+    
   }
   async function cargarDatosReferencia(id: number) {
     try {
@@ -193,12 +208,23 @@ async function cargarDatosUbicacion(id: number) {
       [campo]: e.target.value,
     });
   };
-  const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, campo: string) => {
-      setRequisitosData({
-        ...requisitosData,
-        [campo]: e.target.value,
-      });
-    };
+  const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>,id:number ,campo: string) => {
+      // Encuentra el requisito en el arreglo por su identificador (id)
+      requisitosData.data.map(req=>{
+          if(id==req.identificador){
+            req.descripcion+=e.target.value;
+            console.log(req);
+          }
+        }
+      )
+
+      
+      // setRequisitosData({
+      //   ...requisitosData.data,
+      //   [campo]: e.target.value,
+      // });
+      
+  };
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setCarreraData({
       ...carreraData,
@@ -353,52 +379,55 @@ const editarUbicacion = async (id: number) => {
     }
   };
   const editarRequisitos = async (id: number) => {
-    if (
-      requisitosData.descripcion !== requisitosData.descripcion
-    ) {
-      if(requisitosBkData.descripcion==null){
-        fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+    requisitosData.data.forEach(req => {
+      if (
+        req.descripcion !== req.descripcion
+      ) {
+        if(req.descripcion==null){
+          fetch(
+          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(req.descripcion),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
-        fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        }else{
+          fetch(
+          `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(servicioData),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        }
+        
+      } else {
+        warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
       }
-      
-    } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    }
+    });
+    
   };
 
   const editarReferencias = async (id: number) => {
@@ -449,6 +478,18 @@ const editarUbicacion = async (id: number) => {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
+  const [addRequisitos, setAddRequisitos] = useState(false);
+  const [inputs, setInputs]:any = useState([]);
+
+  const handleAddRequisitos = () => {
+    setAddRequisitos(true);
+    setInputs([...inputs, <Textarea 
+                  key={inputs.length}
+                  rows={3} 
+                  placeholder="Ingresa los requisitos del servicio." 
+                  onChange={(e) => handleChange1(e, 0 ,"descripcion")}
+                />]);
+  }
   return (
     <Layout>
       <PageTitle>Editar Pagina Principal - Gabinete Psico-Pedagogico</PageTitle>
@@ -484,16 +525,31 @@ const editarUbicacion = async (id: number) => {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
           <span>Descripción</span>
-          <Textarea 
-            value={requisitosData.descripcion === null ? "" : requisitosData.descripcion}
-            className="mt-1" 
-            rows={3} 
-            placeholder="Ingresa los requisitos del servicio." 
-            onChange={(e) => handleChange1(e, "descripcion")}
-          />
+          {
+            requisitosData.data.map((req)=>(
+              <div className="my-3" key={req.identificador}>
+                 <Textarea 
+                  value={req.descripcion === null ? "" : req.descripcion}
+                  rows={3} 
+                  placeholder="Ingresa los requisitos del servicio." 
+                  onChange={(e) => handleChange1(e, req.identificador,"descripcion")}
+                />
+              </div>
+            ))
+          }
+         
+          {addRequisitos && inputs}
         </Label>
-        <div className=" mt-4">
-          <Button size="large" onClick={() => editarRequisitos(numId)}>
+        <div className="flex flex-row-reverse ...">
+          <div >
+            <Button  size="small" onClick={handleAddRequisitos}>
+                +
+            </Button>
+          </div>
+        </div>
+        <div className="mt-4">
+         
+          <Button size="large" >
             Editar
           </Button>
         </div>
@@ -579,4 +635,4 @@ const editarUbicacion = async (id: number) => {
   );
 }
 
-export default EditarPaginaPrincipalPage;
+export default EditarDatosGeneralesPage;

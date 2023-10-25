@@ -177,8 +177,8 @@ const routes: IRoute[] = [
     name: "Gabinete Psico-Pedagogico",
     routes: [
       {
-        path: "/gabinetePsicoPedagogico/paginaPrincipal/3",
-        name: "Pagina Principal",
+        path: "/gabinetePsicoPedagogico/datosGenerales/3",
+        name: "Datos Generales",
       },
       {
         path: "/gabinetePsicoPedagogico/listarServicios",
