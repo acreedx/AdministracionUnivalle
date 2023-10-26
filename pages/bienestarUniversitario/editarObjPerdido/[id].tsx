@@ -48,14 +48,14 @@ function AgregarObjPerdidoPage() {
         throw new Error("Error al obtener los datos del servicio.");
       }
       const resData = await res.json();
-
+      console.log(resData);
       setObjPerData({
-        titulo: resData.data.titulo,
-        archivo: resData.data.archivo,
+        titulo: resData.data[0].titulo,
+        archivo: resData.data[0].archivo,
       });
       setObjPerBkData({
-        titulo: resData.data.titulo,
-        archivo: resData.data.archivo,
+        titulo: resData.data[0].titulo,
+        archivo: resData.data[0].archivo,
       });
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
@@ -124,7 +124,7 @@ function AgregarObjPerdidoPage() {
     <Layout>
       <PageTitle>Editar Objeto Perdido - Bienestar Universitario</PageTitle>
 
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <div className="px-4 py-3 mb-8 text-white bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Nombre o descripción del objeto perdido</span>
           <Input
