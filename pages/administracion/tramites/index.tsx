@@ -29,6 +29,7 @@ function Tramites() {
   const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Tramites";
   const resultsPerPage = 10;
+
   useEffect(() => {
     async function doFetch() {
       fetch(`${URL.baseUrl}${route}${moduleName}`)

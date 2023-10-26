@@ -23,7 +23,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 function ModificarTramite({ id }: props) {
-  const route = "Servicios/getServicioById/";
+  const route = "Servicios/getTramiteById/";
 
   const [name, setname] = useState("");
 
@@ -234,12 +234,15 @@ function ModificarTramite({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
+
   const obtenerRequisitosDelServicio = async (serviceId: number) => {
     try {
       const response = await fetch(`${URL.baseUrl}${getRequisitosByID}${serviceId}`);
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         return data;
+
       } else {
         throw new Error("No se pudieron obtener los requisitos del servicio");
       }
@@ -257,13 +260,13 @@ function ModificarTramite({ id }: props) {
       console.log("Datos de requisitosDelServicio:", requisitosDelServicio);
 
       if (requisitosDelServicio.success === 1 && requisitosDelServicio.data.length > 0) {
-        const nuevosRequisitos = requisitosDelServicio.data[0].descripcion;
-        const nuevosPasosRequisitos = requisitosDelServicio.data[0].pasosRequisito.map(
-          (paso: any) => paso.nombre
+        const nuevosRequisitos = requisitosDelServicio.data.map((requisito: any) => requisito.descripcion);
+        const nuevosPasosRequisitos = requisitosDelServicio.data.map((requisito: any) =>
+          requisito.pasosRequisito.map((paso: any) => paso.nombre)
         );
 
-        setRequisitos([nuevosRequisitos]);
-        setPasoRequisitos([nuevosPasosRequisitos]);
+        setRequisitos(nuevosRequisitos);
+        setPasoRequisitos(nuevosPasosRequisitos);
       }
     }
 
@@ -299,12 +302,13 @@ function ModificarTramite({ id }: props) {
             {requisitos.map((requisito, requisitoIndex) => (
               <div key={requisitoIndex}>
                 <div className="flex">
-                  <Input
-                    className="mt-1 mb-1"
-                    placeholder="Ingresa el requisito"
-                    value={requisito}
-                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
-                  />
+                  <button
+                    className="text-white px-2 py-1 rounded-full -mr-2"
+                    type="button"
+                    onClick={() => agregarPasoRequisito(requisitoIndex)}
+                  >
+                    <PlusIcon />
+                  </button>
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
@@ -312,15 +316,16 @@ function ModificarTramite({ id }: props) {
                   >
                     <MinusIcon />
                   </button>
+                  <Input
+                    className="mt-1 mb-1"
+                    placeholder="Ingresa el requisito"
+                    value={requisito}
+                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
+                  />
+
                 </div>
                 {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((paso, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
-                    <Input
-                      className="mt-1 mb-1"
-                      placeholder="Ingresa el paso del requisito"
-                      value={paso}
-                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
-                    />
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
@@ -328,6 +333,13 @@ function ModificarTramite({ id }: props) {
                     >
                       <MinusIcon />
                     </button>
+                    <Input
+                      className="mt-1 mb-1"
+                      placeholder="Ingresa el paso del requisito"
+                      value={paso}
+                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
+                    />
+
                   </div>
                 ))}
               </div>
