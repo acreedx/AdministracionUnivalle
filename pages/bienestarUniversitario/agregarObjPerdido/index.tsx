@@ -10,46 +10,55 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 function AgregarObjPerdidoPage() {
+  const router = useRouter();
   const inputFileImg: any = useRef(null);
   const [objPerImg, setImg]: any = useState(null);
-  const [servicioData, setServicioData] = useState<IObjetosPerdidos>({
+  const [objPerdido, setObjPerdido] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setServicioData((prevData: any) => ({
+    setObjPerdido((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
-    console.log(servicioData);
   };
 
-  const registrarServicio = () => {
-    console.log(servicioData);
-    if (servicioData.titulo != null && servicioData.archivo != null) {
+  const registrarObjPer = () => {
+    if (objPerdido.titulo != null && objPerdido.archivo != null) {
       fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails",
+        "http://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify({
+            titulo: objPerdido.titulo,
+            archivo: objPerdido.archivo,
+            serviciosId: 1,
+            estado: true,
+          }),
         }
       )
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al registrar los datos");
+            router.back();
           } else {
-            throw new Error("Error al cambiar los datos del servicio");
+            throw new Error("Error al registrar los datos");
           }
         })
-        .catch(() => errorAlert("Error al registrar los datos"));
+        .catch((e) => {
+          console.log(e);
+          errorAlert("Error al registrar los datos");
+        });
     } else {
       warningAlert("Rellene todos los campos");
     }
@@ -57,13 +66,13 @@ function AgregarObjPerdidoPage() {
 
   const clearImg = () => {
     if (inputFileImg.current) {
-      inputFileImg.current.value = "";
+      inputFileImg.current.value = null;
     }
   };
 
   const clearData = () => {
-    setServicioData({
-      ...servicioData,
+    setObjPerdido({
+      ...objPerdido,
       titulo: "",
       archivo: "",
     });
@@ -72,11 +81,11 @@ function AgregarObjPerdidoPage() {
   };
 
   const subirArchivos = async () => {
-    servicioData.archivo = "";
+    objPerdido.archivo = "";
     if (objPerImg != null) {
-      servicioData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
+      objPerdido.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
     }
-    registrarServicio();
+    registrarObjPer();
   };
 
   return (
@@ -87,8 +96,9 @@ function AgregarObjPerdidoPage() {
         <Label>
           <span>Nombre o descripción del objeto perdido</span>
           <Input
-            value={servicioData.titulo}
+            value={objPerdido.titulo}
             className="mt-1"
+            maxLength={50}
             placeholder="Escriba aquí el nombre o la descripción de la imagen"
             onChange={(e) => handleChange(e, "titulo")}
           />
@@ -99,7 +109,7 @@ function AgregarObjPerdidoPage() {
           <Input
             type="file"
             ref={inputFileImg}
-            accept="image/*"
+            accept="image/png, image/jpeg"
             className="mt-1"
             placeholder="Imagen para el servicio"
             onChange={(e) => setImg(e.target.files?.[0] || null)}
@@ -109,11 +119,9 @@ function AgregarObjPerdidoPage() {
 
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Button size="large">
-            <Link href={"/bienestarUniversitario/listarObjPerdidos"}>
-              Volver
-            </Link>
-          </Button>
+          <Link href={"/bienestarUniversitario/listarObjPerdidos"}>
+            <Button size="large">Volver</Button>
+          </Link>
         </div>
 
         <div>
