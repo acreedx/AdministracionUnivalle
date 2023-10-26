@@ -31,45 +31,69 @@ const response2 = response.concat([]);
 function Cafeteria() {
 
   const router = useRouter()
-  const ModuleId = 2;
-  const [pageTable1, setPageTable1] = useState(1);
   const [pageTable2, setPageTable2] = useState(1);
-
-  const [dataTable1, setDataTable1] = useState<ICafeteriaData[]>([]);
-  const [dataTable2, setDataTable2] = useState<ICafeteriaData[]>([]);
-
+  const [dataTable2, setMenuinfo] = useState<ICafeteriaData[]>([]);
+  const [TotalResult,setTotal]= useState(Number);
   const resultsPerPage = 10;
-  const totalResults = response.length;
-
-  function onPageChangeTable1(p: number) {
-    setPageTable1(p);
-  }
-
   function onPageChangeTable2(p: number) {
     setPageTable2(p);
   }
+  const categorysArray: string[] = [
+    "Jugo/Batido",
+    "Sandwich",
+    "Postre",
+    "Cafe",
+    "Desayuno",
+    "Especial",
+    "Ensalada"
+  ]
 
   useEffect(() => {
-    setDataTable1(
-      response.slice(
-        (pageTable1 - 1) * resultsPerPage,
-        pageTable1 * resultsPerPage
-      )
-    );
-  }, [pageTable1]);
-
-  useEffect(() => {
-    setDataTable2(
-      response2.slice(
-        (pageTable2 - 1) * resultsPerPage,
-        pageTable2 * resultsPerPage
-      )
-    );
+    const getData = async () => {
+      const query = await fetch('http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyModuloId/4');
+      const response:any= await query.json();
+      //console.log(response)
+      setTotal(response.data.length);
+      setMenuinfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
+      //console.log(response.data)
+    }
+    getData();
   }, [pageTable2]);
+
+  const getDescription = (a:any) =>{
+    var description
+    a.map((b:any) => {
+      if (!categorysArray.includes(b.contenido) && isNaN(b.contenido)) {
+        description = b.contenido
+      }
+    })
+    return description
+    
+  }
+
+  const getCategory = (a:any) =>{
+    var category
+    a.map((b:any) => {
+      if (categorysArray.includes(b.contenido)) {
+        category = b.contenido
+      }
+    })
+    return category
+  }
+
+  const getPrice = (descripcion:any) =>{
+    var price = 0
+    descripcion.map((content:any) => {
+      if (!isNaN(Number(content.contenido))) {
+        price = Number(content.contenido)
+      }
+    })
+    return price
+  }
 
   return (
     <Layout>
-      <PageTitle>Cafeteria</PageTitle>
+      <PageTitle>Menu Cafeteria</PageTitle>
 
       <div>
         <Button > <Link href={'/servicios/cafeteria/create'}>Crear</Link></Button>
@@ -80,33 +104,42 @@ function Cafeteria() {
           <TableHeader>
             <tr>
               <TableCell>Nombre</TableCell>
-              <TableCell>Descripcion</TableCell>
+              <TableCell>Categoria</TableCell>
               <TableCell>Precio</TableCell>
+              <TableCell>Descripcion</TableCell>
               <TableCell>Imagen</TableCell>
               <TableCell>Actions</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
-            {dataTable2.map((menu, i) => (
+            {dataTable2.map((menu:any, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{menu.Titulo}</p>
+                      <p className="font-semibold">{menu.titulo}</p>
                     </div>
                   </div>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{menu.Descripcion_1}</Badge>
+                  <Badge type={"neutral"}>{getCategory(menu.descripcion)}</Badge>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{menu.Descripcion_2}</Badge>
+                  <Badge type={"neutral"}>{getPrice(menu.descripcion)} bs.</Badge>
                 </TableCell>
 
                 <TableCell>
-                  <Badge type={"neutral"}>{menu.archivo}</Badge>
+                  <Badge type={"neutral"}>{getDescription(menu.descripcion)}</Badge>
+                </TableCell>
+
+                <TableCell>
+                  <Avatar
+                      className="hidden mr-3 md:block"
+                      src={menu.archivo}
+                    />
+                  
                 </TableCell>
 
                 <TableCell>
@@ -136,7 +169,7 @@ function Cafeteria() {
 
         <TableFooter>
           <Pagination
-            totalResults={totalResults}
+            totalResults={TotalResult}
             resultsPerPage={resultsPerPage}
             onChange={onPageChangeTable2}
             label="Tabla de navegación"

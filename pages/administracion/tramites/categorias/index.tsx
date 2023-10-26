@@ -157,7 +157,7 @@ function Categorias() {
                         onConfirm={handleAlertConfirm}
                         onCancel={handleAlertCancel}
                       >
-                        Confirma todos los datos del nuevo servicio?
+                        ¿Estas seguro de elimnar el tramite?
                       </SweetAlert>
                     )}
 

@@ -22,11 +22,12 @@ import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
 import SweetAlert from "react-bootstrap-sweetalert";
+import { Bar } from "react-chartjs-2";
 function Tramites() {
   const router = useRouter();
 
   const route = "Servicios/getTramiteByModuleInactive/";
-  const deleteServiceRoute = "Servicios/deleteServicio/";
+  const deleteServiceRoute = "Servicios/restoreServicio/";
   const moduleName = "Tramites";
   const resultsPerPage = 10;
   useEffect(() => {
@@ -132,14 +133,7 @@ function Tramites() {
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Link
-                      href={`/administracion/tramites/editar/[id]`}
-                      as={`/administracion/tramites/editar/${servicio.id}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+
                     <Button
                       layout="link"
                       size="small"
@@ -150,11 +144,13 @@ function Tramites() {
                         setSelectedService(servicio.id);
                       }}
                     >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                      <Badge className="w-5 h-5" aria-hidden="true" />
+
                     </Button>
+
                     {showAlert && (
                       <SweetAlert
-                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                        warning
                         title="Atención"
                         confirmBtnText="Confirmar"
                         cancelBtnText="Cancelar"
@@ -162,17 +158,10 @@ function Tramites() {
                         onConfirm={handleAlertConfirm}
                         onCancel={handleAlertCancel}
                       >
-                        Confirma todos los datos del nuevo servicio?
+                        ¿Estas seguro de restablecer el tramite?
                       </SweetAlert>
                     )}
-                    <Link
-                      href={`/administracion/cajas/[id]/[name]`}
-                      as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Ver">
-                        <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+
                   </div>
                 </TableCell>
               </TableRow>

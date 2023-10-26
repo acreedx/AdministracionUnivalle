@@ -6,7 +6,7 @@ import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
-import { ICategoriasData, convertJSONCategory } from "utils/demo/categoriasData";
+import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
 
 
 function CrearTramite() {
@@ -102,28 +102,20 @@ function CrearTramite() {
     console.log("location a eliminar: ", locationIndex)
     setLocations(nuevasLocation);
   }
-  const [categorias, setCategorias] = useState<ICategoriasData>();
+  const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
-  useEffect(() => {
 
+  useEffect(() => {
     async function doFetch() {
       fetch(`${URL.baseUrl}${getActiveCategoriesRoute}`)
         .then((res) => res.json())
-        .then((res) => {
-          setCategorias(convertJSONCategory(res.data));
-        });
+        .then((res) => setCategorias(convertJSONListCategory(res.data)));
     }
     doFetch();
   }, []);
-
-  useEffect(() => {
-    if (categorias?.name) {
-      setname(categorias!.name);
-    }
-  }, [categorias]);
-
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
@@ -138,7 +130,8 @@ function CrearTramite() {
 
   const handleSubmit = async () => {
     try {
-
+      const selectedCategoryId = selectedCategory;
+      console.log(selectedCategoryId)
       const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
         method: "POST",
         headers: {
@@ -148,6 +141,7 @@ function CrearTramite() {
           nombre: name,
           moduloId: moduleId,
           imagenUrl: "",
+          idCategoria: selectedCategoryId
         }),
       });
       const dataNewService = await newService.json();
@@ -193,7 +187,6 @@ function CrearTramite() {
 
         console.log("Requisito a crear:", requisito, "Pasos:", nuevosPasos, "id", serviceId);
 
-        // Enviar la solicitud solo si el requisito no está vacío
         const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
           method: "POST",
           headers: {
@@ -202,6 +195,7 @@ function CrearTramite() {
           body: JSON.stringify({
             descripcion: requisito,
             serviciosId: serviceId,
+            id_modulo: 3,
             pasos: nuevosPasos,
             estado: true,
           }),
@@ -317,17 +311,17 @@ function CrearTramite() {
 
           <Label className="mt-4">
             <span>Seleccione una categoria de tramite</span>
-            <Select className="mt-1">
-
-              <option value={name}>
-
-              </option>
-
+            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
+              {categorias.map((categoria, i) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.name}
+                </option>
+              ))}
             </Select>
           </Label>
 
 
-          {/* *Ubicaciones */}
+          {/* *Ubicaciones 
           <Label className="mt-4">
             <div className="flex items-center mt-4">
               <span className="mr-2">Ubicaciones</span>
@@ -373,6 +367,7 @@ function CrearTramite() {
               </div>
             ))}
           </Label>
+          */}
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
               <input className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" />

@@ -9,6 +9,7 @@ import { PlusIcon, MinusIcon } from "icons";
 import { GetServerSidePropsContext } from "next";
 
 import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
+import Requisitos from "pages/administracion/cajas/[id]/[name]";
 
 interface props {
   id: number;
@@ -23,7 +24,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 function ModificarTramite({ id }: props) {
-  const route = "Servicios/getServicioById/";
+  const route = "Servicios/getTramiteById/";
 
   const [name, setname] = useState("");
 
@@ -35,7 +36,7 @@ function ModificarTramite({ id }: props) {
   const agregarRequisito = () => {
     console.log("Se agrego nuevo requisito")
     setRequisitos([...requisitos, '']);
-    //   setPasoRequisitos([...pasoRequisito, []]);
+    setPasoRequisitos([...pasoRequisito, []]);
   }
 
   const agregarPasoRequisito = (requisitoIndex: number) => {
@@ -48,7 +49,7 @@ function ModificarTramite({ id }: props) {
     nuevosPasosRequisitos[requisitoIndex].push("");
 
     setPasoRequisitos(nuevosPasosRequisitos);
-    console.log('Requisitos actualizados:', nuevosPasosRequisitos);
+    console.log('Requisitos actualizadosrespuesta :', nuevosPasosRequisitos);
   };
 
 
@@ -87,6 +88,8 @@ function ModificarTramite({ id }: props) {
     const nuevosRequisistos = [...requisitos];
     nuevosRequisistos[index] = e.target.value;
     setRequisitos(nuevosRequisistos);
+    console.log('Valor del primer requisito:', nuevosRequisistos[0]);
+    console.log('Valor del segundo requisito:', nuevosRequisistos[1]);
   };
 
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
@@ -117,7 +120,6 @@ function ModificarTramite({ id }: props) {
 
 
 
-
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
 
@@ -136,12 +138,14 @@ function ModificarTramite({ id }: props) {
 
 
 
-  // Added Service 
+  // Update Services 
   const updateServiceRoute = "Servicios/updateServicio/";
   const updateReferencesRoute = "Referencia/UpdateReferences/";
   const updateDurationServiceRoute = "Tramites/updateTramite/";
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
+
+
 
   const moduleId = 3;
 
@@ -198,9 +202,8 @@ function ModificarTramite({ id }: props) {
   const updateRequisitos = async (serviceId: number) => {
     for (const requisito of requisitos) {
       if (requisito.trim() !== '') {
-        const nuevosPasos = pasoRequisito[requisitos.indexOf(requisito)].map((nombre) => ({ nombre }));
-        // Enviar la solicitud solo si el requisito no está vacío
 
+        console.log(requisitos)
         const updateRequisitoResponse = await fetch(`${URL.baseUrl}${updateRequisitoRoute}${service?.requerimentId}`, {
           method: "PUT",
           headers: {
@@ -209,7 +212,6 @@ function ModificarTramite({ id }: props) {
           body: JSON.stringify({
             descripcion: requisito,
             serviciosId: serviceId,
-            pasos: nuevosPasos,
             estado: true,
           }),
         });
@@ -234,12 +236,15 @@ function ModificarTramite({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
+
   const obtenerRequisitosDelServicio = async (serviceId: number) => {
     try {
       const response = await fetch(`${URL.baseUrl}${getRequisitosByID}${serviceId}`);
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         return data;
+
       } else {
         throw new Error("No se pudieron obtener los requisitos del servicio");
       }
@@ -257,16 +262,15 @@ function ModificarTramite({ id }: props) {
       console.log("Datos de requisitosDelServicio:", requisitosDelServicio);
 
       if (requisitosDelServicio.success === 1 && requisitosDelServicio.data.length > 0) {
-        const nuevosRequisitos = requisitosDelServicio.data[0].descripcion;
-        const nuevosPasosRequisitos = requisitosDelServicio.data[0].pasosRequisito.map(
-          (paso: any) => paso.nombre
+        const nuevosRequisitos = requisitosDelServicio.data.map((requisito: any) => requisito.descripcion);
+        const nuevosPasosRequisitos = requisitosDelServicio.data.map((requisito: any) =>
+          requisito.pasosRequisito.map((paso: any) => paso.nombre)
         );
 
-        setRequisitos([nuevosRequisitos]);
-        setPasoRequisitos([nuevosPasosRequisitos]);
+        setRequisitos(nuevosRequisitos);
+        setPasoRequisitos(nuevosPasosRequisitos);
       }
     }
-
     obtenerYConfigurarRequisitos();
   }, [id]);
 
@@ -299,12 +303,13 @@ function ModificarTramite({ id }: props) {
             {requisitos.map((requisito, requisitoIndex) => (
               <div key={requisitoIndex}>
                 <div className="flex">
-                  <Input
-                    className="mt-1 mb-1"
-                    placeholder="Ingresa el requisito"
-                    value={requisito}
-                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
-                  />
+                  <button
+                    className="text-white px-2 py-1 rounded-full -mr-2"
+                    type="button"
+                    onClick={() => agregarPasoRequisito(requisitoIndex)}
+                  >
+                    <PlusIcon />
+                  </button>
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
@@ -312,15 +317,16 @@ function ModificarTramite({ id }: props) {
                   >
                     <MinusIcon />
                   </button>
+                  <Input
+                    className="mt-1 mb-1"
+                    placeholder="Ingresa el requisito"
+                    value={requisito}
+                    onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
+                  />
+
                 </div>
                 {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((paso, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
-                    <Input
-                      className="mt-1 mb-1"
-                      placeholder="Ingresa el paso del requisito"
-                      value={paso}
-                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
-                    />
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
@@ -328,6 +334,13 @@ function ModificarTramite({ id }: props) {
                     >
                       <MinusIcon />
                     </button>
+                    <Input
+                      className="mt-1 mb-1"
+                      placeholder="Ingresa el paso del requisito"
+                      value={paso}
+                      onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
+                    />
+
                   </div>
                 ))}
               </div>
@@ -362,7 +375,7 @@ function ModificarTramite({ id }: props) {
               onChange={(e) => setcellphone(e.target.value)}
             />
           </Label>
-
+          {/* *Ubicaciones
           <Label className="mt-4">
             <span>Seleccione una categoria de tramite</span>
             <Select className="mt-1">
@@ -374,7 +387,7 @@ function ModificarTramite({ id }: props) {
           </Label>
 
 
-          {/* *Ubicaciones */}
+
           <Label className="mt-4">
             <div className="flex items-center mt-4">
               <span className="mr-2">Ubicaciones</span>
@@ -420,6 +433,7 @@ function ModificarTramite({ id }: props) {
               </div>
             ))}
           </Label>
+          */}
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
               <input className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" />
@@ -440,7 +454,7 @@ function ModificarTramite({ id }: props) {
                   onConfirm={handleAlertConfirm}
                   onCancel={handleAlertCancel}
                 >
-                  Confirma todos los datos del nuevo servicio?
+                  ¿Confirma todos los datos del tramite?
                 </SweetAlert>
               )}
             </div>
