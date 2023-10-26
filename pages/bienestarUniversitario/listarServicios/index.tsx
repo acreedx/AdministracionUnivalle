@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import CTA from "example/components/CTA";
 import {
   Table,
   TableHeader,
@@ -21,6 +20,9 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
+import { isValidUrl } from "utils/functions/url";
+import { errorAlert } from "components/alerts";
+import { ToastContainer } from "react-toastify";
 
 function BienestarUniversitario() {
   const router = useRouter();
@@ -40,17 +42,26 @@ function BienestarUniversitario() {
 
   useEffect(() => {
     const getData = async () => {
-      const query = await fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
-      );
-      const response: any = await query.json();
-      setTotal(response.data.length);
-      setUserInfo(
-        response.data.slice(
-          (pageTable2 - 1) * resultsPerPage,
-          pageTable2 * resultsPerPage
-        )
-      );
+      try {
+        const query = await fetch(
+          "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+        );
+        if (query.ok) {
+          const response: any = await query.json();
+          setTotal(response.data.length);
+          setUserInfo(
+            response.data.slice(
+              (pageTable2 - 1) * resultsPerPage,
+              pageTable2 * resultsPerPage
+            )
+          );
+        } else {
+          throw new Error();
+        }
+      } catch (e) {
+        console.log(e);
+        errorAlert("Ocurrió un error al traer los datos");
+      }
     };
     getData();
   }, [pageTable2]);
@@ -84,104 +95,116 @@ function BienestarUniversitario() {
           <Button size="large">Registrar servicio</Button>
         </Link>
       </div>
-      <SectionTitle>Servicio</SectionTitle>
-      <TableContainer className="mb-8">
-        <Table>
-          <TableHeader>
-            <tr>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Modulo</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Acciones</TableCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-            {dataTable2.map((datos: any, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <Avatar
-                      className="hidden mr-3 md:block"
-                      src={datos.imagen}
-                    />
-                    <div>
-                      <p className="font-semibold">{datos.nombre}</p>
+      {dataTable2.length > 0 ? (
+        <TableContainer className="mb-8">
+          <Table>
+            <TableHeader>
+              <tr>
+                <TableCell>Imagen</TableCell>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Modulo</TableCell>
+                <TableCell>Estado</TableCell>
+                <TableCell>Acciones</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+              {dataTable2.map((datos: any, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      {isValidUrl(datos.archivo) ? (
+                        <Avatar
+                          className="hidden mr-3 md:block"
+                          src={datos.archivo}
+                          size="large"
+                        />
+                      ) : (
+                        <span className="text-center">-</span>
+                      )}
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{datos.modulo}</span>
-                </TableCell>
-                <TableCell>
-                  <Badge type={datos.estado ? "success" : "danger"}>
-                    <p>{datos.estado ? "Activo" : "Inactivo"}</p>
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-4">
-                    <Link
-                      href={{
-                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                      }}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
-                    <Button
-                      layout="link"
-                      size="small"
-                      aria-label="Delete"
-                      type={"button"}
-                      onClick={() => {
-                        setShowAlert(true);
-                        setSelectedService(datos.identificador);
-                      }}
-                    >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                    {showAlert && (
-                      <SweetAlert
-                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
-                        title="Atención"
-                        customButtons={
-                          <React.Fragment>
-                            <Button
-                              onClick={handleAlertCancel}
-                              className="mx-2 bg-red-600"
-                            >
-                              Cancelar
-                            </Button>
-                            <Button
-                              onClick={handleAlertConfirm}
-                              className="mx-2 bg-green-600"
-                            >
-                              Confirmar
-                            </Button>
-                          </React.Fragment>
-                        }
-                        onConfirm={handleAlertConfirm}
-                        onCancel={handleAlertCancel}
-                        focusCancelBtn
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <p>{datos.nombre}</p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{datos.modulo}</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge type={datos.estado ? "success" : "danger"}>
+                      <p>{datos.estado ? "Activo" : "Inactivo"}</p>
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-4">
+                      <Link
+                        href={{
+                          pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
+                        }}
                       >
-                        ¿Está seguro de eliminar este registro?
-                      </SweetAlert>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TableFooter>
-          <Pagination
-            totalResults={TotalResult}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable2}
-            label="Table navigation"
-          />
-        </TableFooter>
-      </TableContainer>
+                        <Button layout="link" size="small" aria-label="Edit">
+                          <EditIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      </Link>
+                      <Button
+                        layout="link"
+                        size="small"
+                        aria-label="Delete"
+                        type={"button"}
+                        onClick={() => {
+                          setShowAlert(true);
+                          setSelectedService(datos.identificador);
+                        }}
+                      >
+                        <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
+                      {showAlert && (
+                        <SweetAlert
+                          warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                          title="Atención"
+                          customButtons={
+                            <React.Fragment>
+                              <Button
+                                onClick={handleAlertCancel}
+                                className="mx-2 bg-red-600"
+                              >
+                                Cancelar
+                              </Button>
+                              <Button
+                                onClick={handleAlertConfirm}
+                                className="mx-2 bg-green-600"
+                              >
+                                Confirmar
+                              </Button>
+                            </React.Fragment>
+                          }
+                          onConfirm={handleAlertConfirm}
+                          onCancel={handleAlertCancel}
+                          focusCancelBtn
+                        >
+                          ¿Está seguro de eliminar este registro?
+                        </SweetAlert>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            <Pagination
+              totalResults={TotalResult}
+              resultsPerPage={resultsPerPage}
+              onChange={onPageChangeTable2}
+              label="Table navigation"
+            />
+          </TableFooter>
+        </TableContainer>
+      ) : (
+        <SectionTitle>No se encontraron datos</SectionTitle>
+      )}
+      <ToastContainer />
     </Layout>
   );
 }

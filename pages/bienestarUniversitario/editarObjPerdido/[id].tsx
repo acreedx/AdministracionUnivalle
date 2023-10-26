@@ -14,6 +14,7 @@ import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { isValidUrl } from "utils/functions/url";
 
 export async function getServerSideProps(context: any) {
   return {
@@ -67,15 +68,6 @@ function AgregarObjPerdidoPage() {
     }));
     console.log(objPerData);
   };
-
-  function isValidUrl(url: string) {
-    try {
-      new URL(url);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
 
   const editarObjPer = async (id: number) => {
     if (objPerData.titulo !== objPerBkData.titulo || objPerImg != null) {

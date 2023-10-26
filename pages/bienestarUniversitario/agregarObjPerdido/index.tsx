@@ -31,23 +31,31 @@ function AgregarObjPerdidoPage() {
   const registrarObjPer = () => {
     if (objPerdido.titulo != null && objPerdido.archivo != null) {
       fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/addServicioWDetails",
+        "http://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(objPerdido),
+          body: JSON.stringify({
+            titulo: objPerdido.titulo,
+            archivo: objPerdido.archivo,
+            serviciosId: 1,
+            estado: true,
+          }),
         }
       )
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al registrar los datos");
           } else {
-            throw new Error("Error al cambiar los datos del servicio");
+            throw new Error("Error al registrar los datos");
           }
         })
-        .catch(() => errorAlert("Error al registrar los datos"));
+        .catch((e) => {
+          console.log(e);
+          errorAlert("Error al registrar los datos");
+        });
     } else {
       warningAlert("Rellene todos los campos");
     }
