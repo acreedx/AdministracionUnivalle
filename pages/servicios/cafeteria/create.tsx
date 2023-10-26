@@ -179,7 +179,7 @@ function Forms() {
           <Label className='mt-4'>
             <span>Categoria</span>
             <Select className="mt-1" onChange={(e) => handleChange1(e)}>
-              <option value="" >Seleccione una Categoria</option>
+              <option value="">Seleccione una Categoria</option>
               <option value="Jugo/Batido">Jugo/Batido</option>
               <option value="Sandwich">Sandwich</option>
               <option value="Postre">Postre</option>

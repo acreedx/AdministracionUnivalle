@@ -28,13 +28,28 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 function EditarProducto({ id }: props) {
   const FlechaIMG = "https://firebasestorage.googleapis.com/v0/b/proveedoresfarmacia-a4ba2.appspot.com/o/Flecha.png?alt=media&token=9ca07039-819c-42cc-a1d5-0c9b509b1e3b&_gl=1*bye4hh*_ga*Nzk1NTIyMzkxLjE2OTY0NjQ2ODM.*_ga_CW55HF8NVT*MTY5ODM1MDU3OC4xNC4xLjE2OTgzNTA2NzIuMjYuMC4w"
+  const categorysArray: string[] = [
+    "Jugo/Batido",
+    "Sandwich",
+    "Postre",
+    "Cafe",
+    "Desayuno",
+    "Especial",
+    "Ensalada"
+  ]
   const router = useRouter();
 
   const [serviceImg, setImg]:any = useState(null);
 
   const [service, setService] = useState<IProductData>();
   const [titulo, setTitulo] = useState("");
-  const [archivo, setArchivo] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [idCategoria, setIdCategoria] = useState(Number);
+  const [precio, setPrecio] = useState(Number);
+  const [idPrecio, setIdPrecio] = useState(Number);
+  const [descripcion, setDescripcion] = useState("");
+  const [idDescripcion, setIdDescripcion] = useState(Number);
+  
 
   const [imagenSeleccionada, setImagenSeleccionada] = useState("");
 
@@ -57,6 +72,7 @@ function EditarProducto({ id }: props) {
       fetch(`http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`)
         .then((res) => res.json())
         .then((res) => setService(convertJSONService(res.data)));
+        
     }
     doFetch();
   }, []);
@@ -66,7 +82,9 @@ function EditarProducto({ id }: props) {
   useEffect(() => {
     if (service?.titulo) {
       setTitulo(service!.titulo);
-      setArchivo(service!.archivo);
+      setCategoria(getCategory(service!.descripcionPublicacion)!);
+      setPrecio(getPrice(service!.descripcionPublicacion)!);
+      setDescripcion(getDescription(service!.descripcionPublicacion)!);
     }
   }, [service]);
 
@@ -90,129 +108,106 @@ function EditarProducto({ id }: props) {
   });
 
   const handleSubmit = async () => {
-    setproductoData({
-      ...productoData,
-      archivo: "",
-      titulo: "",
-      descripcionPublicacion:[
-        {
-          id: 0,
-          contenido: ""
-        },
-        {
-          id: 0,
-          contenido: ""
-        },
-        {
-          id: 0,
-          contenido: ""
-        }
-      ]
-    })
+    
+    console.log(JSON.stringify({
+        archivo: productoData.archivo,
+        titulo: titulo,
+        descripcionPublicacion:[
+          {
+            id: idCategoria,
+            contenido: categoria
+          },
+          {
+            id: idPrecio,
+            contenido: precio.toString()
+          },
+          {
+            id: idDescripcion,
+            contenido: descripcion
+          }
+        ]
+      }));
+    
     await fetch(`http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicacionesWithDescription/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({productoData}),
+      body: JSON.stringify({
+        archivo: productoData.archivo,
+        titulo: titulo,
+        descripcionPublicacion:[
+          {
+            id: idCategoria,
+            contenido: categoria
+          },
+          {
+            id: idPrecio,
+            contenido: precio.toString()
+          },
+          {
+            id: idDescripcion,
+            contenido: descripcion
+          }
+        ]
+      }),
     });
     router.back();
   };
 
-  var category = ""
   var price = ""
   var description = ""
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    var titulo
-    if(e.target.value != "")
-      titulo = e.target.value
-    else
-      titulo = ""
+  const getDescription = (a:any) =>{
+    var description
+    a.map((b:any) => {
+      if (!categorysArray.includes(b.contenido) && isNaN(b.contenido)) {
+        description = b.contenido
+        setIdDescripcion(b.idDescripcion)
+      }
+    })
+    return description
     
-    setproductoData({
-      ...productoData,
-      [campo]:titulo
-    });
-  };
+  }
+
+  const getCategory = (a:any) =>{
+    var category
+    a.map((b:any) => {
+      if (categorysArray.includes(b.contenido)) {
+        category = b.contenido
+        setIdCategoria(b.idDescripcion)
+      }
+    })
+    return category
+  }
+
+  const getPrice = (descripcion:any) =>{
+    var price = 0
+    descripcion.map((content:any) => {
+      if (!isNaN(Number(content.contenido))) {
+        price = Number(content.contenido)
+        setIdPrecio(content.idDescripcion)
+      }
+    })
+    return price
+  }
 
   const handleChange1 = (e: ChangeEvent<HTMLSelectElement>) => {
-    category = e.target.value
-    setproductoData({
-      ...productoData,
-      descripcionPublicacion: [
-        {
-          id: 0,
-          contenido: category
-        },
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[1].contenido
-        },
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[2].contenido
-        }
-      ]
-      
-    });
-  };
-
-  const handleChange2 = (e: ChangeEvent<HTMLInputElement>) => {
-    description = e.target.value
-    setproductoData({
-      ...productoData,
-      descripcionPublicacion: [
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[0].contenido
-        },
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[1].contenido
-        },
-        {
-          id: 0,
-          contenido: description
-        }
-      ]
-      
-    });
-  };
-
-  const handleChange3 = (e: ChangeEvent<HTMLInputElement>) => {
-    price = e.target.value
-    setproductoData({
-      ...productoData,
-      descripcionPublicacion: [
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[0].contenido
-        },
-        {
-          id: 0,
-          contenido: price
-        },
-        {
-          id: 0,
-          contenido: productoData.descripcionPublicacion[2].contenido
-        }
-      ]
-      
-    });
+    setCategoria(e.target.value)
   };
   
   const subirArchivos = async () =>{
     productoData.archivo= null;
     if(serviceImg != null)
     {
-      productoData.archivo= await uploadFile(serviceImg,"menuCafeteria/");
+      productoData.archivo = await uploadFile(serviceImg,"menuCafeteria/");
     } 
+    
     handleSubmit();
   }
   return (
     <Layout>
-      <PageTitle>Registrar un nuevo producto</PageTitle>
+      <PageTitle>Editar producto</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <form>
           <Label className='mt-2'> 
@@ -236,7 +231,6 @@ function EditarProducto({ id }: props) {
               <option value="Desayuno">Desayuno</option>
               <option value="Especial">Especial</option>
               <option value="Ensalada">Ensalada</option>
-              
             </Select>
 
           </Label>
@@ -244,22 +238,22 @@ function EditarProducto({ id }: props) {
           <Label className='mt-4'>
             <span>Descripcion</span>
             <Input 
-              value={productoData.descripcionPublicacion[2].contenido}
+              value={descripcion}
               className="mt-1" 
               placeholder="Ingrese la descripcion del producto" 
-              onChange={(e) => handleChange2(e)}/>
+              onChange={(e) => setDescripcion(e.target.value)}/>
           </Label>
 
           <Label className='mt-4'>
             <span>Precio</span>
             <Input 
-              value={productoData.descripcionPublicacion[1].contenido}
+              value={precio}
               className="mt-1"
               type="number"
               step="0.1"
               min="0.1"
               placeholder="Ingrese el precio del producto" 
-              onChange={(e) => handleChange3(e)}/>
+              onChange={(e) => setPrecio(Number(e.target.value))}/>
           </Label>
 
           <Label className="mt-4">
