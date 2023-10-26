@@ -163,17 +163,10 @@ function Tramites() {
                         onConfirm={handleAlertConfirm}
                         onCancel={handleAlertCancel}
                       >
-                        Confirma todos los datos del nuevo servicio?
+                        ¿Estas seguro de eliminar este Tramite?
                       </SweetAlert>
                     )}
-                    <Link
-                      href={`/administracion/cajas/[id]/[name]`}
-                      as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Ver">
-                        <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+
                   </div>
                 </TableCell>
               </TableRow>
