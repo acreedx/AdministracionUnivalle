@@ -141,7 +141,7 @@ function CrearTramite() {
           nombre: name,
           moduloId: moduleId,
           imagenUrl: "",
-          idCategoria: selectedCategoryId
+          //  idCategoria: selectedCategoryId
         }),
       });
       const dataNewService = await newService.json();
