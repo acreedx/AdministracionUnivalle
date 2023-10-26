@@ -28,8 +28,11 @@ export interface IEditarServicio {
   nombre: string;
   imagenUrl: string | null;
 }
-
+export interface IEditarModulo{
+  nombremodulo: string;
+}
 export interface IEditarUbicacion {
+  identificador:number;
   descripcion: string | null;
   imagen: string | null;
   video: string | null;
@@ -39,10 +42,36 @@ export interface IEditarRequisitos {
   descripcion: string | null;
 }
 
+export interface IEditarRequisitosArray {
+  data:[
+    {
+      identificador:number;
+      descripcion: string | null;
+      pasosRequisito:
+      [
+        {
+          identificador: number;
+          nombre:string | null;
+        }
+      ]
+    }  
+  ]
+}
+
 export interface IEditarCarrera {
   nombre: string | null;
 }
-
+export interface IEditarReferenciaArray {
+  data:
+  [
+    {
+      identificador: number;
+      nombre: string | null;
+      numero: string | null;
+    }
+  ]
+ 
+}
 export interface IEditarReferencia {
   nombre: string | null;
   numeroCel: string | null;
