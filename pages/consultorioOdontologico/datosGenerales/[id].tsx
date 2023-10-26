@@ -334,7 +334,7 @@ const editarUbicacion = async (idMod: number) => {
           estado:true,
         }
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicacion`,
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
         {
           method: "POST",
           headers: {
