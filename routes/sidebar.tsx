@@ -144,10 +144,6 @@ const routes: IRoute[] = [
         path: "/bienestarUniversitario/listarServicios",
         name: "Listar Servicios",
       },
-      {
-        path: "/bienestarUniversitario/registrar",
-        name: "Registrar Servicio",
-      },
     ],
     exact: true,
   },
@@ -163,10 +159,6 @@ const routes: IRoute[] = [
       {
         path: "/gabineteMedico/listarServicios/15",
         name: "Listar Servicios",
-      },
-      {
-        path: "/gabineteMedico/registrar",
-        name: "Registrar Servicio",
       },
     ],
     exact: true,
@@ -184,10 +176,6 @@ const routes: IRoute[] = [
         path: "/gabinetePsicoPedagogico/listarServicios/14",
         name: "Listar Servicios",
       },
-      {
-        path: "/gabinetePsicoPedagogico/registrar",
-        name: "Registrar Servicio",
-      },
     ],
     exact: true,
   },
@@ -204,10 +192,7 @@ const routes: IRoute[] = [
         path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
-      {
-        path: "/consultorioOdontologico/registrar",
-        name: "Registrar Servicio",
-      },
+     
     ],
     exact: true,
   },

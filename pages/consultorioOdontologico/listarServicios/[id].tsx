@@ -22,6 +22,9 @@ import  { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { useRouter } from "next/router";
+
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 // make a copy of the data, for the second table
 
 function ConsultorioOdontologico() {
@@ -65,6 +68,11 @@ function ConsultorioOdontologico() {
       <PageTitle>Listar Servicios - Consultorio Odontológico</PageTitle>
 
       <SectionTitle>Servicio</SectionTitle>
+
+      <div className=" flex flex-row-reverse  mb-5">
+        <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
+      </div>
+
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>
