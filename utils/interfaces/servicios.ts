@@ -32,6 +32,7 @@ export interface IEditarModulo{
   nombremodulo: string;
 }
 export interface IEditarUbicacion {
+  identificador:number;
   descripcion: string | null;
   imagen: string | null;
   video: string | null;
@@ -44,11 +45,12 @@ export interface IEditarRequisitos {
 export interface IEditarRequisitosArray {
   data:[
     {
-      identificador:number,
+      identificador:number;
       descripcion: string | null;
       pasosRequisito:
       [
         {
+          identificador: number;
           nombre:string | null;
         }
       ]
