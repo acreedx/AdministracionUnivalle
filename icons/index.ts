@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import ButtonsIcon from "./buttons.svg";
 import CardsIcon from "./cards.svg";
 import ChartsIcon from "./charts.svg";
@@ -30,10 +29,10 @@ import OutlineLogoutIcon from "./outlineLogout.svg";
 import PlusIcon from "./plus.svg";
 import MinusIcon from "./minus.svg";
 import RestoreIcon from "./restore.svg";
-import BienestarIcon from './bienestar.svg'
-import MedicineIcon from './medicine.svg'
-import DentistIcon from './dentist.svg'
-import MindIcon from './mind.svg'
+import BienestarIcon from "./bienestar.svg";
+import MedicineIcon from "./medicine.svg";
+import DentistIcon from "./dentist.svg";
+import MindIcon from "./mind.svg";
 
 export {
   BienestarIcon,
