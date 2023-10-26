@@ -2,6 +2,8 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+
+import { FaRedo } from "react-icons/fa";
 import {
   Table,
   TableHeader,
