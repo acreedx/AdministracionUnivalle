@@ -22,10 +22,7 @@ import {
 import { EditIcon, TrashIcon } from "icons";
 import { FaRedo } from "react-icons/fa";
 
-<<<<<<< HEAD
-=======
 import SweetAlert from "react-bootstrap-sweetalert";
->>>>>>> reactlin
 import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
@@ -33,27 +30,18 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 
 function BienestarUniversitario() {
-<<<<<<< HEAD
-  // setup pages control for every table
-=======
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [selectedService, setSelectedService] = useState<number>(0);
->>>>>>> reactlin
   const [pageTable2, setPageTable2] = useState(1);
 
   const [dataTable, setTotalData] = useState<IListarServicios[]>([]);
   const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
-<<<<<<< HEAD
-  const [TotalResult, setTotal] = useState(Number);
-  // pagination setup
-  const resultsPerPage = 10;
-
-  // pagination change control
-=======
   const [dataTableSearch, setSearch] = useState<IListarServicios[]>([]);
   const [TotalResult, setTotal] = useState(Number);
   const [searchPage, setSearchPage] = useState(1);
@@ -64,33 +52,10 @@ function BienestarUniversitario() {
   const [selectedObj, setSelectedObj] = useState<number>(0);
   const [activeInactive, setActiveInactive] = useState<string>();
 
->>>>>>> reactlin
   function onPageChangeTable2(p: number) {
     setPageTable2(p);
   }
 
-<<<<<<< HEAD
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-  useEffect(() => {
-    const getData = async () => {
-      const query = await fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
-      );
-      const response: any = await query.json();
-      setTotal(response.data.length);
-      setUserInfo(
-        response.data.slice(
-          (pageTable2 - 1) * resultsPerPage,
-          pageTable2 * resultsPerPage
-        )
-      );
-    };
-    getData();
-=======
   const getData = async (url: string) => {
     try {
       const query = await fetch(url);
@@ -127,7 +92,6 @@ function BienestarUniversitario() {
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
->>>>>>> reactlin
   }, [pageTable2]);
 
   const handleSubmit = async (action: boolean) => {
@@ -199,83 +163,8 @@ function BienestarUniversitario() {
         <>
           <PageTitle>Listado de servicios - Bienestar Universitario</PageTitle>
 
-<<<<<<< HEAD
-      <SectionTitle>Servicio</SectionTitle>
-
-       <div className=" flex flex-row-reverse  mb-5">
-        <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
-      </div>
-
-      <TableContainer className="mb-8">
-        <Table>
-          <TableHeader>
-            <tr>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Modulo</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Acciones</TableCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-            {dataTable2.map((datos: any, i) => (
-              <TableRow key={datos}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <Avatar
-                      className="hidden mr-3 md:block"
-                      src={datos.imagen}
-                    />
-                    <div>
-                      <p className="font-semibold">{datos.nombre}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{datos.modulo}</span>
-                </TableCell>
-                <TableCell>
-                  <Badge></Badge>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center space-x-4">
-                    <Link
-                      href={{
-                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                      }}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
-                    <Link
-                      href={{
-                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                      }}
-                    >
-                      <Button layout="link" size="small" aria-label="Delete">
-                        <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <TableFooter>
-          <Pagination
-            totalResults={TotalResult}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable2}
-            label="Table navigation"
-          />
-        </TableFooter>
-      </TableContainer>
-=======
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/registrar">
-              <Button size="large">Registrar servicio</Button>
-            </Link>
+          <div className=" flex  mb-5">
+            <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
           </div>
           {dataTable2.length > 0 ? (
             <>
@@ -366,7 +255,7 @@ function BienestarUniversitario() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
                                       }}
                                     >
                                       <Button
@@ -468,7 +357,6 @@ function BienestarUniversitario() {
         </div>
       )}
       <ToastContainer />
->>>>>>> reactlin
     </Layout>
   );
 }
