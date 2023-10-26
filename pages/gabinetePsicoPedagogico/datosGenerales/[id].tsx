@@ -152,7 +152,7 @@ async function cargarDatosUbicacion(id: number) {
       });
       console.log(ubicacionData);
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
   async function cargarDatosRequisitos(id: number) {
@@ -173,7 +173,7 @@ async function cargarDatosUbicacion(id: number) {
       });
       
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
     
   }
@@ -194,7 +194,7 @@ async function cargarDatosUbicacion(id: number) {
         data:resData.data,
       });
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
 

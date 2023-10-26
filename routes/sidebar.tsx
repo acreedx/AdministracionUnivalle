@@ -161,7 +161,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabineteMedico/listarServicios",
+        path: "/gabineteMedico/listarServicios/15",
         name: "Listar Servicios",
       },
       {
@@ -181,7 +181,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabinetePsicoPedagogico/listarServicios",
+        path: "/gabinetePsicoPedagogico/listarServicios/14",
         name: "Listar Servicios",
       },
       {
@@ -201,7 +201,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/consultorioOdontologico/listarServicios",
+        path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
       {
