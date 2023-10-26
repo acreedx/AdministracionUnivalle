@@ -129,7 +129,7 @@ const routes: IRoute[] = [
     name: "Bienestar Universitario",
     routes: [
       {
-        path: "/bienestarUniversitario/paginaPrincipal/1",
+        path: "/bienestarUniversitario/datosGenerales/1",
         name: "Datos Generales",
       },
       {
@@ -157,7 +157,7 @@ const routes: IRoute[] = [
     name: "Gabinete Medico",
     routes: [
       {
-        path: "/gabineteMedico/paginaPrincipal/2",
+        path: "/gabineteMedico/datosGenerales/15",
         name: "Datos Generales",
       },
       {
@@ -177,8 +177,8 @@ const routes: IRoute[] = [
     name: "Gabinete Psico-Pedagogico",
     routes: [
       {
-        path: "/gabinetePsicoPedagogico/paginaPrincipal/3",
-        name: "Pagina Principal",
+        path: "/gabinetePsicoPedagogico/datosGenerales/14",
+        name: "Datos Generales",
       },
       {
         path: "/gabinetePsicoPedagogico/listarServicios",
@@ -197,7 +197,7 @@ const routes: IRoute[] = [
     name: "Consultorio Odontologico",
     routes: [
       {
-        path: "/consultorioOdontologico/paginaPrincipal/4",
+        path: "/consultorioOdontologico/datosGenerales/16",
         name: "Datos Generales",
       },
       {
