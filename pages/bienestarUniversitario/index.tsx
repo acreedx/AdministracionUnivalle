@@ -18,23 +18,20 @@ import {
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon } from "icons";
 
-import  { IListarServicios } from "utils/interfaces/servicios";
+import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 // make a copy of the data, for the second table
 
 function BienestarUniversitario() {
-
-
   // setup pages control for every table
   const [pageTable2, setPageTable2] = useState(1);
 
   // setup data for every table
   const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
-  const [TotalResult,setTotal]= useState(Number);
+  const [TotalResult, setTotal] = useState(Number);
   // pagination setup
   const resultsPerPage = 10;
-
 
   // pagination change control
   function onPageChangeTable2(p: number) {
@@ -44,16 +41,22 @@ function BienestarUniversitario() {
   // on page change, load new sliced data
   // here you would make another server request for new data
 
-
   // on page change, load new sliced data
   // here you would make another server request for new data
- useEffect(() => {
+  useEffect(() => {
     const getData = async () => {
-      const query = await fetch('http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1');
-      const response:any= await query.json();
+      const query = await fetch(
+        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+      );
+      const response: any = await query.json();
       setTotal(response.data.length);
-      setUserInfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
-    }
+      setUserInfo(
+        response.data.slice(
+          (pageTable2 - 1) * resultsPerPage,
+          pageTable2 * resultsPerPage
+        )
+      );
+    };
     getData();
   }, [pageTable2]);
 
@@ -73,9 +76,7 @@ function BienestarUniversitario() {
             </tr>
           </TableHeader>
           <TableBody>
-            
-            {
-              dataTable2.map((datos:any, i) => (
+            {dataTable2.map((datos: any, i) => (
               <TableRow key={datos}>
                 <TableCell>
                   <div className="flex items-center text-sm">
@@ -84,7 +85,6 @@ function BienestarUniversitario() {
                       src={datos.imagen}
                     />
                     <div>
-                      
                       <p className="font-semibold">{datos.nombre}</p>
                     </div>
                   </div>
@@ -92,25 +92,33 @@ function BienestarUniversitario() {
                 <TableCell>
                   <span className="text-sm">{datos.modulo}</span>
                 </TableCell>
-                 <TableCell>
+                <TableCell>
                   <Badge></Badge>
-                </TableCell> 
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
-                    <Button layout="link" size="small" aria-label="Edit">
-                      <EditIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                    <Link
+                      href={{
+                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
+                      }}
+                    >
+                      <Button layout="link" size="small" aria-label="Edit">
+                        <EditIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
                     </Link>
-                    <Link href={{pathname: `/bienestarUniversitario/editar/${datos.identificador}`}}>
-                    <Button layout="link" size="small" aria-label="Delete">
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                     </Link>
+                    <Link
+                      href={{
+                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
+                      }}
+                    >
+                      <Button layout="link" size="small" aria-label="Delete">
+                        <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                      </Button>
+                    </Link>
                   </div>
                 </TableCell>
               </TableRow>
-              ))}
+            ))}
           </TableBody>
         </Table>
         <TableFooter>

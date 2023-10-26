@@ -134,14 +134,6 @@ function Requisitos({ id, name }: props) {
             <Button size="regular">Añadir nuevo requisito</Button>
           </Link>
         </div>
-        <TableFooter>
-          <Pagination
-            totalResults={totalResults}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable}
-            label="Tabla de navegación"
-          />
-        </TableFooter>
       </TableContainer>
     </Layout>
   );
