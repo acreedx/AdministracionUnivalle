@@ -125,7 +125,7 @@ function EditarDatosGeneralesPage() {
       });
       
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
 async function cargarDatosUbicacion(id: number) {
@@ -152,7 +152,7 @@ async function cargarDatosUbicacion(id: number) {
       });
       console.log(ubicacionData);
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
   async function cargarDatosRequisitos(id: number) {
@@ -173,7 +173,7 @@ async function cargarDatosUbicacion(id: number) {
       });
       
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
     
   }
@@ -194,7 +194,7 @@ async function cargarDatosUbicacion(id: number) {
         data:resData.data,
       });
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
 
@@ -303,6 +303,7 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosModulo(id);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -333,6 +334,7 @@ const editarUbicacion = async (idMod: number) => {
           id_modulo:idMod,
           estado:true,
         }
+        console.log(postUbi)
         fetch(
         `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
         {
@@ -346,6 +348,8 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -373,6 +377,8 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -385,12 +391,22 @@ const editarUbicacion = async (idMod: number) => {
     }
   };
   const editarRequisitos = async (idMod: number) => {
-    var count =0;
-    requisitosData.data.forEach(req => {
+      var count =0;
+      requisitosData.data.forEach(req => {
+      var aux1:any;
+      var aux2:any;
+      if(count>=requisitosBkData.data.length){
+        aux1=null;
+        aux2=null;
+      }else{
+        aux1=requisitosBkData.data[count].descripcion
+        aux2=requisitosBkData.data[count].pasosRequisito[0].nombre
+      }
       if (
-        req.descripcion !== requisitosBkData.data[count].descripcion ||
-        req.pasosRequisito[0].nombre !== requisitosBkData.data[count].pasosRequisito[0].nombre
-      ) {
+        req.descripcion !== aux1 ||
+        req.pasosRequisito[0].nombre !== aux2
+      ) 
+      {
         if(req.identificador<=0){
           const postReq = {
               descripcion: req.descripcion,
@@ -415,6 +431,7 @@ const editarUbicacion = async (idMod: number) => {
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
@@ -444,6 +461,7 @@ const editarUbicacion = async (idMod: number) => {
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
@@ -461,9 +479,18 @@ const editarUbicacion = async (idMod: number) => {
   const editarReferencias = async (idMod: number) => {
     var count =0;
     referenciaData.data.forEach(req => {
+    var aux1:any;
+    var aux2:any;
+    if(count>=refereciaBkData.data.length){
+      aux1=null;
+      aux2=null;
+    }else{
+      aux1=refereciaBkData.data[count].nombre
+      aux2=refereciaBkData.data[count].numero
+    }
     if (
-      req.nombre !== refereciaBkData.data[count].nombre ||
-      req.numero !== refereciaBkData.data[count].numero
+      req.nombre !== aux1 ||
+      req.numero !== aux2
     ) {
       if(req.identificador<=0){
         const postRef = {
@@ -486,6 +513,7 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -509,6 +537,7 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -678,7 +707,7 @@ const editarUbicacion = async (idMod: number) => {
               <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
                 <img
                   className="w-full h-full object-cover"
-                  src={ubicacionBkData.imagen === null ? "" : ubicacionBkData.imagen}
+                  src={ubicacionBkData.imagen === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : ubicacionBkData.imagen}
                   alt="Imagen de Ubicación actual"
                 />
               </div>

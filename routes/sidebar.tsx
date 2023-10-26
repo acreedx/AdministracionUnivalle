@@ -35,15 +35,61 @@ const routes: IRoute[] = [
   {
     path: "/example/forms",
     icon: "FormsIcon",
-    name: "Forms",
+    name: "Cajas",
     routes: [
       {
         path: "/administracion/cajas",
-        name: "Listar",
+        name: "Listar Servicios",
       },
       {
         path: "/administracion/cajas/crear",
+        name: "Crear Servicios",
+      },
+      {
+        path: "/administracion/cajas/horariosubicacion",
+        name: "Contactos",
+      },
+      {
+        path: "/administracion/cajas/crearcontacto",
+        name: "Crear Contacto",
+      },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Tramites",
+    routes: [
+      {
+        path: "/administracion/tramites",
+        name: "Listar",
+      },
+      {
+        path: "/administracion/tramites/crear",
         name: "Crear",
+      },
+      {
+        path: "/administracion/tramites/inactivos",
+        name: "Listar deshabilitados",
+      },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Tipos de tramites",
+    routes: [
+      {
+        path: "/administracion/tramites/categorias",
+        name: "Listar",
+      },
+      {
+        path: "/administracion/tramites/categorias/crear",
+        name: "Crear",
+      },
+      {
+        path: "/administracion/tramites/categorias/inactivos",
+        name: "Listar deshabilitados",
       },
     ],
   },
@@ -144,10 +190,6 @@ const routes: IRoute[] = [
         path: "/bienestarUniversitario/listarServicios",
         name: "Listar Servicios",
       },
-      {
-        path: "/bienestarUniversitario/registrar",
-        name: "Registrar Servicio",
-      },
     ],
     exact: true,
   },
@@ -161,12 +203,8 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabineteMedico/listarServicios",
+        path: "/gabineteMedico/listarServicios/15",
         name: "Listar Servicios",
-      },
-      {
-        path: "/gabineteMedico/registrar",
-        name: "Registrar Servicio",
       },
     ],
     exact: true,
@@ -181,12 +219,8 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabinetePsicoPedagogico/listarServicios",
+        path: "/gabinetePsicoPedagogico/listarServicios/14",
         name: "Listar Servicios",
-      },
-      {
-        path: "/gabinetePsicoPedagogico/registrar",
-        name: "Registrar Servicio",
       },
     ],
     exact: true,
@@ -201,13 +235,10 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/consultorioOdontologico/listarServicios",
+        path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
-      {
-        path: "/consultorioOdontologico/registrar",
-        name: "Registrar Servicio",
-      },
+     
     ],
     exact: true,
   },

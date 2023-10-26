@@ -1,10 +1,9 @@
-import React, { useState, ChangeEvent, useEffect } from "react";
-import {
+import React, { useState, ChangeEvent, useEffect, TextareaHTMLAttributes } from "react";
+import { 
   IEditarServicio,
   IEditarUbicacion,
-  IEditarReferencia,
-  IEditarCarrera,
-  IEditarRequisitos,
+  IEditarReferenciaArray,
+  IEditarRequisitosArray 
 } from "../../../utils/interfaces/servicios";
 import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
@@ -18,111 +17,153 @@ import {
   warningAlert,
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
-import { uploadFile } from "../../../firebase/config";
-import Link from "next/link";
-
+import {uploadFile} from "../../../firebase/config"
+import ReferenciaInputs from "../../../components/referenciasInput"
+import RequisitoInputs from "../../../components/requisitosInput"
+import RequisitoPasosInputs from "../../../components/requisitoPasosInput"
+import Image from 'next/image'
+import VideoPlayer from "components/video_player";
 export async function getServerSideProps(context: any) {
   return {
     props: {},
   };
 }
 
-function EditarServicioPage() {
+function EditarDatosGeneralesPage() {
+
+  var countReq=-1;
+  const [ubicacionImg,setUImg]:any = useState(null)
+  const [ubicaionVideo,setUVideo]:any = useState(null)
   const [serviceImg, setImg]: any = useState(null);
-  const [ubicacionImg, setUImg]: any = useState(null);
-  const [ubicaionVideo, setUVideo]: any = useState(null);
-  const [servicioData, setServicioData] = useState<IEditarServicio>({
+
+  const [moduloData, setModuloData] = useState<IEditarServicio>({
     nombre: "",
-    imagenUrl: null,
+    imagenUrl:null
   });
-  const [servicioBkData, setServicioBkData] = useState<IEditarServicio>({
+  const [moduloBkData, setModuloBkData] = useState<IEditarServicio>({
     nombre: "",
-    imagenUrl: null,
+    imagenUrl:null
   });
   const [ubicacionData, setUbicacionData] = useState<IEditarUbicacion>({
+    identificador:0,
     descripcion: null,
     imagen: null,
-    video: null,
+    video:null,
   });
   const [ubicacionBkData, setUbicacionBkData] = useState<IEditarUbicacion>({
+    identificador:0,
     descripcion: null,
     imagen: null,
-    video: null,
+    video:null,
   });
-  const [requisitosData, setRequisitosData] = useState<IEditarRequisitos>({
-    descripcion: null,
+  const [requisitosData, setRequisitosData] = useState<IEditarRequisitosArray>({
+    data:[
+      { 
+        identificador:0,
+        descripcion: null,
+        pasosRequisito:
+        [ 
+          {
+            identificador:0,
+            nombre:null
+          }
+        ]
+      }
+    ] 
   });
-  const [requisitosBkData, setRequisitosBkData] = useState<IEditarRequisitos>({
-    descripcion: null,
+  const [requisitosBkData, setRequisitosBkData] = useState<IEditarRequisitosArray>({
+     data:[
+      { 
+        identificador:0,
+        descripcion: null,
+        pasosRequisito:
+        [ 
+          {
+            identificador:0,
+            nombre:null
+          }
+        ]
+        
+      }
+    ] 
   });
-  const [referenciaData, setReferenciaData] = useState<IEditarReferencia>({
-    nombre: null,
-    numeroCel: null,
+  const [referenciaData, setReferenciaData] = useState<IEditarReferenciaArray>({
+    data:
+    [
+      {
+        identificador:0,
+        nombre: null,
+        numero: null,
+      } 
+    ]
   });
-  const [refereciaBkData, setReferenciaBkData] = useState<IEditarReferencia>({
-    nombre: null,
-    numeroCel: null,
-  });
-  const [carreraData, setCarreraData] = useState<IEditarCarrera>({
-    nombre: null,
-  });
-  const [carreraBkData, setCarreraBkData] = useState<IEditarCarrera>({
-    nombre: null,
+  const [refereciaBkData, setReferenciaBkData] = useState<IEditarReferenciaArray>({
+    data:
+    [
+      {
+        identificador:0,
+        nombre: null,
+        numero: null,
+      } 
+    ]
   });
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
-
-  async function cargarDatosServicio(id: number) {
+  
+  async function cargarDatosModulo(id: number) {
     try {
       const res = await fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
       );
       if (!res.ok) {
-        throw new Error("Error al obtener los datos del servicio.");
+        throw new Error("Error al obtener los datos del modulo.");
       }
       const resData = await res.json();
-
-      setServicioBkData({
-        nombre: resData.data.nombre,
-        imagenUrl: resData.data.imagenUrl,
+      setModuloBkData({
+        nombre: resData.data[0].nombre,
+        imagenUrl: resData.data[0].imagenUrl,
       });
-      setServicioData({
-        nombre: resData.data.nombre,
-        imagenUrl: resData.data.imagenUrl,
+      setModuloData({
+        nombre: resData.data[0].nombre,
+        imagenUrl: resData.data[0].imagenUrl,
       });
+      console.log(moduloData);
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
     }
   }
-  async function cargarDatosUbicacion(id: number) {
+async function cargarDatosUbicacion(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyServicioId/${id}`
       );
       if (!res.ok) {
-        throw new Error("Error al obtener los datos del servicio.");
+        throw new Error("Error al obtener los datos de la ubicación.");
       }
       const resData = await res.json();
 
       setUbicacionBkData({
-        descripcion: resData.data.descripcion,
-        imagen: resData.data.imagen,
-        video: resData.data.video,
+        identificador:resData.data[0].identificador,
+        descripcion: resData.data[0].descripcion,
+        imagen: resData.data[0].imagen,
+        video:resData.data[0].video,
       });
       setUbicacionData({
-        descripcion: resData.data.descripcion,
-        imagen: resData.data.imagen,
-        video: resData.data.video,
+        identificador:resData.data[0].identificador,
+        descripcion: resData.data[0].descripcion,
+        imagen: resData.data[0].imagen,
+        video:resData.data[0].video,
       });
+      console.log(ubicacionData);
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByServiceId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -130,19 +171,21 @@ function EditarServicioPage() {
       const resData = await res.json();
 
       setRequisitosBkData({
-        descripcion: resData.data.descripcion,
+        data: resData.data,
       });
       setRequisitosData({
-        descripcion: resData.data.descripcion,
+        data: resData.data,
       });
+      
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
+    
   }
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyServicioId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -150,71 +193,88 @@ function EditarServicioPage() {
       const resData = await res.json();
 
       setReferenciaBkData({
-        nombre: resData.data.nombre,
-        numeroCel: resData.data.numeroCel,
+        data:resData.data,
       });
       setReferenciaData({
-        nombre: resData.data.nombre,
-        numeroCel: resData.data.numeroCel,
+        data:resData.data,
       });
     } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
+      //errorAlert("Ocurrió un error al traer los datos");
     }
   }
-  async function cargarDatosCarrera(id: number) {
-    try {
-      const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
-      );
-      if (!res.ok) {
-        throw new Error("Error al obtener los datos del servicio.");
-      }
-      const resData = await res.json();
 
-      setCarreraBkData({
-        nombre: resData.data.nombre,
-      });
-      setCarreraData({
-        nombre: resData.data.nombre,
-      });
-    } catch (error) {
-      errorAlert("Ocurrió un error al traer los datos");
-    }
-  }
   useEffect(() => {
-    cargarDatosServicio(numId);
+    cargarDatosModulo(numId);
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-    cargarDatosCarrera(numId);
   }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setServicioData({
-      ...servicioData,
+    setModuloData({
+      ...moduloData,
       [campo]: e.target.value,
     });
   };
-  const handleChange1 = (
-    e: ChangeEvent<HTMLTextAreaElement>,
-    campo: string
-  ) => {
-    setRequisitosData({
-      ...requisitosData,
-      [campo]: e.target.value,
+const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, id: number, pasoId: number, campo: string) => {
+  setRequisitosData((prevData: any) => {
+    const newData = prevData.data.map((requisito: any) => {
+      if (requisito.identificador === id) {
+        const updatedPasos = requisito.pasosRequisito.map((paso: any) => {
+          if (paso.identificador === pasoId) {
+            return {
+              ...paso,
+              [campo]: e.target.value,
+            };
+          }
+          return paso;
+        });
+
+        return {
+          ...requisito,
+          pasosRequisito: updatedPasos,
+        };
+      }
+      return requisito;
     });
+
+    return { data: newData };
+  });
+  console.log(requisitosData.data);
+};
+const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
+      setRequisitosData((prevData:any) => {
+      const newData = prevData.data.map((item:any) => {
+        if (item.identificador === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          return {
+            ...item,
+            [campo]: e.target.value,
+          };
+        }
+        return item;
+        });
+
+        return { data: newData };
+      });
+      console.log(requisitosData.data);
   };
-  const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setCarreraData({
-      ...carreraData,
-      [campo]: e.target.value,
-    });
-  };
-  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setReferenciaData({
-      ...referenciaData,
-      [campo]: e.target.value,
-    });
+  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
+      setReferenciaData((prevData:any) => {
+      const newData = prevData.data.map((item:any) => {
+        if (item.identificador === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          return {
+            ...item,
+            [campo]: e.target.value,
+          };
+        }
+        return item;
+        });
+
+        return { data: newData };
+      });
+      console.log(referenciaData.data);
   };
   const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setUbicacionData({
@@ -222,18 +282,27 @@ function EditarServicioPage() {
       [campo]: e.target.value,
     });
   };
+  
   const clearData = () => {
-    setServicioData(servicioBkData);
+    setModuloData(moduloBkData);
   };
 
-  const editarServicio = async (id: number) => {
+  const editarModulo= async (id: number) => {
     if (
-      servicioData.nombre !== servicioBkData.nombre ||
-      servicioData.imagenUrl !== servicioBkData.imagenUrl
+      moduloData.nombre !== moduloBkData.nombre ||
+      serviceImg!=null
+
     ) {
       if (serviceImg != null) {
-        servicioData.imagenUrl = await uploadFile(serviceImg, "servicios/");
+        moduloData.imagenUrl = await uploadFile(serviceImg, "servicios/");
       }
+
+      const postModul={
+        nombre:moduloData.nombre,
+        imagenUrl:moduloData.imagenUrl
+      }
+      
+
       fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
         {
@@ -241,250 +310,360 @@ function EditarServicioPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
+          body: JSON.stringify(postModul),
         }
       )
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosModulo(id);
+            setImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-    } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    }
-  };
-  const editarUbicacion = async (id: number) => {
-    if (
-      ubicacionData.descripcion !== ubicacionData.descripcion ||
-      ubicacionData.imagen !== ubicacionData.imagen ||
-      ubicacionData.video !== ubicacionData.video
-    ) {
-      if (ubicacionImg != null) {
-        ubicacionData.imagen = await uploadFile(
-          ubicacionImg,
-          "ubicaciones/imagenes/"
-        );
-      }
-      if (ubicaionVideo != null) {
-        ubicacionData.video = await uploadFile(
-          ubicaionVideo,
-          "ubicaciones/videos/"
-        );
-      }
-      if (
-        ubicacionBkData.descripcion == null &&
-        ubicacionBkData.imagen == null &&
-        ubicacionBkData.video == null
-      ) {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicacion`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(servicioData),
-          }
-        )
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       } else {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicacion/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(servicioData),
-          }
-        )
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }
-    } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
-  const editarCarrera = async (id: number) => {
-    if (carreraData.nombre !== carreraData.nombre) {
-      if (carreraBkData.nombre == null) {
-        fetch(`http://apisistemaunivalle.somee.com/api/Carreras/addCarrera`, {
+const editarUbicacion = async (idMod: number) => {
+    if (
+      
+      ubicacionData.descripcion !== ubicacionBkData.descripcion ||
+      ubicacionImg!=null||
+      ubicaionVideo!=null
+    ) {
+      if(ubicacionImg!=null){
+        ubicacionData.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
+      }
+      if(ubicaionVideo!=null){
+        ubicacionData.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
+      }
+      if(ubicacionBkData.descripcion==null && ubicacionBkData.imagen==null && ubicacionBkData.video==null){
+        const postUbi={
+          descripcion:ubicacionData.descripcion,
+          imagen:ubicacionData.imagen,
+          video:ubicacionData.video,
+          id_modulo:idMod,
+          estado:true,
+        }
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
+        {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(servicioData),
-        })
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      } else {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Carreras/updateCarrera/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(servicioData),
+          body: JSON.stringify(postUbi),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
           }
-        )
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        })
+        .catch(() => errorAlert("Ocurrio un error al agregar nuevos datos"));
+      }else{
+        const postUbi={
+          descripcion:ubicacionData.descripcion,
+          imagen:ubicacionData.imagen,
+          video:ubicacionData.video,
+          id_modulo:idMod,
+          estado:true,
+        }
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postUbi),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
+      
     } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
-  const editarRequisitos = async (id: number) => {
-    if (requisitosData.descripcion !== requisitosData.descripcion) {
-      if (requisitosBkData.descripcion == null) {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisisto`,
+  const editarRequisitos = async (idMod: number) => {
+    var count =0;
+    requisitosData.data.forEach(req => {
+      var aux1:any;
+      var aux2:any;
+      if(count>=requisitosBkData.data.length){
+        aux1=null;
+        aux2=null;
+      }else{
+        aux1=requisitosBkData.data[count].descripcion
+        aux2=requisitosBkData.data[count].pasosRequisito[0].nombre
+      }
+      if (
+        req.descripcion !== aux1 ||
+        req.pasosRequisito[0].nombre !== aux2
+      ) {
+        if(req.identificador<=0){
+          const postReq = {
+              descripcion: req.descripcion,
+              serviciosId:idMod,
+              pasos: [
+                {
+                  nombre:req.pasosRequisito[0].nombre,
+                }
+              ]
+              
+        };
+          fetch(
+          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(servicioData),
+            body: JSON.stringify(postReq),
           }
         )
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
           })
           .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      } else {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/updatRequisito/${id}`,
+        }else{
+          const postReq = {
+              descripcion: req.descripcion,
+              pasos: [
+                {
+                  id:req.pasosRequisito[0].identificador,
+                  nombre:req.pasosRequisito[0].nombre,
+                }
+              ]
+        };
+        console.log(postReq)
+          fetch(
+          `http://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
           {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify(servicioData),
+            body: JSON.stringify(postReq),
           }
         )
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
           })
           .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        }
+        
+      } else {
+       // warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      }
+      count++;
+    });
+    
+  };
+  const editarReferencias = async (idMod: number) => {
+    var count =0;
+    referenciaData.data.forEach(req => {
+    var aux1:any;
+    var aux2:any;
+    if(count>=refereciaBkData.data.length){
+      aux1=null;
+      aux2=null;
+    }else{
+      aux1=refereciaBkData.data[count].nombre
+      aux2=refereciaBkData.data[count].numero
+    }
+    if (
+      req.nombre !== aux1 ||
+      req.numero !== aux2
+    ) {
+      if(req.identificador<=0){
+        const postRef = {
+          nombre:req.nombre,
+          numerocel:req.numero,
+          serviciosId:idMod,
+          estado: true
+        };
+        console.log(postRef)
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postRef),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+         const postRef = {
+          nombre:req.nombre,
+          numerocel:req.numero,
+        };
+        fetch(
+        `http://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postRef),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
       }
     } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
+    count++;
+  });
   };
 
-  const editarReferencias = async (id: number) => {
-    if (
-      referenciaData.nombre !== referenciaData.nombre ||
-      referenciaData.numeroCel !== referenciaData.numeroCel
-    ) {
-      if (refereciaBkData.nombre == null && refereciaBkData.numeroCel == null) {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Referencias/addReferencia`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(servicioData),
-          }
-        )
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      } else {
-        fetch(
-          `http://apisistemaunivalle.somee.com/api/Referencias/updateReferencia/${id}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(servicioData),
-          }
-        )
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al editar los datos");
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }
-    } else {
-      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+  const [inputsReq, setInputsReq]:any = useState([]);
+  const [inputsRef, setInputsRef]:any = useState([]);
+
+  const handleAddRequisitos = () => {
+    
+    const newRequisito:IEditarRequisitosArray = {
+      data:[
+        {
+        identificador:(requisitosData.data.length+1) * -1,
+          descripcion: "",
+          pasosRequisito:
+          [
+              {
+                identificador: countReq,
+                nombre:""
+              }  
+          ]  
+      }]
+
+    };
+    requisitosData.data.push(newRequisito.data[0]);
+    countReq--;
+    setInputsReq([...inputsReq]);
+    console.log(requisitosData.data)
+  }
+  const handleDeleteRequisitos = (id:number) => {
+    if(id<0){
+      requisitosData.data.pop();
+      setInputsReq([...inputsReq]);
+      console.log(requisitosData.data)
     }
-  };
+    
+  }
+  const handleAddReferencias = () => {
+    const newReference = {
+      identificador: (referenciaData.data.length+1) * -1,
+      nombre: "", 
+      numero: "", 
+    };
+    referenciaData.data.push(newReference);
+    setInputsRef([...inputsRef]);
+    console.log(referenciaData.data)
+  }
+  const handleDeleteReferencias = (id:number) => {
+    if(id<0){
+      referenciaData.data.pop();
+      setInputsRef([...inputsRef]);
+      console.log(referenciaData.data)
+    }
+    
+  }
   return (
     <Layout>
-      <PageTitle>Editar servicio - Bienestar Universitario</PageTitle>
+      <PageTitle>Editar Servicio - Bienestar Universitario</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Nombre del servicio</span>
           <Input
-            value={servicioData.nombre}
+            value={moduloData.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange(e, "nombre")}
           />
         </Label>
-
-        <Label className="mt-4">
-          <span>Imagen de referencia para el servicio</span>
-          <Input
-            type="file"
-            className="mt-1"
-            accept="image/png, image/jpeg"
-            placeholder="Imagen para el servicio"
-            onChange={(e) => setImg(e.target.files?.[0] || null)}
-          />
+        <hr className="my-4"/>
+        <Label>
+          <span className=" text-lg">Imagen de referencia para el Servicio</span>
+          <div className="text-center">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col items-center space-y-2">
+              <span>Imagen Actual</span>
+              <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={moduloBkData.imagenUrl === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : moduloBkData.imagenUrl}
+                  alt="Imagen de Ubicación actual"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <span >Nueva Imagen</span>
+              <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
+                  alt="Imagen de Ubicación Nueva"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+         <Input
+          type="file"
+          className="mt-1"
+          placeholder="Imagen del servicio"
+          onChange={e => setImg(e.target.files?.[0] || null)}
+        />
         </Label>
         <div className=" mt-4">
-          <Button size="large" onClick={() => editarServicio(numId)}>
+          <Button size="large" onClick={() => editarModulo(numId)}>
             Editar
           </Button>
         </div>
@@ -492,38 +671,32 @@ function EditarServicioPage() {
       <SectionTitle>Requisitos</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
-          <span>Descripción</span>
-          <Textarea
-            value={
-              requisitosData.descripcion === null
-                ? ""
-                : requisitosData.descripcion
-            }
-            className="mt-1"
-            rows={3}
-            placeholder="Ingresa los requisitos del servicio."
-            onChange={(e) => handleChange1(e, "descripcion")}
-          />
+          
+          {
+            requisitosData.data.map((req,index)=>(
+              <div className="my-3" key={req.identificador}>
+                <RequisitoInputs index={index} identificador={req.identificador} valueTitulo={req.descripcion} handle={handleChange2} hadleDelete={handleDeleteRequisitos} />
+                {req.pasosRequisito.map((paso,index)=>(
+                   <div className="my-3" key={paso.identificador}>
+                  <RequisitoPasosInputs index={index} identificadorReq={req.identificador} identificador={paso.identificador} valueDescripcion={paso.nombre} handle={handleChange1}/>
+                  </div>
+                ))}
+              </div>
+            ))
+          }
+          
+          {inputsReq}
         </Label>
-        <div className=" mt-4">
-          <Button size="large" onClick={() => editarRequisitos(numId)}>
-            Editar
-          </Button>
+        <div className="flex flex-row-reverse ...">
+          <div >
+            <Button  size="small" onClick={handleAddRequisitos}>
+                +
+            </Button>
+          </div>
         </div>
-      </div>
-      <SectionTitle>Carrera</SectionTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <Label className="mt-4">
-          <span>Nombre</span>
-          <Input
-            value={carreraData.nombre === null ? "" : carreraData.nombre}
-            className="mt-1"
-            placeholder="Escriba el nombre de la carrera."
-            onChange={(e) => handleChange2(e, "nombre")}
-          />
-        </Label>
-        <div className=" mt-4">
-          <Button size="large" onClick={() => editarCarrera(numId)}>
+        <div className="mt-4">
+         
+          <Button size="large" onClick={()=>editarRequisitos(numId)}>
             Editar
           </Button>
         </div>
@@ -531,25 +704,25 @@ function EditarServicioPage() {
       <SectionTitle>Contactos de referencia</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label className="mt-4">
-          <span>Nombre del Contacto</span>
-          <Input
-            value={referenciaData.nombre === null ? "" : referenciaData.nombre}
-            className="mt-1"
-            placeholder="Escriba el nombre del contacto."
-            onChange={(e) => handleChange3(e, "nombre")}
-          />
+          
+          {
+            referenciaData.data.map((ref,index)=>(
+               <div className="my-3" key={ref.identificador}>
+                <ReferenciaInputs index={index} identificador={ref.identificador} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
+               </div>
+            ))
+          }
+      
+          {inputsRef}
+
         </Label>
-        <Label className="mt-4">
-          <span>Número del Contacto</span>
-          <Input
-            value={
-              referenciaData.numeroCel === null ? "" : referenciaData.numeroCel
-            }
-            className="mt-1"
-            placeholder="Escriba el numero del contacto."
-            onChange={(e) => handleChange3(e, "numeroCel")}
-          />
-        </Label>
+        <div className="flex flex-row-reverse ...">
+          <div >
+            <Button  size="small" onClick={handleAddReferencias}>
+                +
+            </Button>
+          </div>
+        </div>
         <div className=" mt-4">
           <Button size="large" onClick={() => editarReferencias(numId)}>
             Editar
@@ -558,52 +731,95 @@ function EditarServicioPage() {
       </div>
       <SectionTitle>Ubicación</SectionTitle>
 
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <Label>
-          <span>Ubicación</span>
-          <Input
-            value={
-              ubicacionData.descripcion === null
-                ? ""
-                : ubicacionData.descripcion
-            }
-            className="mt-1"
-            placeholder="Ingrese la ubicación del servicio"
-            onChange={(e) => handleChange4(e, "descripcion")}
-          />
-        </Label>
-
-        <Label className="mt-4">
-          <span>Imagen de la ubicación del servicio</span>
-          <Input
-            type="file"
-            className="mt-1"
-            accept="image/png, image/jpeg"
-            placeholder="Imagen para ubicación"
-            onChange={(e) => setUImg(e.target.files?.[0] || null)}
-          />
-        </Label>
-        <Label className="mt-4">
-          <span>Video de la ubicación del servicio</span>
-          <Input
-            type="file"
-            className="mt-1"
-            accept="video/mp4,video/x-m4v,video/*"
-            placeholder="Imagen para ubicación"
-            onChange={(e) => setUVideo(e.target.files?.[0] || null)}
-          />
-        </Label>
-        <div className=" mt-4">
-          <Button size="large" onClick={() => editarUbicacion(numId)}>
-            Editar
-          </Button>
+    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <Label>
+        <span >Descripción</span>
+        <Input
+          value={ubicacionData.descripcion === null ? "" : ubicacionData.descripcion}
+          className="mt-1"
+          placeholder="Ingrese la ubicación del servicio"
+          onChange={(e) => handleChange4(e, "descripcion")}
+        />
+      </Label>
+      <hr className="mt-4"/>
+      <Label className="mt-4">
+        <span className=" text-lg">Imagen de la ubicación del servicio</span>
+        <div className="text-center">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col items-center space-y-2">
+              <span>Imagen Actual</span>
+              <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={ubicacionBkData.imagen === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : ubicacionBkData.imagen}
+                  alt="Imagen de Ubicación actual"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <span >Nueva Imagen</span>
+              <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={ubicacionImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(ubicacionImg)}
+                  alt="Imagen de Ubicación Nueva"
+                />
+              </div>
+            </div>
+          </div>
         </div>
+        <Input
+          type="file"
+          className="mt-1"
+          placeholder="Imagen para ubicación"
+          onChange={e => setUImg(e.target.files?.[0] || null)}
+        />
+      </Label>
+      <hr className="mt-4"/>
+      <Label className="mt-4">
+        <span className=" text-lg">Video de la ubicación del servicio</span>
+        <div className="text-center">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col items-center space-y-2">
+              <span>Video Actual</span>
+              <div className="w-96 h-56 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                <VideoPlayer
+                  url={ubicacionData.video === null ? "" : ubicacionData.video}
+                  width="384"
+                  height="224"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <span>Nuevo Video</span>
+              <div className="w-96 h-56 border-2 border-gray-500 rounded-lg overflow-hidden">
+                <VideoPlayer
+                  url={ubicacionData.video === null ? "" : ubicacionData.video}
+                  width="384"
+                  height="224"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <Input
+          type="file"
+          className="mt-1"
+          placeholder="Video para ubicación"
+          onChange={e => setUVideo(e.target.files?.[0] || null)}
+        />
+      </Label>
+
+      <div className="mt-4">
+        <Button size="large" onClick={() => editarUbicacion(numId)}>
+          Editar
+        </Button>
       </div>
+    </div>
+
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Link href={"/bienestarUniversitario/listarServicios"}>
-            <Button size="large">Volver</Button>
-          </Link>
+          <Button size="large">Volver</Button>
         </div>
 
         <div>
@@ -611,10 +827,12 @@ function EditarServicioPage() {
             Limpiar campos
           </Button>
         </div>
+
+        
       </div>
       <ToastContainer />
     </Layout>
   );
 }
 
-export default EditarServicioPage;
+export default EditarDatosGeneralesPage;

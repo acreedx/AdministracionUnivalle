@@ -53,7 +53,11 @@ function Requisitos({ id, name }: props) {
     async function doFetch() {
       fetch(`${URL.baseUrl}${route}${id}`)
         .then((res) => res.json())
-        .then((res) => setRequirements(convertJSONListRequirement(res.data)));
+        .then((res) =>
+          res.data != null
+            ? setRequirements(convertJSONListRequirement(res.data))
+            : console.log("No se encontraron requisitos")
+        );
     }
     doFetch();
   }, []);
@@ -130,14 +134,6 @@ function Requisitos({ id, name }: props) {
             <Button size="regular">Añadir nuevo requisito</Button>
           </Link>
         </div>
-        <TableFooter>
-          <Pagination
-            totalResults={totalResults}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable}
-            label="Tabla de navegación"
-          />
-        </TableFooter>
       </TableContainer>
     </Layout>
   );

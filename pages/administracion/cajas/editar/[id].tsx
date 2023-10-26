@@ -30,12 +30,16 @@ function EditarServicio({ id }: props) {
 
   const [name, setname] = useState("");
 
+  const [imgUrl, setimgUrl] = useState("");
   const [ubicacion, setubicacion] = useState("");
 
   const [encharged, setencharged] = useState("");
 
   const [cellphone, setcellphone] = useState("");
 
+  const [showAlertValidation, setShowAlertValidation] =
+    useState<boolean>(false);
+  const [validationMessage, setvalidationMessage] = useState<string>("");
   useEffect(() => {
     async function doFetch() {
       fetch(`${URL.baseUrl}${route}${id}`)
@@ -49,9 +53,32 @@ function EditarServicio({ id }: props) {
   const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
   const updateReferencesRoute = "Referencia/UpdateReferences/";
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
+    if (name == "" || name == null) {
+      setvalidationMessage("Debe rellenar el campo de Nombre");
+      setShowAlertValidation(true);
+      return;
+    }
+    if (imgUrl == "" || imgUrl == null) {
+      setvalidationMessage("Debe rellenar el campo de Imagen");
+      setShowAlertValidation(true);
+      return;
+    }
+    if (ubicacion == "" || ubicacion == null) {
+      setvalidationMessage("Debe rellenar el campo de Ubicación");
+      setShowAlertValidation(true);
+      return;
+    }
+    if (encharged == "" || encharged == null) {
+      setvalidationMessage("Debe rellenar el campo de Encargado");
+      setShowAlertValidation(true);
+      return;
+    }
+    if (cellphone == "" || cellphone == null) {
+      setvalidationMessage("Debe rellenar el campo de Teléfono");
+      setShowAlertValidation(true);
+      return;
+    }
     await fetch(`${URL.baseUrl}${updateServiceRoute}${id}`, {
       method: "PUT",
       headers: {
@@ -59,50 +86,54 @@ function EditarServicio({ id }: props) {
       },
       body: JSON.stringify({
         nombre: name,
-        imagenUrl: "",
+        imagenUrl: imgUrl,
       }),
     });
-    await fetch(`${URL.baseUrl}${updateUbicacionRoute}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        descripcion: ubicacion,
-        imagen: "",
-        video: "",
-        serviciosId: id,
-        estado: service?.status == "success" ? true : false,
-      }),
-    });
-    await fetch(`${URL.baseUrl}${updateReferencesRoute}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: encharged,
-        numerocel: cellphone,
-        serviciosId: id,
-      }),
-    });
+    await fetch(
+      `${URL.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          descripcion: ubicacion,
+          imagen: "",
+          video: "",
+          serviciosId: id,
+          estado: service?.status == "success" ? true : false,
+        }),
+      }
+    );
+    await fetch(
+      `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombre: encharged,
+          numerocel: cellphone,
+          serviciosId: id,
+        }),
+      }
+    );
     router.back();
   };
 
   useEffect(() => {
     if (service?.name) {
       setname(service!.name);
-      setubicacion(service!.ubicacion);
+      setimgUrl(service!.imagenUrl);
+      setubicacion(service!.ubicacion == null ? "" : service!.ubicacion);
       setencharged(service!.encharged);
       setcellphone(service!.cellphone);
     }
   }, [service]);
 
   const handleAlertConfirm = () => {
-    const form = document.getElementById("miFormulario") as HTMLFormElement;
-    if (form) {
-      form.submit();
-    }
+    handleSubmit();
   };
 
   const handleAlertCancel = () => {
@@ -134,6 +165,15 @@ function EditarServicio({ id }: props) {
             />
           </Label>
           <Label className="mt-4">
+            <span>Imagen</span>
+            <Input
+              className="mt-1"
+              placeholder="Ingresa la URL de la imagen"
+              value={imgUrl}
+              onChange={(e) => setimgUrl(e.target.value)}
+            />
+          </Label>
+          <Label className="mt-4">
             <span>Ubicación</span>
             <Input
               className="mt-1"
@@ -155,6 +195,7 @@ function EditarServicio({ id }: props) {
             <span>Teléfono de referencia</span>
             <Input
               className="mt-1"
+              type="number"
               placeholder="Ingresa el teléfono de referencia"
               value={cellphone}
               onChange={(e) => setcellphone(e.target.value)}
@@ -173,23 +214,36 @@ function EditarServicio({ id }: props) {
               >
                 Editar
               </button>
-              {showAlert && (
-                <SweetAlert
-                  warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
-                  title="Atención"
-                  confirmBtnText="Confirmar"
-                  cancelBtnText="Cancelar"
-                  showCancel
-                  onConfirm={handleAlertConfirm}
-                  onCancel={handleAlertCancel}
-                >
-                  Esta seguro que desea actualizar este servicio?
-                </SweetAlert>
-              )}
             </div>
           </Label>
         </form>
       </div>
+      {showAlert && (
+        <SweetAlert
+          warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+          title="Atención"
+          confirmBtnText="Confirmar"
+          cancelBtnText="Cancelar"
+          showCancel
+          onConfirm={handleAlertConfirm}
+          onCancel={handleAlertCancel}
+        >
+          Esta seguro que desea actualizar este servicio?
+        </SweetAlert>
+      )}
+      {showAlertValidation && (
+        <SweetAlert
+          error // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+          title="Atención"
+          confirmBtnText="Ok"
+          onConfirm={() => {
+            setShowAlertValidation(false);
+            setShowAlert(false);
+          }}
+        >
+          {validationMessage}
+        </SweetAlert>
+      )}
     </Layout>
   );
 }

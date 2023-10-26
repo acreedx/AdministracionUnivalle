@@ -23,7 +23,11 @@ export interface ICrearServicios {
     serviciosId: number;
   };
 }
-
+export interface ICrearServicio{
+    nombre: string;
+    moduloId: number;
+    imagenUrl: string | null;
+}
 export interface IEditarServicio {
   nombre: string;
   imagenUrl: string | null;
