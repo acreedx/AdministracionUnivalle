@@ -349,7 +349,7 @@ const editarUbicacion = async (idMod: number) => {
           descripcion:ubicacionData.descripcion,
           imagen:ubicacionData.imagen,
           video:ubicacionData.video,
-          id_modulo:idMod,
+          serviciosId:idMod,
           estado:true,
         }
         fetch(
@@ -377,7 +377,7 @@ const editarUbicacion = async (idMod: number) => {
           descripcion:ubicacionData.descripcion,
           imagen:ubicacionData.imagen,
           video:ubicacionData.video,
-          id_modulo:idMod,
+          serviciosId:idMod,
           estado:true,
         }
         fetch(
