@@ -387,9 +387,18 @@ const editarUbicacion = async (idMod: number) => {
   const editarRequisitos = async (idMod: number) => {
     var count =0;
     requisitosData.data.forEach(req => {
+      var aux1:any;
+      var aux2:any;
+      if(count>=requisitosBkData.data.length){
+        aux1=null;
+        aux2=null;
+      }else{
+        aux1=requisitosBkData.data[count].descripcion
+        aux2=requisitosBkData.data[count].pasosRequisito[0].nombre
+      }
       if (
-        req.descripcion !== requisitosBkData.data[count].descripcion ||
-        req.pasosRequisito[0].nombre !== requisitosBkData.data[count].pasosRequisito[0].nombre
+        req.descripcion !== aux1 ||
+        req.pasosRequisito[0].nombre !== aux2
       ) {
         if(req.identificador<=0){
           const postReq = {
@@ -461,9 +470,18 @@ const editarUbicacion = async (idMod: number) => {
   const editarReferencias = async (idMod: number) => {
     var count =0;
     referenciaData.data.forEach(req => {
+    var aux1:any;
+    var aux2:any;
+    if(count>=refereciaBkData.data.length){
+      aux1=null;
+      aux2=null;
+    }else{
+      aux1=refereciaBkData.data[count].nombre
+      aux2=refereciaBkData.data[count].numero
+    }
     if (
-      req.nombre !== refereciaBkData.data[count].nombre ||
-      req.numero !== refereciaBkData.data[count].numero
+      req.nombre !== aux1 ||
+      req.numero !== aux2
     ) {
       if(req.identificador<=0){
         const postRef = {
