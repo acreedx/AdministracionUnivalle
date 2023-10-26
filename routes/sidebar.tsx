@@ -60,6 +60,10 @@ const routes: IRoute[] = [
         path: "/administracion/tramites/crear",
         name: "Crear",
       },
+      {
+        path: "/administracion/tramites/inactivos",
+        name: "Listar deshabilitados",
+      },
     ],
   },
   {
@@ -77,7 +81,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/administracion/tramites/categorias/inactivos",
-        name: "Listar Deshabilitados",
+        name: "Listar deshabilitados",
       },
     ],
   },

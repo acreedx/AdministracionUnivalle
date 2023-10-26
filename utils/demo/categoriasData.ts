@@ -7,7 +7,7 @@ interface ICategoriasData {
 function convertJSONCategory(data: any) {
   const convertedData: ICategoriasData = {
     id: data.idCategoria,
-    name: data.nombre,
+    name: data.nombreCategoria,
     description: data.descripcion,
     status: data.estado == true ? "success" : "danger",
   };
@@ -20,29 +20,6 @@ function convertJSONListCategory(data: any) {
   });
   return convertedListData;
 }
-/*
-const tableData: ICategoriasData[] = [
-  {
-    id: 1,
-    name: "Solicitudes",
-    description: "dani",
-    status: "success",
-  },
 
-  {
-    id: 2,
-    name: "Certificaciones",
-    description: "dani",
-    status: "success",
-  },
-  {
-    id: 3,
-    name: "Gestiones academicas",
-    description: "dani",
-    status: "success",
-  },
-];
-*/
-//export default tableData;
 export type { ICategoriasData };
 export { convertJSONCategory, convertJSONListCategory };

@@ -8,7 +8,8 @@ interface ITramitesData {
   duration: string;
   requerimentId: number;
   requeriment: string;
-
+  categoryId: number;
+  categoryName: string;
   //  category: string;
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
@@ -35,6 +36,15 @@ function convertJSONService(data: any) {
       data.requisitos && data.requisitos[0]
         ? data.requisitos[0].descripcion
         : null,
+
+    categoryId:
+      data.categoria && data.categoria[0]
+        ? data.categoria[0].idCategoria
+        : null,
+
+    categoryName:
+      data.categoria && data.categoria[0] ? data.categoria[0].nombre : null,
+
     //category: data.categorias[0].nombre,
     status: data.estado == true ? "success" : "danger",
   };

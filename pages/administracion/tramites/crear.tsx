@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Input, Label, Select } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -6,6 +6,7 @@ import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
+import { ICategoriasData, convertJSONCategory } from "utils/demo/categoriasData";
 
 
 function CrearTramite() {
@@ -23,6 +24,7 @@ function CrearTramite() {
     setRequisitos([...requisitos, '']);
     //   setPasoRequisitos([...pasoRequisito, []]);
   }
+
 
   const agregarPasoRequisito = (requisitoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
@@ -100,8 +102,27 @@ function CrearTramite() {
     console.log("location a eliminar: ", locationIndex)
     setLocations(nuevasLocation);
   }
+  const [categorias, setCategorias] = useState<ICategoriasData>();
 
+  const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
+  useEffect(() => {
+
+    async function doFetch() {
+      fetch(`${URL.baseUrl}${getActiveCategoriesRoute}`)
+        .then((res) => res.json())
+        .then((res) => {
+          setCategorias(convertJSONCategory(res.data));
+        });
+    }
+    doFetch();
+  }, []);
+
+  useEffect(() => {
+    if (categorias?.name) {
+      setname(categorias!.name);
+    }
+  }, [categorias]);
 
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -297,10 +318,11 @@ function CrearTramite() {
           <Label className="mt-4">
             <span>Seleccione una categoria de tramite</span>
             <Select className="mt-1">
-              <option>$1,000</option>
-              <option>$5,000</option>
-              <option>$10,000</option>
-              <option>$25,000</option>
+
+              <option value={name}>
+
+              </option>
+
             </Select>
           </Label>
 

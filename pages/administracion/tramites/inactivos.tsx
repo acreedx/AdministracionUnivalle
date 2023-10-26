@@ -25,7 +25,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 function Tramites() {
   const router = useRouter();
 
-  const route = "Servicios/getTramiteByModuleActive/";
+  const route = "Servicios/getTramiteByModuleInactive/";
   const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Tramites";
   const resultsPerPage = 10;

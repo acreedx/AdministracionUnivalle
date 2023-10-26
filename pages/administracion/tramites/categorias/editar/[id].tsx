@@ -34,13 +34,23 @@ function EditarCategoria({ id }: props) {
   useEffect(() => {
 
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${id}`)
-        .then((res) => res.json())
-        .then((res) => {
-          setService(convertJSONCategory(res.data));
-        });
+      try {
+        const response = await fetch(`${URL.baseUrl}${route}${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.data) {
+            setService(convertJSONCategory(data.data));
+          } else {
+            console.error("La respuesta de la API no contiene datos válidos.");
+          }
+        } else {
+          console.error("Error en la solicitud a la API:", response.status);
+        }
+      } catch (error) {
+        console.error("Error en la solicitud a la API:", error);
+      }
     }
-    doFetch();
+    doFetch()
   }, []);
 
   const updateServiceRoute = "Categoria/updateCategoria/";
@@ -61,9 +71,11 @@ function EditarCategoria({ id }: props) {
   };
 
   useEffect(() => {
-    if (service?.name) {
+    if (service?.name || service?.description) {
       setname(service!.name);
       setdescription(service!.description);
+      console.log("name:", service.name);
+      console.log("description:", service.description);
     }
   }, [service]);
 
