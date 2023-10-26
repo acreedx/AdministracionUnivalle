@@ -147,8 +147,8 @@ function Cafeteria() {
 
 
                     <Link
-                      href={`/servicios/cafeteria/[id]/[Titulo]`}
-                      as={`/servicios/cafeteria/${menu.Id}/${menu.Titulo}`}
+                      href={`/servicios/cafeteria/editar/[id]`}
+                      as={`/servicios/cafeteria/editar/${menu.identificador}`}
                     >
                       <Button layout="link" size="small" aria-label="Edit">
                         <EditIcon className="w-5 h-5" aria-hidden="true" />
