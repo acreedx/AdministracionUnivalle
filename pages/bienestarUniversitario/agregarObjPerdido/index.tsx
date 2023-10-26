@@ -10,13 +10,15 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 function AgregarObjPerdidoPage() {
+  const router = useRouter();
   const inputFileImg: any = useRef(null);
   const [objPerImg, setImg]: any = useState(null);
-  const [objPerdido, setObjPerdido] = useState<IObjetosPerdidos>({
+  const [objPerdido, setObjPerdido] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
@@ -48,6 +50,7 @@ function AgregarObjPerdidoPage() {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al registrar los datos");
+            router.back();
           } else {
             throw new Error("Error al registrar los datos");
           }

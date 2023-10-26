@@ -10,7 +10,7 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Image from "next/image";
@@ -29,17 +29,18 @@ function AgregarObjPerdidoPage() {
 
   const inputFileImg: any = useRef(null);
   const [objPerImg, setImg]: any = useState(null);
-  const [objPerData, setObjPerData] = useState<IObjetosPerdidos>({
+  const [objPerData, setObjPerData] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
-  const [objPerBkData, setObjPerBkData] = useState<IObjetosPerdidos>({
+  const [objPerBkData, setObjPerBkData] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
 
   async function cargarDatosObj(id: number) {
     try {
+      console.log(id);
       const res = await fetch(
         `http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
       );
