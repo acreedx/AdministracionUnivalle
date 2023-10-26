@@ -158,7 +158,7 @@ function BienestarUniversitario() {
       {!isLoading ? (
         <>
           <PageTitle>
-            Listado de servicios - Gabinete Psico Pedagógico
+            Listado de servicios - Gabinete Psico-Pedagógico
           </PageTitle>
 
           <div className=" flex  mb-5">

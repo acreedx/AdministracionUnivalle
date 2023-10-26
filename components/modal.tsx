@@ -14,16 +14,16 @@ const ModalPage: FC<ModalProps> = ({
   return (
     <>
       <Button
-        
           type="button"
           onClick={() => setShowModal(true)}
         >
           {buttonName}
         </Button>
+
        {showModal ? (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="w-fit bg-gray-900  rounded-lg shadow-xl p-3">
-            <h2 className="text-base text-gray-400 font-semibold text-center">
+            <h2 className="text-base text-gray-400 font-semibold ">
               {pageRender}
             </h2>
             <Button
