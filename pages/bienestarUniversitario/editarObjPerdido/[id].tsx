@@ -10,9 +10,11 @@ import {
 } from "../../../components/alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../../firebase/config";
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
+import { isValidUrl } from "utils/functions/url";
 
 export async function getServerSideProps(context: any) {
   return {
@@ -24,21 +26,23 @@ function AgregarObjPerdidoPage() {
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
+
   const inputFileImg: any = useRef(null);
   const [objPerImg, setImg]: any = useState(null);
-  const [objPerData, setObjPerData] = useState<IObjetosPerdidos>({
+  const [objPerData, setObjPerData] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
-  const [objPerBkData, setObjPerBkData] = useState<IObjetosPerdidos>({
+  const [objPerBkData, setObjPerBkData] = useState<IAddObjPerdido>({
     titulo: "",
     archivo: "",
   });
 
   async function cargarDatosObj(id: number) {
     try {
+      console.log(id);
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/getServicioById/${id}`
+        `http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -46,12 +50,12 @@ function AgregarObjPerdidoPage() {
       const resData = await res.json();
 
       setObjPerData({
-        titulo: resData.data.nombre,
-        archivo: resData.data.imagenUrl,
+        titulo: resData.data.titulo,
+        archivo: resData.data.archivo,
       });
       setObjPerBkData({
-        titulo: resData.data.nombre,
-        archivo: resData.data.imagenUrl,
+        titulo: resData.data.titulo,
+        archivo: resData.data.archivo,
       });
     } catch (error) {
       errorAlert("Ocurrió un error al traer los datos");
@@ -66,32 +70,35 @@ function AgregarObjPerdidoPage() {
     console.log(objPerData);
   };
 
-  const editarServicio = async (id: number) => {
-    if (
-      objPerData.titulo !== objPerBkData.titulo ||
-      objPerData.archivo !== objPerBkData.archivo
-    ) {
+  const editarObjPer = async (id: number) => {
+    if (objPerData.titulo !== objPerBkData.titulo || objPerImg != null) {
       if (objPerData.archivo != null) {
         objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
-      }
-      fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(objPerData),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
+        fetch(
+          `http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              archivo: objPerData.archivo,
+              titulo: objPerData.titulo,
+              serviciosId: 1,
+            }),
           }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        )
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al editar los datos");
+            } else {
+              throw new Error();
+            }
+          })
+          .catch(() => errorAlert("Error al cambiar los datos del servicio"));
+      } else {
+        warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      }
     } else {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
@@ -99,13 +106,13 @@ function AgregarObjPerdidoPage() {
 
   const clearImg = () => {
     if (inputFileImg.current) {
-      inputFileImg.current.value = objPerBkData.archivo;
+      inputFileImg.current.value = null;
     }
   };
 
   const clearData = () => {
     setObjPerData(objPerBkData);
-    setImg(objPerImg);
+    setImg(null);
     clearImg();
   };
 
@@ -123,31 +130,49 @@ function AgregarObjPerdidoPage() {
           <Input
             value={objPerData.titulo}
             className="mt-1"
+            maxLength={50}
             placeholder="Escriba aquí el nombre o la descripción de la imagen"
             onChange={(e) => handleChange(e, "titulo")}
           />
         </Label>
 
-        <Label className="mt-4">
-          <span>Imagen del objeto perdido</span>
-          <Input
-            type="file"
-            ref={inputFileImg}
-            accept="image/*"
-            className="mt-1"
-            placeholder="Imagen para el servicio"
-            onChange={(e) => setImg(e.target.files?.[0] || null)}
-          />
-        </Label>
+        <div className="flex flex-row flex-wrap justify-around mt-4">
+          <div className="w-1/4 text-center">
+            {isValidUrl(objPerBkData.archivo) && (
+              <>
+                <span className="text-center">Imagen del objeto perdido</span>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "100%",
+                    paddingTop: "100%",
+                  }}
+                >
+                  <Image src={objPerBkData.archivo} layout="fill" />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex flex-col justify-center">
+            <Label>
+              <Input
+                type="file"
+                ref={inputFileImg}
+                accept="image/png, image/jpeg"
+                className="mt-1"
+                placeholder="Imagen del objeto perdido"
+                onChange={(e) => setImg(e.target.files?.[0] || null)}
+              />
+            </Label>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Button size="large">
-            <Link href={"/bienestarUniversitario/listarObjPerdidos"}>
-              Volver
-            </Link>
-          </Button>
+          <Link href={"/bienestarUniversitario/listarObjPerdidos"}>
+            <Button size="large">Volver</Button>
+          </Link>
         </div>
 
         <div>
@@ -157,7 +182,7 @@ function AgregarObjPerdidoPage() {
         </div>
 
         <div>
-          <Button size="large" onClick={() => editarServicio(numId)}>
+          <Button size="large" onClick={() => editarObjPer(numId)}>
             Editar
           </Button>
         </div>
