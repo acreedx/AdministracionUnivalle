@@ -20,7 +20,7 @@ import { useRouter } from "next/router";
 import { EditIcon, TrashIcon, MenuIcon, PlusIcon } from "icons";
 import SweetAlert from "react-bootstrap-sweetalert";
 
-function horariosubicacion() {
+function Horariosubicacion() {
   {
     /* Variables */
   }
@@ -234,4 +234,4 @@ function horariosubicacion() {
     </Layout>
   );
 }
-export default horariosubicacion;
+export default Horariosubicacion;
