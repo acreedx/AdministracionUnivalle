@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import CTA from "example/components/CTA";
 import {
   Table,
   TableHeader,
@@ -23,7 +21,7 @@ import Layout from "example/containers/Layout";
 import Link from "next/link";
 // make a copy of the data, for the second table
 
-function BienestarUniversitario() {
+function ObjetosPerdidos() {
   // setup pages control for every table
   const [pageTable2, setPageTable2] = useState(1);
 
@@ -62,38 +60,55 @@ function BienestarUniversitario() {
 
   return (
     <Layout>
-      <PageTitle>Bienestar Universitario</PageTitle>
+      <PageTitle>
+        Listado de objetos perdidos - Bienestar Universitario
+      </PageTitle>
 
-      <SectionTitle>Servicio</SectionTitle>
+      <div className="mb-8">
+        <Button size="large">
+          <Link href={"/bienestarUniversitario/agregarObjPerdido"}>
+            Agregar Objeto Perdido
+          </Link>
+        </Button>
+      </div>
+
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Modulo</TableCell>
+              <TableCell>Imagen</TableCell>
+              <TableCell>Objeto Perdido</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Acciones</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
             {dataTable2.map((datos: any, i) => (
-              <TableRow key={datos}>
+              <TableRow key={datos.id}>
                 <TableCell>
                   <div className="flex items-center text-sm">
-                    <Avatar
-                      className="hidden mr-3 md:block"
-                      src={datos.imagen}
-                    />
-                    <div>
-                      <p className="font-semibold">{datos.nombre}</p>
-                    </div>
+                    {datos.imagen ? (
+                      <Avatar
+                        className="hidden mr-3 md:block"
+                        src={datos.imagen}
+                        size="large"
+                      />
+                    ) : (
+                      <span className="text-center">-</span>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{datos.modulo}</span>
+                  <div>
+                    <p className="font-semibold">{datos.nombre}</p>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <Badge></Badge>
+                  <div>
+                    <p className="font-semibold">
+                      {datos.estado ? "Activo" : "Inactivo"}
+                    </p>
+                  </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-4">
@@ -134,4 +149,4 @@ function BienestarUniversitario() {
   );
 }
 
-export default BienestarUniversitario;
+export default ObjetosPerdidos;

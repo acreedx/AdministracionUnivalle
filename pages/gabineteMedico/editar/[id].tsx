@@ -615,7 +615,7 @@ const editarUbicacion = async (idMod: number) => {
   }
   return (
     <Layout>
-      <PageTitle>Editar Servicio - Bienestar Universitario</PageTitle>
+      <PageTitle>Editar Servicio - Gabinete Medico</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">

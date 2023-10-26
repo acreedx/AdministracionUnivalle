@@ -171,17 +171,74 @@ const routes: IRoute[] = [
   },
   {
     path: "/bienestarUniversitario",
-    icon: "HomeIcon",
+    icon: "BienestarIcon",
     name: "Bienestar Universitario",
     routes: [
       {
-        path: "/bienestarUniversitario",
-        name: "Listar Servicios",
+        path: "/bienestarUniversitario/datosGenerales/1",
+        name: "Datos Generales",
       },
       {
-        path: "/bienestarUniversitario/registrar",
-        name: "Registrar Servicio",
+        path: "/bienestarUniversitario/listarObjPerdidos/",
+        name: "Listar Objetos Perdidos",
       },
+      {
+        path: "/bienestarUniversitario/agregarObjPerdido",
+        name: "Agregar Objeto Perdido",
+      },
+      {
+        path: "/bienestarUniversitario/listarServicios",
+        name: "Listar Servicios",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/gabineteMedico",
+    icon: "MedicineIcon",
+    name: "Gabinete Medico",
+    routes: [
+      {
+        path: "/gabineteMedico/datosGenerales/15",
+        name: "Datos Generales",
+      },
+      {
+        path: "/gabineteMedico/listarServicios/15",
+        name: "Listar Servicios",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/gabinetePsicoPedagogico",
+    icon: "MindIcon",
+    name: "Gabinete Psico-Pedagogico",
+    routes: [
+      {
+        path: "/gabinetePsicoPedagogico/datosGenerales/14",
+        name: "Datos Generales",
+      },
+      {
+        path: "/gabinetePsicoPedagogico/listarServicios/14",
+        name: "Listar Servicios",
+      },
+    ],
+    exact: true,
+  },
+  {
+    path: "/consultorioOdontologico",
+    icon: "DentistIcon",
+    name: "Consultorio Odontologico",
+    routes: [
+      {
+        path: "/consultorioOdontologico/datosGenerales/16",
+        name: "Datos Generales",
+      },
+      {
+        path: "/consultorioOdontologico/listarServicios/16",
+        name: "Listar Servicios",
+      },
+     
     ],
     exact: true,
   },
