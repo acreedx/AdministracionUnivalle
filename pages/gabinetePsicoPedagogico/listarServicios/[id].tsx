@@ -52,7 +52,7 @@ function GabinetePsicoPedagogico() {
   // here you would make another server request for new data
  useEffect(() => {
     const getData = async () => {
-      const query = await fetch(`http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/${numId}`);
+      const query = await fetch(`http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/14`);
       const response:any= await query.json();
       setTotal(response.data.length);
       setUserInfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
