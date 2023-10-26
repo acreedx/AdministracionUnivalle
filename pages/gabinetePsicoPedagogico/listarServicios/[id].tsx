@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import CTA from "example/components/CTA";
@@ -62,9 +64,11 @@ function GabinetePsicoPedagogico() {
 
   return (
     <Layout>
-      <PageTitle>Listar Servicios - Gabinete Psico-Pedagogico</PageTitle>
-
+      <PageTitle>Listar Servicios - Gabinete Psico-Pedagogico</PageTitle> 
       <SectionTitle>Servicio</SectionTitle>
+      <div className=" flex flex-row-reverse  mb-5">
+        <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
+      </div>
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>

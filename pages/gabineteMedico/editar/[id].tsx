@@ -34,6 +34,7 @@ function EditarDatosGeneralesPage() {
   var countReq=-1;
   const [ubicacionImg,setUImg]:any = useState(null)
   const [ubicaionVideo,setUVideo]:any = useState(null)
+  const [serviceImg, setImg]: any = useState(null);
 
   const [moduloData, setModuloData] = useState<IEditarServicio>({
     nombre: "",
@@ -288,14 +289,20 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
 
   const editarModulo= async (id: number) => {
     if (
-      moduloData.nombre !== moduloBkData.nombre 
+      moduloData.nombre !== moduloBkData.nombre ||
+      serviceImg!=null
 
     ) {
+      if (serviceImg != null) {
+        moduloData.imagenUrl = await uploadFile(serviceImg, "servicios/");
+      }
+
       const postModul={
         nombre:moduloData.nombre,
         imagenUrl:moduloData.imagenUrl
       }
-      console.log(postModul)
+      
+
       fetch(
         `http://apisistemaunivalle.somee.com/api/Servicios/updateServicio/${id}`,
         {
@@ -309,6 +316,8 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosModulo(id);
+            setImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -352,6 +361,8 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -365,7 +376,6 @@ const editarUbicacion = async (idMod: number) => {
           id_modulo:idMod,
           estado:true,
         }
-        console.log(postUbi)
         fetch(
         `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
@@ -379,6 +389,8 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosUbicacion(idMod);
+            setUImg(null);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -430,6 +442,7 @@ const editarUbicacion = async (idMod: number) => {
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
@@ -459,6 +472,7 @@ const editarUbicacion = async (idMod: number) => {
           .then((response) => {
             if (response.ok) {
               successAlert("Éxito al editar los datos");
+              cargarDatosRequisitos(idMod);
             } else {
               throw new Error("Error al cambiar los datos del servicio");
             }
@@ -510,6 +524,7 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -533,6 +548,7 @@ const editarUbicacion = async (idMod: number) => {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
+            cargarDatosReferencia(idMod);
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
@@ -547,7 +563,6 @@ const editarUbicacion = async (idMod: number) => {
   };
 
   const [inputsReq, setInputsReq]:any = useState([]);
-  const [inputPaso, setInputsPaso]:any = useState([]);
   const [inputsRef, setInputsRef]:any = useState([]);
 
   const handleAddRequisitos = () => {
@@ -612,6 +627,40 @@ const editarUbicacion = async (idMod: number) => {
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange(e, "nombre")}
           />
+        </Label>
+        <hr className="my-4"/>
+        <Label>
+          <span className=" text-lg">Imagen de referencia para el Servicio</span>
+          <div className="text-center">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col items-center space-y-2">
+              <span>Imagen Actual</span>
+              <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={moduloBkData.imagenUrl === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : moduloBkData.imagenUrl}
+                  alt="Imagen de Ubicación actual"
+                />
+              </div>
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <span >Nueva Imagen</span>
+              <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
+                  alt="Imagen de Ubicación Nueva"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+         <Input
+          type="file"
+          className="mt-1"
+          placeholder="Imagen del servicio"
+          onChange={e => setImg(e.target.files?.[0] || null)}
+        />
         </Label>
         <div className=" mt-4">
           <Button size="large" onClick={() => editarModulo(numId)}>
@@ -702,7 +751,7 @@ const editarUbicacion = async (idMod: number) => {
               <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
                 <img
                   className="w-full h-full object-cover"
-                  src={ubicacionBkData.imagen === null ? "" : ubicacionBkData.imagen}
+                  src={ubicacionBkData.imagen === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : ubicacionBkData.imagen}
                   alt="Imagen de Ubicación actual"
                 />
               </div>

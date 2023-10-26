@@ -21,6 +21,8 @@ import { EditIcon, TrashIcon } from "icons";
 import  { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 // make a copy of the data, for the second table
 
 function BienestarUniversitario() {
@@ -62,6 +64,11 @@ function BienestarUniversitario() {
       <PageTitle>Listar Servicios - Bienestar Universitario</PageTitle>
 
       <SectionTitle>Servicio</SectionTitle>
+
+       <div className=" flex flex-row-reverse  mb-5">
+        <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
+      </div>
+
       <TableContainer className="mb-8">
         <Table>
           <TableHeader>
