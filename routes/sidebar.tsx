@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-    ? pathname.indexOf(route.path) === 0
-    : false;
+      ? pathname.indexOf(route.path) === 0
+      : false;
 }
 
 const routes: IRoute[] = [
@@ -65,10 +65,6 @@ const routes: IRoute[] = [
         name: "Listar",
       },
       {
-        path: "/administracion/tramites/crear",
-        name: "Crear",
-      },
-      {
         path: "/administracion/tramites/inactivos",
         name: "Listar deshabilitados",
       },
@@ -82,10 +78,6 @@ const routes: IRoute[] = [
       {
         path: "/administracion/tramites/categorias",
         name: "Listar",
-      },
-      {
-        path: "/administracion/tramites/categorias/crear",
-        name: "Crear",
       },
       {
         path: "/administracion/tramites/categorias/inactivos",
@@ -238,7 +230,7 @@ const routes: IRoute[] = [
         path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
-     
+
     ],
     exact: true,
   },

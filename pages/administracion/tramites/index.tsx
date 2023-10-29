@@ -80,6 +80,13 @@ function Tramites() {
       <PageTitle>Tramites</PageTitle>
 
       <SectionTitle>Listado de tramites</SectionTitle>
+      <div className="mb-1">
+        <Link href={`/administracion/tramites/crear`}>
+          <Button size="small">
+            Registrar un nuevo tramite
+          </Button>
+        </Link>
+      </div>
       <TableContainer className="my-8">
         <Table>
           <TableHeader>

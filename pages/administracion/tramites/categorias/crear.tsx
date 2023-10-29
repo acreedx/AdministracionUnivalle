@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Input, Label } from "@roketid/windmill-react-ui";
+import { Button, Input, Label } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
+import Link from "next/link";
 
 function CrearCategoria() {
   const [name, setname] = useState("");

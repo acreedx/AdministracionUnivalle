@@ -76,8 +76,14 @@ function Categorias() {
   return (
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
-
       <SectionTitle>Categorias de tramites</SectionTitle>
+      <div className="mb-1">
+        <Link href={`/administracion/tramites/categorias/crear`}>
+          <Button size="small">
+            Registrar una nueva categoria de tramites
+          </Button>
+        </Link>
+      </div>
       <TableContainer className="my-8">
         <Table>
           <TableHeader>

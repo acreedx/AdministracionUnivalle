@@ -181,10 +181,10 @@ function CrearTramite() {
   //Added requeriment
   const createRequisitoRoute = "Requisitos/addRequisito";
   const createRequisitos = async (serviceId: number) => {
-    for (const requisito of requisitos) {
+    for (let i = 0; i < requisitos.length; i++) {
+      const requisito = requisitos[i];
       if (requisito.trim() !== '') {
-        const nuevosPasos = pasoRequisito[requisitos.indexOf(requisito)].map((nombre) => ({ nombre }));
-
+        const nuevosPasos = pasoRequisito[i] ? pasoRequisito[i].map((nombre) => ({ nombre })) : [];
         console.log("Requisito a crear:", requisito, "Pasos:", nuevosPasos, "id", serviceId);
 
         const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
@@ -200,6 +200,7 @@ function CrearTramite() {
             estado: true,
           }),
         });
+
         console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
       }
     }
