@@ -1,6 +1,7 @@
 interface ITramitesData {
   id: number;
   name: string;
+  image: string;
   enchargedId: number;
   encharged: string;
   cellphone: string;
@@ -17,6 +18,8 @@ function convertJSONService(data: any) {
   const convertedData: ITramitesData = {
     id: data.id,
     name: data.nombre,
+    image: data.imagen,
+
     enchargedId:
       data.referencia && data.referencia[0] ? data.referencia[0].id : null,
     encharged:

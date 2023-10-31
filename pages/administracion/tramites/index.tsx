@@ -14,6 +14,7 @@ import {
   Badge,
   Button,
   Pagination,
+  Avatar,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 //import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
@@ -91,6 +92,7 @@ function Tramites() {
         <Table>
           <TableHeader>
             <tr>
+              <TableCell>Imagen</TableCell>
               <TableCell>Nombre</TableCell>
               <TableCell>Encargado</TableCell>
               <TableCell>Telefono de Referencia</TableCell>
@@ -102,6 +104,19 @@ function Tramites() {
           <TableBody>
             {services.map((servicio, i) => (
               <TableRow key={i}>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      < Avatar
+                        className="hidden mr-3 md:block"
+                        src={servicio.image}
+                        size="large"
+                      />
+                    </div>
+                  </div>
+                </TableCell>
+
+
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>

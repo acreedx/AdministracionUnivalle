@@ -3,15 +3,17 @@ import { useRouter } from "next/router";
 import { Input, Label, Select } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
-import URL from "utils/demo/api";
+import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
 import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
+import { uploadFile } from "../../../firebase/config";
 
 
 function CrearTramite() {
 
   const [name, setname] = useState("");
+
 
   // ! Requisitos
   const [requisitos, setRequisitos] = useState<string[]>(['']);
@@ -85,6 +87,16 @@ function CrearTramite() {
     console.log("location a eliminar: ", locationIndex)
     setLocations(nuevasLocation);
   }
+
+  //Images
+  var [serviceImg, setImg]: any = useState(null);
+  const subirArchivos = async () => {
+    if (serviceImg != null) {
+      serviceImg = await uploadFile(serviceImg, "servicios/");
+    }
+    handleSubmit();
+  }
+
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
@@ -93,7 +105,7 @@ function CrearTramite() {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${getActiveCategoriesRoute}`)
+      fetch(`${URLS.baseUrl}${getActiveCategoriesRoute}`)
         .then((res) => res.json())
         .then((res) => setCategorias(convertJSONListCategory(res.data)));
     }
@@ -115,7 +127,7 @@ function CrearTramite() {
     try {
       const selectedCategoryId = selectedCategory;
       console.log(selectedCategoryId)
-      const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
+      const newService = await fetch(`${URLS.baseUrl}${createServiceRoute}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -123,7 +135,7 @@ function CrearTramite() {
         body: JSON.stringify({
           nombre: name,
           moduloId: moduleId,
-          imagenUrl: "",
+          imagenUrl: await uploadFile(serviceImg, "servicios/"),
           //  idCategoria: selectedCategoryId
         }),
       });
@@ -132,7 +144,7 @@ function CrearTramite() {
 
       await createRequisitos(newServiceId);
 
-      await fetch(`${URL.baseUrl}${createReferenceRoute}`, {
+      await fetch(`${URLS.baseUrl}${createReferenceRoute}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,7 +157,7 @@ function CrearTramite() {
         }),
       });
 
-      await fetch(`${URL.baseUrl}${createDurationServiceRoute}`, {
+      await fetch(`${URLS.baseUrl}${createDurationServiceRoute}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -170,7 +182,7 @@ function CrearTramite() {
         const nuevosPasos = pasoRequisito[i] ? pasoRequisito[i].map((nombre) => ({ nombre })) : [];
         console.log("Requisito a crear:", requisito, "Pasos:", nuevosPasos, "id", serviceId);
 
-        const newRequisitoResponse = await fetch(`${URL.baseUrl}${createRequisitoRoute}`, {
+        const newRequisitoResponse = await fetch(`${URLS.baseUrl}${createRequisitoRoute}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -210,6 +222,30 @@ function CrearTramite() {
               className="mt-1"
               placeholder="Ingresa el nombre del tramite"
               onChange={(e) => setname(e.target.value)}
+            />
+          </Label>
+
+          <Label className="mt-4">
+            <span className=" text-lg">Imagen de referencia para el servicio</span>
+            <div className="text-center mb-5">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <span>Imagen</span>
+                  <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
+                      alt="Imagen de Ubicación Nueva"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Input
+              type="file"
+              className="mt-1"
+              placeholder="Imagen para el servicio"
+              onChange={(e) => setImg(e.target.files?.[0] || null)}
             />
           </Label>
           <Label className="mt-4">
