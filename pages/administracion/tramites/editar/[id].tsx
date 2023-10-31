@@ -3,14 +3,14 @@ import { useRouter } from "next/router";
 import { Input, Label, Select } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
-import URL from "utils/demo/api";
+import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
 import { GetServerSidePropsContext } from "next";
-
 import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
-import Requisitos from "pages/administracion/cajas/[id]/[name]";
-
+import { uploadFile } from "../../../../firebase/config";
+import SectionTitle from "example/components/Typography/SectionTitle";
+import { ICategoriasData } from "utils/demo/categoriasData";
 interface props {
   id: number;
 }
@@ -28,17 +28,27 @@ function ModificarTramite({ id }: props) {
 
   const [name, setname] = useState("");
 
+  var [serviceImg, setImg]: any = useState(null);
+
+  const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+
   // ! Requisitos
   const [requisitos, setRequisitos] = useState<string[]>(['']);
   // ! Paso requisito
   const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
 
-  const agregarRequisito = () => {
-    console.log("Se agrego nuevo requisito")
-    setRequisitos([...requisitos, '']);
-    setPasoRequisitos([...pasoRequisito, []]);
-  }
+  const [agregarNuevoRequisito, setAgregarNuevoRequisito] = useState(true);
 
+  const agregarRequisito = () => {
+    if (agregarNuevoRequisito == true) {
+      // Agregar un nuevo requisito aquí, por ejemplo:
+      setRequisitos([...requisitos, '']);
+
+    } else {
+      setAgregarNuevoRequisito(true)
+    }
+  };
   const agregarPasoRequisito = (requisitoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
 
@@ -55,23 +65,10 @@ function ModificarTramite({ id }: props) {
 
 
   const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
-    console.log('Índice de requisito:', requisitoIndex, 'Índice de PASO requisito a eliminar:', pasoIndex);
-
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
-
-    // ! Verificar si es el último pasoRequisito en el requisito
-    if (nuevosPasosRequisitos[requisitoIndex].length === 0 || pasoIndex === nuevosPasosRequisitos[requisitoIndex].length) {
-      // ! eliminar el ultimo requisito si se elimina el ultimo pasoRequisito
-      const nuevosRequisitos = [...requisitos];
-      nuevosRequisitos.splice(requisitoIndex, 1);
-      nuevosPasosRequisitos.splice(requisitoIndex, 1);
-      setRequisitos(nuevosRequisitos);
-    } else {
-      setPasoRequisitos(nuevosPasosRequisitos);
-    }
-
-    console.log(nuevosPasosRequisitos);
+    setAgregarNuevoRequisito(false)
+    setPasoRequisitos(nuevosPasosRequisitos);
   };
   const eliminarRequisito = (requisitoIndex: number) => {
     console.log("Indice de requisito a eliminar", requisitoIndex)
@@ -128,14 +125,12 @@ function ModificarTramite({ id }: props) {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${id}`)
+      fetch(`${URLS.baseUrl}${route}${id}`)
         .then((res) => res.json())
         .then((res) => setService(convertJSONService(res.data[0])));
     }
     doFetch();
   }, []);
-
-
 
 
   // Update Services 
@@ -152,14 +147,14 @@ function ModificarTramite({ id }: props) {
   const handleSubmit = async () => {
     try {
 
-      await fetch(`${URL.baseUrl}${updateServiceRoute}${id}`, {
+      await fetch(`${URLS.baseUrl}${updateServiceRoute}${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           nombre: name,
-          imagenUrl: "",
+          imagenUrl: await uploadFile(serviceImg, "servicios/"),
         }),
       });
       //   const dataNewService = await newService.json();
@@ -169,7 +164,7 @@ function ModificarTramite({ id }: props) {
 
 
       await fetch(
-        `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
+        `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
         {
           method: "PUT",
           headers: {
@@ -183,7 +178,7 @@ function ModificarTramite({ id }: props) {
         }
       );
 
-      await fetch(`${URL.baseUrl}${updateDurationServiceRoute}${service?.durationId}`, {
+      await fetch(`${URLS.baseUrl}${updateDurationServiceRoute}${service?.durationId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -204,7 +199,7 @@ function ModificarTramite({ id }: props) {
       if (requisito.trim() !== '') {
 
         console.log(requisitos)
-        const updateRequisitoResponse = await fetch(`${URL.baseUrl}${updateRequisitoRoute}${service?.requerimentId}`, {
+        const updateRequisitoResponse = await fetch(`${URLS.baseUrl}${updateRequisitoRoute}${service?.requerimentId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -239,7 +234,7 @@ function ModificarTramite({ id }: props) {
 
   const obtenerRequisitosDelServicio = async (serviceId: number) => {
     try {
-      const response = await fetch(`${URL.baseUrl}${getRequisitosByID}${serviceId}`);
+      const response = await fetch(`${URLS.baseUrl}${getRequisitosByID}${serviceId}`);
       if (response.ok) {
         const data = await response.json();
         console.log(data);
@@ -281,8 +276,11 @@ function ModificarTramite({ id }: props) {
   return (
     <Layout>
       <PageTitle>Editar tramite</PageTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <form id="miFormulario" onSubmit={handleSubmit}>
+      <form id="miFormulario" onSubmit={handleSubmit}>
+
+        <SectionTitle>Datos generales</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
           <Label>
             <span>Nombre del tramite</span>
             <Input
@@ -292,7 +290,86 @@ function ModificarTramite({ id }: props) {
               onChange={(e) => setname(e.target.value)}
             />
           </Label>
+
           <Label className="mt-4">
+            <span className=" text-lg">Imagen de referencia del tramite</span>
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <span>Imagen Actual</span>
+                  <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : service?.image}
+                      alt="Imagen de Ubicación actual"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center space-y-2">
+                  <span >Nueva Imagen</span>
+                  <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
+                      alt="Imagen de Ubicación Nueva"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Input
+              type="file"
+              className="mt-4"
+              placeholder="Imagen del servicio"
+              onChange={e => setImg(e.target.files?.[0] || null)}
+            />
+          </Label>
+
+
+          <Label className="mt-4">
+            <span>Duracion del tramite</span>
+            <Input
+              className="mt-1"
+              placeholder="Ingresa la duracion del tramite"
+              value={processingTime}
+              onChange={(e) => setprocessingTime(e.target.value)}
+            />
+          </Label>
+
+          <Label className="mt-4">
+            <span>Encargado</span>
+            <Input
+              className="mt-1"
+              value={encharged}
+              placeholder="Ingresa el nombre completo del encargado"
+              onChange={(e) => setencharged(e.target.value)}
+            />
+          </Label>
+          <Label className="mt-4">
+            <span>Teléfono de referencia</span>
+            <Input
+              className="mt-1"
+              value={cellphone}
+              placeholder="Ingresa el teléfono de referencia del encargado"
+              onChange={(e) => setcellphone(e.target.value)}
+            />
+          </Label>
+          <Label className="mt-4">
+            <span>Seleccione una categoria de tramite</span>
+            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
+              {categorias.map((categoria, i) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.name}
+                </option>
+              ))}
+            </Select>
+          </Label>
+        </div>
+
+        <SectionTitle>Requisitos</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
+          <Label>
             <div className="flex items-center mt-4">
               <span className="mr-2">Requisitos</span>
               <button type="button" onClick={agregarRequisito}>
@@ -346,47 +423,10 @@ function ModificarTramite({ id }: props) {
               </div>
             ))}
           </Label>
+        </div>
 
-          <Label className="mt-4">
-            <span>Duracion del tramite</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la duracion del tramite"
-              value={processingTime}
-              onChange={(e) => setprocessingTime(e.target.value)}
-            />
-          </Label>
-
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className="mt-1"
-              value={encharged}
-              placeholder="Ingresa el nombre completo del encargado"
-              onChange={(e) => setencharged(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              className="mt-1"
-              value={cellphone}
-              placeholder="Ingresa el teléfono de referencia del encargado"
-              onChange={(e) => setcellphone(e.target.value)}
-            />
-          </Label>
-          {/* *Ubicaciones
-          <Label className="mt-4">
-            <span>Seleccione una categoria de tramite</span>
-            <Select className="mt-1">
-              <option>$1,000</option>
-              <option>$5,000</option>
-              <option>$10,000</option>
-              <option>$25,000</option>
-            </Select>
-          </Label>
-
-
+        <SectionTitle>Ubicaciones</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
 
           <Label className="mt-4">
             <div className="flex items-center mt-4">
@@ -433,34 +473,35 @@ function ModificarTramite({ id }: props) {
               </div>
             ))}
           </Label>
-          */}
-          <Label className="mt-4">
-            <div className="relative text-gray-500 focus-within:text-purple-600">
-              <input className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input" />
-              <button
-                type={"button"}
-                onClick={() => setShowAlert(true)}
-                className="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+        </div>
+
+        <Label className="mt-4">
+          <div className="relative text-gray-500 focus-within:text-purple-600">
+
+            <button
+              type={"button"}
+              onClick={() => setShowAlert(true)}
+              className="my-4 mb-6 px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+            >
+              Guardar
+            </button>
+            {showAlert && (
+              <SweetAlert
+                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                title="Atención"
+                confirmBtnText="Confirmar"
+                cancelBtnText="Cancelar"
+                showCancel
+                onConfirm={handleAlertConfirm}
+                onCancel={handleAlertCancel}
               >
-                Click
-              </button>
-              {showAlert && (
-                <SweetAlert
-                  warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
-                  title="Atención"
-                  confirmBtnText="Confirmar"
-                  cancelBtnText="Cancelar"
-                  showCancel
-                  onConfirm={handleAlertConfirm}
-                  onCancel={handleAlertCancel}
-                >
-                  ¿Confirma todos los datos del tramite?
-                </SweetAlert>
-              )}
-            </div>
-          </Label>
-        </form>
-      </div>
+                ¿Confirma todos los datos del tramite?
+              </SweetAlert>
+            )}
+          </div>
+        </Label>
+      </form>
+
     </Layout >
   );
 }

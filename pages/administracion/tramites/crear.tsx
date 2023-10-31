@@ -13,6 +13,7 @@ import { uploadFile } from "../../../firebase/config";
 function CrearTramite() {
 
   const [name, setname] = useState("");
+  const [serviceImg, setImg]: any = useState(null);
 
 
   // ! Requisitos
@@ -86,15 +87,6 @@ function CrearTramite() {
     nuevasLocation.splice(locationIndex, 1);
     console.log("location a eliminar: ", locationIndex)
     setLocations(nuevasLocation);
-  }
-
-  //Images
-  var [serviceImg, setImg]: any = useState(null);
-  const subirArchivos = async () => {
-    if (serviceImg != null) {
-      serviceImg = await uploadFile(serviceImg, "servicios/");
-    }
-    handleSubmit();
   }
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
