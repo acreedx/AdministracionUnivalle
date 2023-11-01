@@ -11,6 +11,7 @@ import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
 import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import { ICategoriasData } from "utils/demo/categoriasData";
+import { IRequirementData, convertJSONListRequirement } from "utils/demo/requirementData";
 interface props {
   id: number;
 }
@@ -34,7 +35,10 @@ function ModificarTramite({ id }: props) {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   // ! Requisitos
-  const [requisitos, setRequisitos] = useState<string[]>(['']);
+  const [requisitos, setRequisitos] = useState<IRequirementData[]>([{ id: 0, description: '' }]);
+
+  // const [requisitos, setRequisitos] = useState<IRequirementData[]>([]);
+
   // ! Paso requisito
   const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
 
@@ -42,8 +46,7 @@ function ModificarTramite({ id }: props) {
 
   const agregarRequisito = () => {
     if (agregarNuevoRequisito == true) {
-      // Agregar un nuevo requisito aquí, por ejemplo:
-      setRequisitos([...requisitos, '']);
+      setRequisitos([...requisitos, { id: 0, description: '' }]);
 
     } else {
       setAgregarNuevoRequisito(true)
@@ -83,10 +86,8 @@ function ModificarTramite({ id }: props) {
 
   const handleRequisitoChange = (e: any, index: any) => {
     const nuevosRequisistos = [...requisitos];
-    nuevosRequisistos[index] = e.target.value;
+    nuevosRequisistos[index].description = e.target.value;
     setRequisitos(nuevosRequisistos);
-    console.log('Valor del primer requisito:', nuevosRequisistos[0]);
-    console.log('Valor del segundo requisito:', nuevosRequisistos[1]);
   };
 
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
@@ -139,8 +140,18 @@ function ModificarTramite({ id }: props) {
   const updateDurationServiceRoute = "Tramites/updateTramite/";
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
+  const deleteRequerimentRoute = "Requisitos/deleteRequisito/"
 
+  useEffect(() => {
+    async function doFetch() {
+      fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
+        .then((res) => res.json())
+        .then((res) => setRequisitos(convertJSONListRequirement(res.data)));
+    }
+    doFetch();
+  }, []);
 
+  const [selectedRequeriment, setSelectedRequeriment] = useState<number>(0);
 
   const moduleId = 3;
 
@@ -160,8 +171,27 @@ function ModificarTramite({ id }: props) {
       //   const dataNewService = await newService.json();
       //   const newServiceId = dataNewService.data.id;
 
-      await updateRequisitos(id);
 
+      for (const requisito of requisitos) {
+        if (requisito.description.trim() !== '') {
+          const updateRequisitoResponse = await fetch(`${URLS.baseUrl}${updateRequisitoRoute}${requisito.id}`, {
+
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+              descripcion: requisito.description,
+              estado: true,
+            }),
+          }
+          );
+
+          console.log("Respuesta del servidor al crear el requisito:", updateRequisitoResponse);
+
+        }
+      }
 
       await fetch(
         `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
@@ -189,33 +219,20 @@ function ModificarTramite({ id }: props) {
         }),
       });
 
+      await fetch(`${URLS.baseUrl}${deleteRequerimentRoute}${selectedRequeriment}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      //   router.reload();
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
     }
   };
 
-  const updateRequisitos = async (serviceId: number) => {
-    for (const requisito of requisitos) {
-      if (requisito.trim() !== '') {
 
-        console.log(requisitos)
-        const updateRequisitoResponse = await fetch(`${URLS.baseUrl}${updateRequisitoRoute}${service?.requerimentId}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            descripcion: requisito,
-            serviciosId: serviceId,
-            estado: true,
-          }),
-        });
-
-        console.log("Respuesta del servidor al crear el requisito:", updateRequisitoResponse);
-
-      }
-    }
-  };
 
 
   const handleAlertConfirm = () => {
@@ -231,43 +248,6 @@ function ModificarTramite({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
-
-  const obtenerRequisitosDelServicio = async (serviceId: number) => {
-    try {
-      const response = await fetch(`${URLS.baseUrl}${getRequisitosByID}${serviceId}`);
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        return data;
-
-      } else {
-        throw new Error("No se pudieron obtener los requisitos del servicio");
-      }
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  };
-
-
-  useEffect(() => {
-    async function obtenerYConfigurarRequisitos() {
-      const requisitosDelServicio = await obtenerRequisitosDelServicio(id);
-
-      console.log("Datos de requisitosDelServicio:", requisitosDelServicio);
-
-      if (requisitosDelServicio.success === 1 && requisitosDelServicio.data.length > 0) {
-        const nuevosRequisitos = requisitosDelServicio.data.map((requisito: any) => requisito.descripcion);
-        const nuevosPasosRequisitos = requisitosDelServicio.data.map((requisito: any) =>
-          requisito.pasosRequisito.map((paso: any) => paso.nombre)
-        );
-
-        setRequisitos(nuevosRequisitos);
-        setPasoRequisitos(nuevosPasosRequisitos);
-      }
-    }
-    obtenerYConfigurarRequisitos();
-  }, [id]);
 
 
   const handleAlertCancel = () => {
@@ -390,14 +370,17 @@ function ModificarTramite({ id }: props) {
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
-                    onClick={() => eliminarRequisito(requisitoIndex)}
+                    onClick={() => {
+                      eliminarRequisito(requisitoIndex);
+                      setSelectedRequeriment(requisito.id)
+                    }}
                   >
                     <MinusIcon />
                   </button>
                   <Input
                     className="mt-1 mb-1"
                     placeholder="Ingresa el requisito"
-                    value={requisito}
+                    value={requisito.description}
                     onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
                   />
 
