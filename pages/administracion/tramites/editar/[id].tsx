@@ -12,6 +12,8 @@ import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import { ICategoriasData } from "utils/demo/categoriasData";
 import { IRequirementData, convertJSONListRequirement } from "utils/demo/requirementData";
+import { IStepRequirementData, convertJSONListRequirementStep } from "utils/demo/stepRequerimentData";
+//import { IStepRequirementDataM, } from "utils/demo/stepRequerimentData";
 interface props {
   id: number;
 }
@@ -112,7 +114,7 @@ function ModificarTramite({ id }: props) {
 
     const nuevasLocation = [...locations];
     nuevasLocation.splice(locationIndex, 1);
-    console.log("location a eliminar: ", locationIndex)
+    console.log("location to delete: ", locationIndex)
     setLocations(nuevasLocation);
   }
 
@@ -140,8 +142,8 @@ function ModificarTramite({ id }: props) {
   const updateDurationServiceRoute = "Tramites/updateTramite/";
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
-  const deleteRequerimentRoute = "Requisitos/deleteRequisito/"
-
+  const deleteRequerimentRoute = "Requisitos/deleteRequisito?"
+  const createRequisitoRoute = "Requisitos/addRequisito";
   useEffect(() => {
     async function doFetch() {
       fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
@@ -193,6 +195,33 @@ function ModificarTramite({ id }: props) {
         }
       }
 
+
+      // Obtén los requisitos existentes de la base de datos
+      const requisitosExistentes = await fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
+        .then((res) => res.json())
+        .then((res) => convertJSONListRequirement(res.data));
+
+      // Filtra los nuevos requisitos que no existen en la base de datos
+      const nuevosRequisitosParaCrear = requisitos.filter((nuevoRequisito) => {
+        return !requisitosExistentes.some((requisitoExistente) => {
+          return nuevoRequisito.description === requisitoExistente.description;
+        });
+      });
+
+      // Realiza una solicitud POST para crear los nuevos requisitos
+      for (const nuevoRequisito of nuevosRequisitosParaCrear) {
+        await fetch(`${URLS.baseUrl}${createRequisitoRoute}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            descripcion: nuevoRequisito.description,
+            serviciosId: id,
+            estado: true,
+          }),
+        });
+      }
       await fetch(
         `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
         {
