@@ -11,9 +11,8 @@ import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
 import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import { ICategoriasData } from "utils/demo/categoriasData";
-import { IRequirementData, convertJSONListRequirement } from "utils/demo/requirementData";
-import { IStepRequirementData, convertJSONListRequirementStep } from "utils/demo/stepRequerimentData";
-//import { IStepRequirementDataM, } from "utils/demo/stepRequerimentData";
+import { IStepRequirementData, convertJSONListRequirement } from "utils/demo/stepRequerimentData";
+
 interface props {
   id: number;
 }
@@ -37,67 +36,79 @@ function ModificarTramite({ id }: props) {
   const [selectedCategory, setSelectedCategory] = useState("");
 
   // ! Requisitos
-  const [requisitos, setRequisitos] = useState<IRequirementData[]>([{ id: 0, description: '' }]);
+  const [requisitos, setRequisitos] = useState<IStepRequirementData[]>([{ id: 0, description: '', pasosRequisito: [{ idStep: 0, nameStep: '' }] }]);
+  const [pasosRequisitos, setPasosRequisitos] = useState<string[][]>([[]]);
+
 
   // const [requisitos, setRequisitos] = useState<IRequirementData[]>([]);
 
   // ! Paso requisito
-  const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
+  //const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
 
   const [agregarNuevoRequisito, setAgregarNuevoRequisito] = useState(true);
 
   const agregarRequisito = () => {
     if (agregarNuevoRequisito == true) {
-      setRequisitos([...requisitos, { id: 0, description: '' }]);
+      setRequisitos([...requisitos, { id: 0, description: '', pasosRequisito: [{ idStep: 0, nameStep: '' }] }]);
 
     } else {
       setAgregarNuevoRequisito(true)
     }
   };
   const agregarPasoRequisito = (requisitoIndex: number) => {
-    const nuevosPasosRequisitos = [...pasoRequisito];
+    const nuevosPasosRequisitos = [...pasosRequisitos];
 
     if (!nuevosPasosRequisitos[requisitoIndex]) {
       nuevosPasosRequisitos[requisitoIndex] = [];
     }
 
     nuevosPasosRequisitos[requisitoIndex].push("");
-
-    setPasoRequisitos(nuevosPasosRequisitos);
-    console.log('Requisitos actualizadosrespuesta :', nuevosPasosRequisitos);
+    setPasosRequisitos(nuevosPasosRequisitos);
   };
-
-
-
-  const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
-    const nuevosPasosRequisitos = [...pasoRequisito];
-    nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
-    setAgregarNuevoRequisito(false)
-    setPasoRequisitos(nuevosPasosRequisitos);
-  };
-  const eliminarRequisito = (requisitoIndex: number) => {
-    console.log("Indice de requisito a eliminar", requisitoIndex)
+  /*
+  const agregarPasoRequerimento = (requisitoIndex: number, paso: { idStep: number, nameStep: string }) => {
     const nuevosRequisitos = [...requisitos];
-    nuevosRequisitos.splice(requisitoIndex, 1);
-    const nuevosPasosRequisitos = [...pasoRequisito];
-    nuevosPasosRequisitos.splice(requisitoIndex, 1);
 
+    nuevosRequisitos[requisitoIndex].stepRequeriment.push(paso);
     setRequisitos(nuevosRequisitos);
-    setPasoRequisitos(nuevosPasosRequisitos);
   };
-
+*/
+  /*
+    const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
+      const nuevosPasosRequisitos = [...pasoRequisito];
+      nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
+      setAgregarNuevoRequisito(false)
+      setPasoRequisitos(nuevosPasosRequisitos);
+    };
+    const eliminarRequisito = (requisitoIndex: number) => {
+      console.log("Indice de requisito a eliminar", requisitoIndex)
+      const nuevosRequisitos = [...requisitos];
+      nuevosRequisitos.splice(requisitoIndex, 1);
+      const nuevosPasosRequisitos = [...pasoRequisito];
+      nuevosPasosRequisitos.splice(requisitoIndex, 1);
+  
+      setRequisitos(nuevosRequisitos);
+      setPasoRequisitos(nuevosPasosRequisitos);
+    };
+  */
   const handleRequisitoChange = (e: any, index: any) => {
     const nuevosRequisistos = [...requisitos];
     nuevosRequisistos[index].description = e.target.value;
     setRequisitos(nuevosRequisistos);
   };
 
-  const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
+  /*const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
     setPasoRequisitos(nuevosPasosRequisitos);
-  };
+  };*/
+  const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
+    const nuevosRequisitos = [...requisitos];
+    const pasoActual = nuevosRequisitos[requisitoIndex].pasosRequisito[pasoIndex];
+    pasoActual.nameStep = e.target.value; // Actualiza el nombre del paso
 
+    setRequisitos(nuevosRequisitos); // Actualiza el estado con los cambios
+  };
   const [encharged, setencharged] = useState("");
 
   const [cellphone, setcellphone] = useState("");
@@ -146,6 +157,7 @@ function ModificarTramite({ id }: props) {
   const createRequisitoRoute = "Requisitos/addRequisito";
   useEffect(() => {
     async function doFetch() {
+
       fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
         .then((res) => res.json())
         .then((res) => setRequisitos(convertJSONListRequirement(res.data)));
@@ -153,9 +165,9 @@ function ModificarTramite({ id }: props) {
     doFetch();
   }, []);
 
+
   const [selectedRequeriment, setSelectedRequeriment] = useState<number>(0);
 
-  const moduleId = 3;
 
   const handleSubmit = async () => {
     try {
@@ -170,8 +182,6 @@ function ModificarTramite({ id }: props) {
           imagenUrl: await uploadFile(serviceImg, "servicios/"),
         }),
       });
-      //   const dataNewService = await newService.json();
-      //   const newServiceId = dataNewService.data.id;
 
 
       for (const requisito of requisitos) {
@@ -203,7 +213,7 @@ function ModificarTramite({ id }: props) {
 
       // Filtra los nuevos requisitos que no existen en la base de datos
       const nuevosRequisitosParaCrear = requisitos.filter((nuevoRequisito) => {
-        return !requisitosExistentes.some((requisitoExistente) => {
+        return !requisitosExistentes.some((requisitoExistente: any) => {
           return nuevoRequisito.description === requisitoExistente.description;
         });
       });
@@ -392,7 +402,7 @@ function ModificarTramite({ id }: props) {
                   <button
                     className="text-white px-2 py-1 rounded-full -mr-2"
                     type="button"
-                    onClick={() => agregarPasoRequisito(requisitoIndex)}
+                  //  onClick={() => agregarPasoRequerimento(requisitoIndex)}
                   >
                     <PlusIcon />
                   </button>
@@ -400,7 +410,7 @@ function ModificarTramite({ id }: props) {
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
                     onClick={() => {
-                      eliminarRequisito(requisitoIndex);
+                      //         eliminarRequisito(requisitoIndex);
                       setSelectedRequeriment(requisito.id)
                     }}
                   >
@@ -414,19 +424,19 @@ function ModificarTramite({ id }: props) {
                   />
 
                 </div>
-                {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((paso, pasoIndex) => (
+                {requisito.pasosRequisito.map((paso, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
-                      onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
+                    //  onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
                     >
                       <MinusIcon />
                     </button>
                     <Input
                       className="mt-1 mb-1"
                       placeholder="Ingresa el paso del requisito"
-                      value={paso}
+                      value={paso.nameStep}
                       onChange={(e) => handlePasoRequisitoChange(e, requisitoIndex, pasoIndex)}
                     />
 
