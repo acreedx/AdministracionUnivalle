@@ -35,80 +35,60 @@ function ModificarTramite({ id }: props) {
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // ! Requisitos
+  // ! Requisitos y pasos requisitos
   const [requisitos, setRequisitos] = useState<IStepRequirementData[]>([{ id: 0, description: '', pasosRequisito: [{ idStep: 0, nameStep: '' }] }]);
-  const [pasosRequisitos, setPasosRequisitos] = useState<string[][]>([[]]);
-
-
-  // const [requisitos, setRequisitos] = useState<IRequirementData[]>([]);
-
-  // ! Paso requisito
-  //const [pasoRequisito, setPasoRequisitos] = useState<Array<Array<string>>>([[]]);
 
   const [agregarNuevoRequisito, setAgregarNuevoRequisito] = useState(true);
 
   const agregarRequisito = () => {
     if (agregarNuevoRequisito == true) {
-      setRequisitos([...requisitos, { id: 0, description: '', pasosRequisito: [{ idStep: 0, nameStep: '' }] }]);
+      setRequisitos([...requisitos, { id: 0, description: '', pasosRequisito: [] }]);
 
     } else {
       setAgregarNuevoRequisito(true)
     }
   };
-  const agregarPasoRequisito = (requisitoIndex: number) => {
-    const nuevosPasosRequisitos = [...pasosRequisitos];
 
-    if (!nuevosPasosRequisitos[requisitoIndex]) {
-      nuevosPasosRequisitos[requisitoIndex] = [];
-    }
+  const agregarPasoRequisito = (requisitoIndex: number, paso: { idStep: number, nameStep: string }) => {
+    const nuevosPasosRequisitos = [...requisitos];
 
-    nuevosPasosRequisitos[requisitoIndex].push("");
-    setPasosRequisitos(nuevosPasosRequisitos);
+    nuevosPasosRequisitos[requisitoIndex].pasosRequisito.push(paso)
+    setRequisitos(nuevosPasosRequisitos)
   };
-  /*
-  const agregarPasoRequerimento = (requisitoIndex: number, paso: { idStep: number, nameStep: string }) => {
+
+  const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
+    const nuevosPasosRequisitos = [...requisitos];
+    nuevosPasosRequisitos[requisitoIndex].pasosRequisito.splice(pasoIndex, 1);
+    setAgregarNuevoRequisito(false)
+    setRequisitos(nuevosPasosRequisitos);
+  };
+
+  const eliminarRequisito = (requisitoIndex: number) => {
+    console.log("Indice de requisito a eliminar", requisitoIndex)
     const nuevosRequisitos = [...requisitos];
 
-    nuevosRequisitos[requisitoIndex].stepRequeriment.push(paso);
+    nuevosRequisitos.splice(requisitoIndex, 1);
+    setAgregarNuevoRequisito(false)
     setRequisitos(nuevosRequisitos);
   };
-*/
-  /*
-    const eliminarPasoRequisito = (requisitoIndex: number, pasoIndex: number) => {
-      const nuevosPasosRequisitos = [...pasoRequisito];
-      nuevosPasosRequisitos[requisitoIndex].splice(pasoIndex, 1);
-      setAgregarNuevoRequisito(false)
-      setPasoRequisitos(nuevosPasosRequisitos);
-    };
-    const eliminarRequisito = (requisitoIndex: number) => {
-      console.log("Indice de requisito a eliminar", requisitoIndex)
-      const nuevosRequisitos = [...requisitos];
-      nuevosRequisitos.splice(requisitoIndex, 1);
-      const nuevosPasosRequisitos = [...pasoRequisito];
-      nuevosPasosRequisitos.splice(requisitoIndex, 1);
-  
-      setRequisitos(nuevosRequisitos);
-      setPasoRequisitos(nuevosPasosRequisitos);
-    };
-  */
+
+
   const handleRequisitoChange = (e: any, index: any) => {
     const nuevosRequisistos = [...requisitos];
     nuevosRequisistos[index].description = e.target.value;
     setRequisitos(nuevosRequisistos);
   };
 
-  /*const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
-    const nuevosPasosRequisitos = [...pasoRequisito];
-    nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
-    setPasoRequisitos(nuevosPasosRequisitos);
-  };*/
+
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosRequisitos = [...requisitos];
     const pasoActual = nuevosRequisitos[requisitoIndex].pasosRequisito[pasoIndex];
-    pasoActual.nameStep = e.target.value; // Actualiza el nombre del paso
+    pasoActual.nameStep = e.target.value;
 
-    setRequisitos(nuevosRequisitos); // Actualiza el estado con los cambios
+    setRequisitos(nuevosRequisitos);
   };
+
+
   const [encharged, setencharged] = useState("");
 
   const [cellphone, setcellphone] = useState("");
@@ -402,7 +382,7 @@ function ModificarTramite({ id }: props) {
                   <button
                     className="text-white px-2 py-1 rounded-full -mr-2"
                     type="button"
-                  //  onClick={() => agregarPasoRequerimento(requisitoIndex)}
+                    onClick={() => agregarPasoRequisito(requisitoIndex, { idStep: 0, nameStep: '' })}
                   >
                     <PlusIcon />
                   </button>
@@ -410,7 +390,7 @@ function ModificarTramite({ id }: props) {
                     className="text-white px-2 py-1 rounded-full mr-2"
                     type="button"
                     onClick={() => {
-                      //         eliminarRequisito(requisitoIndex);
+                      eliminarRequisito(requisitoIndex);
                       setSelectedRequeriment(requisito.id)
                     }}
                   >
@@ -426,10 +406,11 @@ function ModificarTramite({ id }: props) {
                 </div>
                 {requisito.pasosRequisito.map((paso, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
+
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
-                    //  onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
+                      onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
                     >
                       <MinusIcon />
                     </button>
@@ -522,7 +503,7 @@ function ModificarTramite({ id }: props) {
             )}
           </div>
         </Label>
-      </form>
+      </form >
 
     </Layout >
   );
