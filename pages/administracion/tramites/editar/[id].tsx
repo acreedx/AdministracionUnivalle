@@ -166,6 +166,11 @@ function ModificarTramite({ id }: props) {
 
       for (const requisito of requisitos) {
         if (requisito.description.trim() !== '') {
+          const pasosFormateados = requisito.pasosRequisito.map((paso) => ({
+            id: paso.idStep,
+            nombre: paso.nameStep
+          }));
+          console.log("DATOS A ENVIAR", requisito.pasosRequisito)
           const updateRequisitoResponse = await fetch(`${URLS.baseUrl}${updateRequisitoRoute}${requisito.id}`, {
 
             method: "PUT",
@@ -175,7 +180,8 @@ function ModificarTramite({ id }: props) {
 
             body: JSON.stringify({
               descripcion: requisito.description,
-              estado: true,
+              pasos: pasosFormateados,
+
             }),
           }
           );
@@ -185,20 +191,17 @@ function ModificarTramite({ id }: props) {
         }
       }
 
-
-      // Obtén los requisitos existentes de la base de datos
+      //Filtrado de requisitos existentes en la DB
       const requisitosExistentes = await fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
         .then((res) => res.json())
         .then((res) => convertJSONListRequirement(res.data));
 
-      // Filtra los nuevos requisitos que no existen en la base de datos
       const nuevosRequisitosParaCrear = requisitos.filter((nuevoRequisito) => {
         return !requisitosExistentes.some((requisitoExistente: any) => {
           return nuevoRequisito.description === requisitoExistente.description;
         });
       });
 
-      // Realiza una solicitud POST para crear los nuevos requisitos
       for (const nuevoRequisito of nuevosRequisitosParaCrear) {
         await fetch(`${URLS.baseUrl}${createRequisitoRoute}`, {
           method: "POST",
@@ -212,6 +215,7 @@ function ModificarTramite({ id }: props) {
           }),
         });
       }
+
       await fetch(
         `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
         {
