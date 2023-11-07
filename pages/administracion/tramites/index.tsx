@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
@@ -15,6 +15,10 @@ import {
   Button,
   Pagination,
   Avatar,
+  Card,
+  CardBody,
+  Input,
+  Label,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 //import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
@@ -25,27 +29,28 @@ import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
 function Tramites() {
   const router = useRouter();
-
+  const [state, setState] = useState("activos");
   const route = "Servicios/getTramiteByModuleActive/";
+  const routeInactives = "Servicios/getTramiteByModuleInactive/";
   const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Tramites";
   const resultsPerPage = 10;
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${moduleName}`)
+      fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}${moduleName}`)
         .then((res) => res.json())
         .then((res) => setServices(convertJSONListService(res.data)));
     }
     doFetch();
-  }, []);
+  }, [state]);
 
   const [selectedService, setSelectedService] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [pageTable, setPageTable] = useState(1);
   const [services, setServices] = useState<ITramitesData[]>([]);
   const totalResults = services.length;
-
+  const restoreServiceRoute = "Servicios/restoreServicio/";
   function onPageChangeTable2(p: number) {
     setPageTable(p);
   }
@@ -66,6 +71,16 @@ function Tramites() {
         "Content-Type": "application/json",
       },
     });
+    if (state != "activos") {
+
+      await fetch(`${URL.baseUrl}${restoreServiceRoute}${selectedService}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+    }
     router.reload();
   };
 
@@ -76,10 +91,39 @@ function Tramites() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+
+  const handleActiveChange = (e: any) => {
+    setState(e.target.value);
+  };
+
   return (
     <Layout>
       <PageTitle>Tramites</PageTitle>
 
+      <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+        <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+          <Label radio>
+            <Input
+              type="radio"
+              value="activos"
+              name="activeInactive"
+              checked={state === 'activos'}
+              onChange={(e) => handleActiveChange(e)}
+            />
+            <span className="ml-2">Activos</span>
+          </Label>
+          <Label radio>
+            <Input
+              type="radio"
+              value="inactivos"
+              name="activeInactive"
+              checked={state === 'inactivos'}
+              onChange={(e) => handleActiveChange(e)}
+            />
+            <span className="ml-2">Inactivos</span>
+          </Label>
+        </CardBody>
+      </Card>
       <SectionTitle>Listado de tramites</SectionTitle>
       <div className="mb-1">
         <Link href={`/administracion/tramites/crear`}>
@@ -154,30 +198,52 @@ function Tramites() {
                   </Badge>
                 </TableCell>
                 <TableCell>
+
                   <div className="flex items-center space-x-4">
-                    <Link
-                      href={`/administracion/tramites/editar/[id]`}
-                      as={`/administracion/tramites/editar/${servicio.id}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
+                    {state === "activos" ? (
+                      <>
+                        <Link
+                          href={`/administracion/tramites/editar/[id]`}
+                          as={`/administracion/tramites/editar/${servicio.id}`}
+                        >
+                          <Button layout="link" size="small" aria-label="Edit">
+                            <EditIcon className="w-5 h-5" aria-hidden="true" />
+                          </Button>
+                        </Link>
+                        <Button
+                          layout="link"
+                          size="small"
+                          aria-label="Delete"
+                          type="button"
+                          onClick={() => {
+                            setShowAlert(true);
+                            setSelectedService(servicio.id);
+                          }}
+                        >
+                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      </>
+                    ) : (
+
+                      <Button
+                        layout="link"
+                        size="small"
+                        aria-label="Delete"
+                        type={"button"}
+                        onClick={() => {
+                          setShowAlert(true);
+                          setSelectedService(servicio.id);
+                        }}
+                      >
+                        <Badge className="w-5 h-5" aria-hidden="true" />
+
                       </Button>
-                    </Link>
-                    <Button
-                      layout="link"
-                      size="small"
-                      aria-label="Delete"
-                      type={"button"}
-                      onClick={() => {
-                        setShowAlert(true);
-                        setSelectedService(servicio.id);
-                      }}
-                    >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                    )}
+
+
                     {showAlert && (
                       <SweetAlert
-                        warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                        warning
                         title="Atención"
                         confirmBtnText="Confirmar"
                         cancelBtnText="Cancelar"
@@ -185,11 +251,11 @@ function Tramites() {
                         onConfirm={handleAlertConfirm}
                         onCancel={handleAlertCancel}
                       >
-                        ¿Estas seguro de eliminar este Tramite?
+                        {state == "activos" ? "¿Estás seguro de eliminar este Trámite?" : "¿Estás seguro de restaurar este Trámite?"}
                       </SweetAlert>
                     )}
-
                   </div>
+
                 </TableCell>
               </TableRow>
             ))}

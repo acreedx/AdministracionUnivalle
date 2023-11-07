@@ -14,6 +14,10 @@ import {
   Badge,
   Button,
   Pagination,
+  Card,
+  CardBody,
+  Label,
+  Input,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
@@ -24,18 +28,22 @@ import SweetAlert from "react-bootstrap-sweetalert";
 function Categorias() {
   const router = useRouter();
   // * Modificar ruta segun la api * 
+  const [state, setState] = useState("activos");
   const route = "Categoria/getActiveCategorias";
+  const routeInactives = "Categoria/getDeletedCategorias";
   const deleteCategoryRoute = "Categoria/deleteCategoria/";
+  const restoreCategoryRoute = "Categoria/restoreCategoria/";
+
   const resultsPerPage = 10;
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}`)
+      fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}`)
         .then((res) => res.json())
         .then((res) => setCategories(convertJSONListCategory(res.data)));
     }
     doFetch();
-  }, []);
+  }, [state]);
 
   const [selectedCategory, setSelectedCategory] = useState<number>(0);
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -63,6 +71,14 @@ function Categorias() {
         "Content-Type": "application/json",
       },
     });
+    if (state != "activos") {
+      await fetch(`${URL.baseUrl}${restoreCategoryRoute}${selectedCategory}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
     router.reload();
   };
 
@@ -73,10 +89,38 @@ function Categorias() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+  const handleActiveChange = (e: any) => {
+    setState(e.target.value);
+  };
   return (
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
       <SectionTitle>Categorias de tramites</SectionTitle>
+      <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+        <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+          <Label radio>
+            <Input
+              type="radio"
+              value="activos"
+              name="activeInactive"
+              checked={state === 'activos'}
+              onChange={(e) => handleActiveChange(e)}
+            />
+            <span className="ml-2">Activos</span>
+          </Label>
+          <Label radio>
+            <Input
+              type="radio"
+              value="inactivos"
+              name="activeInactive"
+              checked={state === 'inactivos'}
+              onChange={(e) => handleActiveChange(e)}
+            />
+            <span className="ml-2">Inactivos</span>
+          </Label>
+        </CardBody>
+      </Card>
+
       <div className="mb-1">
         <Link href={`/administracion/tramites/categorias/crear`}>
           <Button size="small">
@@ -131,27 +175,46 @@ function Categorias() {
 
                 <TableCell>
                   <div className="flex items-center space-x-4">
-                    <Link
-                      href={`/administracion/tramites/categorias/editar/[id]`}
-                      as={`/administracion/tramites/categorias/editar/${categoria.id}`}
-                    >
-                      <Button layout="link" size="small" aria-label="Edit">
-                        <EditIcon className="w-5 h-5" aria-hidden="true" />
-                      </Button>
-                    </Link>
+                    {state === "activos" ? (
+                      <>
 
-                    <Button
-                      layout="link"
-                      size="small"
-                      aria-label="Delete"
-                      type={"button"}
-                      onClick={() => {
-                        setShowAlert(true);
-                        setSelectedCategory(categoria.id);
-                      }}
-                    >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
+                        <Link
+                          href={`/administracion/tramites/categorias/editar/[id]`}
+                          as={`/administracion/tramites/categorias/editar/${categoria.id}`}
+                        >
+                          <Button layout="link" size="small" aria-label="Edit">
+                            <EditIcon className="w-5 h-5" aria-hidden="true" />
+                          </Button>
+                        </Link>
+
+                        <Button
+                          layout="link"
+                          size="small"
+                          aria-label="Delete"
+                          type={"button"}
+                          onClick={() => {
+                            setShowAlert(true);
+                            setSelectedCategory(categoria.id);
+                          }}
+                        >
+                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                        </Button>
+                      </>
+                    ) : (
+
+                      <Button
+                        layout="link"
+                        size="small"
+                        aria-label="Delete"
+                        type={"button"}
+                        onClick={() => {
+                          setShowAlert(true);
+                          setSelectedCategory(categoria.id);
+                        }}
+                      >
+                        <Badge className="w-5 h-5" aria-hidden="true" />
+                      </Button>
+                    )}
 
                     {showAlert && (
                       <SweetAlert
@@ -163,7 +226,7 @@ function Categorias() {
                         onConfirm={handleAlertConfirm}
                         onCancel={handleAlertCancel}
                       >
-                        ¿Estas seguro de elimnar el tramite?
+                        {state == "activos" ? "¿Estás seguro de eliminar la categoria de trámite?" : "¿Estás seguro de restaurar la categoria de trámite?"}
                       </SweetAlert>
                     )}
 
