@@ -133,7 +133,7 @@ function ModificarTramite({ id }: props) {
   const updateDurationServiceRoute = "Tramites/updateTramite/";
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
-  const deleteRequerimentRoute = "Requisitos/deleteRequisito?"
+  const deleteRequerimentRoute = "Requisitos/deleteRequisito/"
   const createRequisitoRoute = "Requisitos/addRequisito";
   useEffect(() => {
     async function doFetch() {

@@ -14,6 +14,8 @@ function CrearTramite() {
 
   const [name, setname] = useState("");
   const [serviceImg, setImg]: any = useState(null);
+  const [locationImg, setLocationImage]: any = useState(null);
+  const [locationCroquisImg, setLocationCroquisImage]: any = useState(null);
 
 
   // ! Requisitos
@@ -113,6 +115,9 @@ function CrearTramite() {
   const createServiceRoute = "Servicios/addServicio";
   const createReferenceRoute = "Referencia/addReferences";
   const createDurationServiceRoute = "Tramites/addTramite";
+  const createUbicacionRoute = "Ubicaciones/addUbicaciones";
+
+
   const moduleId = 3;
 
   const handleSubmit = async () => {
@@ -135,6 +140,8 @@ function CrearTramite() {
       const newServiceId = dataNewService.data.id;
 
       await createRequisitos(newServiceId);
+
+      await createLocation(newServiceId);
 
       await fetch(`${URLS.baseUrl}${createReferenceRoute}`, {
         method: "POST",
@@ -159,7 +166,6 @@ function CrearTramite() {
           serviciosId: newServiceId,
         }),
       });
-
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
     }
@@ -187,15 +193,35 @@ function CrearTramite() {
             estado: true,
           }),
         });
-
         console.log("Respuesta del servidor al crear el requisito:", newRequisitoResponse);
       }
     }
   };
 
 
+  const createLocation = async (serviceId: number) => {
+    for (let i = 0; i < locations.length; i++) {
+      const location = locations[i];
+      if (location.trim() !== '') {
+        const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            imagen: "",
+            video: "",
+            serviciosId: serviceId,
+            estado: true,
+          }),
+        });
+
+        console.log("Respuesta del servidor al crear la ubicacion:", newLocationResponse);
+      }
+    }
+  };
+
   const handleAlertConfirm = () => {
-    // handleSubmit();
     setShowAlert(false);
     handleSubmit();
   };
@@ -341,6 +367,8 @@ function CrearTramite() {
               </button>
             </div>
 
+
+
             {locations.map((location, locationIndex) => (
               <div key={locationIndex} className={locationIndex === locations.length - 1 ? 'hidden' : ''}>
                 <div className="flex">
@@ -364,6 +392,7 @@ function CrearTramite() {
                       type="file"
                       className="mt-1"
                       placeholder="Imagen para ubicación"
+                      onChange={(e) => setLocationImage(e.target.files?.[0] || null)}
                     />
                   </Label>
                   <Label className="mt-4">
@@ -372,6 +401,7 @@ function CrearTramite() {
                       type="file"
                       className="mt-1"
                       placeholder="Imagen para ubicación"
+                      onChange={(e) => setLocationCroquisImage(e.target.files?.[0] || null)}
                     />
                   </Label>
                 </div>
