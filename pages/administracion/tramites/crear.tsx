@@ -65,6 +65,11 @@ function CrearTramite() {
     setRequisitos(nuevosRequisistos);
   };
 
+   const handleLocationChange = (e: any, index: any) => {
+    const nuevosLocalizaciones = [...locations];
+    nuevosLocalizaciones[index] = e.target.value;
+    setLocations(nuevosLocalizaciones);
+  };
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
@@ -81,14 +86,18 @@ function CrearTramite() {
 
 
   const agregarLocation = () => {
-    setLocations([...locations, '']);
+        setLocations([...locations, '']);
+  
   }
+
   const eliminarLocation = (locationIndex: number) => {
 
     const nuevasLocation = [...locations];
     nuevasLocation.splice(locationIndex, 1);
     console.log("location a eliminar: ", locationIndex)
     setLocations(nuevasLocation);
+
+
   }
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
@@ -385,6 +394,9 @@ function CrearTramite() {
                   <Input
                     className="mt-1 mb-1"
                     placeholder="Ingrese la ubicación del servicio"
+                    value={location}
+                    onChange={(e) => handleLocationChange(e, locationIndex)}
+                    key={`locations-${locationIndex}`}
                   />
                 </div>
 

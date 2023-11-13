@@ -207,6 +207,8 @@ function ModificarTramite({ id }: props) {
         }
       }
 
+
+      
       //Filtrado de requisitos existentes en la DB
       const requisitosExistentes = await fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
         .then((res) => res.json())
