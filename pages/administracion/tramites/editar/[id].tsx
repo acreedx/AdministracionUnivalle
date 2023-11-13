@@ -10,7 +10,7 @@ import { GetServerSidePropsContext } from "next";
 import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
 import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import { ICategoriasData } from "utils/demo/categoriasData";
+import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
 import { IStepRequirementData, convertJSONListRequirement } from "utils/demo/stepRequerimentData";
 
 interface props {
@@ -34,7 +34,7 @@ function ModificarTramite({ id }: props) {
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
-
+  const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
   // ! Requisitos y pasos requisitos
   const [requisitos, setRequisitos] = useState<IStepRequirementData[]>([{ id: 0, description: '', pasosRequisito: [{ idStep: 0, nameStep: '' }] }]);
 
@@ -70,6 +70,7 @@ function ModificarTramite({ id }: props) {
     nuevosRequisitos.splice(requisitoIndex, 1);
     setAgregarNuevoRequisito(false)
     setRequisitos(nuevosRequisitos);
+
   };
 
 
@@ -124,6 +125,14 @@ function ModificarTramite({ id }: props) {
         .then((res) => setService(convertJSONService(res.data[0])));
     }
     doFetch();
+
+
+    async function fetchData() {
+      fetch(`${URLS.baseUrl}${getActiveCategoriesRoute}`)
+        .then((res) => res.json())
+        .then((res) => setCategorias(convertJSONListCategory(res.data)));
+    }
+    fetchData();
   }, []);
 
 
@@ -134,6 +143,8 @@ function ModificarTramite({ id }: props) {
   const updateRequisitoRoute = "Requisitos/updateRequisito/";
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
   const deleteRequerimentRoute = "Requisitos/deleteRequisito/"
+  const deleteStepRequerimentRoute = "Requisitos/deletePasoRequisito/"
+
   const createRequisitoRoute = "Requisitos/addRequisito";
   useEffect(() => {
     async function doFetch() {
@@ -147,11 +158,13 @@ function ModificarTramite({ id }: props) {
 
 
   const [selectedRequeriment, setSelectedRequeriment] = useState<number>(0);
+  const [selectedRequerimentsArray, setSelectedRequerimentsArray] = useState<number[]>([]);
 
+  const [selectedStepRequeriment, setSelectedStepRequeriment] = useState<number>(0);
 
   const handleSubmit = async () => {
     try {
-
+      const selectedCategoryId = selectedCategory;
       await fetch(`${URLS.baseUrl}${updateServiceRoute}${id}`, {
         method: "PUT",
         headers: {
@@ -159,7 +172,10 @@ function ModificarTramite({ id }: props) {
         },
         body: JSON.stringify({
           nombre: name,
-          imagenUrl: await uploadFile(serviceImg, "servicios/"),
+          //     imagenUrl: await uploadFile(serviceImg, "servicios/"),
+          imageUrl: "",
+          idCategoria: selectedCategoryId,
+
         }),
       });
 
@@ -198,12 +214,19 @@ function ModificarTramite({ id }: props) {
 
       const nuevosRequisitosParaCrear = requisitos.filter((nuevoRequisito) => {
         return !requisitosExistentes.some((requisitoExistente: any) => {
-          return nuevoRequisito.description === requisitoExistente.description;
+          return nuevoRequisito.description === requisitoExistente.description &&
+            nuevoRequisito.pasosRequisito == requisitoExistente.pasoRequisito;
         });
       });
 
       for (const nuevoRequisito of nuevosRequisitosParaCrear) {
+
+        const pasosFormateados = nuevoRequisito.pasosRequisito.map((paso) => ({
+          id: paso.idStep,
+          nombre: paso.nameStep
+        }));
         await fetch(`${URLS.baseUrl}${createRequisitoRoute}`, {
+
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -211,6 +234,7 @@ function ModificarTramite({ id }: props) {
           body: JSON.stringify({
             descripcion: nuevoRequisito.description,
             serviciosId: id,
+            pasos: pasosFormateados,
             estado: true,
           }),
         });
@@ -241,8 +265,15 @@ function ModificarTramite({ id }: props) {
           serviciosId: id,
         }),
       });
-
-      await fetch(`${URLS.baseUrl}${deleteRequerimentRoute}${selectedRequeriment}`, {
+      for (const selectedRequisitoId of selectedRequerimentsArray) {
+        await fetch(`${URLS.baseUrl}${deleteRequerimentRoute}${selectedRequisitoId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
+      await fetch(`${URLS.baseUrl}${deleteStepRequerimentRoute}${selectedStepRequeriment}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -251,7 +282,7 @@ function ModificarTramite({ id }: props) {
 
       //   router.reload();
     } catch (error) {
-      console.error("Error al crear el servicio y requisitos:", error);
+      console.error("Error al hacer el fetch:", error);
     }
   };
 
@@ -395,7 +426,10 @@ function ModificarTramite({ id }: props) {
                     type="button"
                     onClick={() => {
                       eliminarRequisito(requisitoIndex);
+                      //  setSelectedRequeriment(requisito.id)
                       setSelectedRequeriment(requisito.id)
+                      setSelectedRequerimentsArray((prevArray) => [...prevArray, requisito.id])
+                      console.log(selectedRequerimentsArray)
                     }}
                   >
                     <MinusIcon />
@@ -414,7 +448,12 @@ function ModificarTramite({ id }: props) {
                     <button
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
-                      onClick={() => eliminarPasoRequisito(requisitoIndex, pasoIndex)}
+                      onClick={() => {
+                        setSelectedStepRequeriment(requisito.pasosRequisito[pasoIndex].idStep)
+                        eliminarPasoRequisito(requisitoIndex, pasoIndex)
+                      }
+
+                      }
                     >
                       <MinusIcon />
                     </button>

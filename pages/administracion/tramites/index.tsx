@@ -141,6 +141,7 @@ function Tramites() {
               <TableCell>Encargado</TableCell>
               <TableCell>Telefono de Referencia</TableCell>
               <TableCell>Duracion del tramite</TableCell>
+              <TableCell>Categoria</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Actions</TableCell>
             </tr>
@@ -187,6 +188,13 @@ function Tramites() {
                   <div className="flex items-center text-sm">
                     <div>
                       <p className="font-semibold">{servicio.duration}</p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{servicio.categoryId}</p>
                     </div>
                   </div>
                 </TableCell>
