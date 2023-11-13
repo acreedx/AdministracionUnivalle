@@ -6,9 +6,10 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
-import URL from "utils/demo/api";
+import URLS from "utils/demo/api";
 import { ICajasData, convertJSONService } from "utils/demo/cajasData";
 import { GetServerSidePropsContext } from "next";
+import SectionTitle from "example/components/Typography/SectionTitle";
 
 interface props {
   id: number;
@@ -42,7 +43,7 @@ function EditarServicio({ id }: props) {
   const [validationMessage, setvalidationMessage] = useState<string>("");
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${id}`)
+      fetch(`${URLS.baseUrl}${route}${id}`)
         .then((res) => res.json())
         .then((res) => setService(convertJSONService(res.data[0])));
     }
@@ -79,7 +80,7 @@ function EditarServicio({ id }: props) {
       setShowAlertValidation(true);
       return;
     }
-    await fetch(`${URL.baseUrl}${updateServiceRoute}${id}`, {
+    await fetch(`${URLS.baseUrl}${updateServiceRoute}${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -90,7 +91,7 @@ function EditarServicio({ id }: props) {
       }),
     });
     await fetch(
-      `${URL.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
+      `${URLS.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
       {
         method: "PUT",
         headers: {
@@ -106,7 +107,7 @@ function EditarServicio({ id }: props) {
       }
     );
     await fetch(
-      `${URL.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
+      `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
       {
         method: "PUT",
         headers: {
@@ -139,7 +140,8 @@ function EditarServicio({ id }: props) {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
-
+  
+  const [serviceImg, setImg]: any = useState(null);
   return (
     <Layout>
       <PageTitle>Editar un servicio</PageTitle>
@@ -154,7 +156,7 @@ function EditarServicio({ id }: props) {
         </Link>
       </div>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <form id="miFormulario" onSubmit={handleSubmit}>
+        <SectionTitle>Datos generales</SectionTitle>
           <Label>
             <span>Nombre del servicio</span>
             <Input
@@ -164,15 +166,42 @@ function EditarServicio({ id }: props) {
               onChange={(e) => setname(e.target.value)}
             />
           </Label>
+          
           <Label className="mt-4">
-            <span>Imagen</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la URL de la imagen"
-              value={imgUrl}
-              onChange={(e) => setimgUrl(e.target.value)}
-            />
+            <span className=" text-lg">Imagen de referencia del tramite</span>
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <span>Imagen Actual</span>
+                  <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={service?.imagenUrl === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : service?.imagenUrl}
+                      alt="Imagen de Ubicación actual"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center space-y-2">
+                  <span >Nueva Imagen</span>
+                  <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
+                      alt="Imagen de Ubicación Nueva"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            
           </Label>
+          <Input
+              type="file"
+              accept=".jpg, .jpeg, .png"
+              className="mt-4"
+              placeholder="Imagen del servicio"
+              onChange={e => setImg(e.target.files?.[0] || null)}
+            />
           <Label className="mt-4">
             <span>Ubicación</span>
             <Input
@@ -201,23 +230,30 @@ function EditarServicio({ id }: props) {
               onChange={(e) => setcellphone(e.target.value)}
             />
           </Label>
-          <Label className="mt-4">
-            <div className="relative text-gray-500 focus-within:text-purple-600">
-              <input
-                className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
-                disabled
-              />
-              <button
-                type={"button"}
-                onClick={() => setShowAlert(true)}
-                className="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
-              >
-                Editar
-              </button>
-            </div>
-          </Label>
-        </form>
       </div>
+      
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <SectionTitle>Requisitos</SectionTitle>
+      </div>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <SectionTitle>Ubicaciones</SectionTitle>
+      </div>
+
+      <Label className="mb-4">
+        <div className="relative text-gray-500 focus-within:text-purple-600">
+          <input
+            className="block w-full py-2 pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
+            disabled
+          />
+          <button
+            type={"button"}
+            onClick={() => setShowAlert(true)}
+            className="absolute inset-y-0 right-0 px-4 py-2 text-lg font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+          >
+            Editar
+          </button>
+        </div>
+      </Label>
       {showAlert && (
         <SweetAlert
           warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)

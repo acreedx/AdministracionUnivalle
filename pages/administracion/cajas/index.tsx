@@ -242,7 +242,7 @@ function Cajas() {
                       <PlusIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   )}
-                </TableCell>
+                </TableCell>  
               </TableRow>
             ))}
           </TableBody>
