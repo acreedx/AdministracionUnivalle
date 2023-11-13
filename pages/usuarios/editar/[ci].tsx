@@ -33,12 +33,19 @@ function RegistrarUsuarioPageModal() {
   const router = useRouter();
   const {ci}= router.query;
   const strCi = ci?.toString();
-  const [usuarioData, setUsuarioData] = useState<IRegistrarUsuario>({
+  const [nuevoUsuarioData, setNuevoUsuarioData] = useState<IRegistrarUsuario>({
     ciUsuario: "",
     clave: "",
     nombres: "",
     apellidos: "",
     cargoId: 0,
+  });
+  const [usuarioData, setUsuarioData] = useState<IObtenerUsuario>({
+    ci: "",
+    nombres: "",
+    apellidos: "",
+    cargo: 0,
+    estado:true
   });
   const [usuarioBKData, setUsuarioBKData] = useState<IObtenerUsuario>({
     ci: "",
@@ -65,15 +72,15 @@ function RegistrarUsuarioPageModal() {
       [campo]: e.target.value,
     }));
 
-    if (usuarioData.ciUsuario == "") {
+    if (usuarioData.ci == "") {
       setValid(null);
     } else {
       usuariosData.every((data: any) => {
-        if (data.ci == usuarioData.ciUsuario) {
+        if (data.ci == usuarioData.ci) {
           setValid(false);
           return false;
         }
-        if (data.ci != usuarioData.ciUsuario) {
+        if (data.ci != usuarioData.ci) {
           setValid(true);
         }
       });
@@ -90,17 +97,10 @@ function RegistrarUsuarioPageModal() {
     // });
 
     console.log(ciValid);
-    console.log(usuarioData.ciUsuario);
+    console.log(usuarioData.ci);
   };
   const clearData = () => {
-    setUsuarioData({
-      ...usuarioData,
-      ciUsuario: "",
-      clave: "",
-      nombres: "",
-      apellidos: "",
-      cargoId: 0,
-    });
+    setUsuarioData(usuarioBKData);
   };
 async function cargarDatosUsuario(ciUser:any) {
     try {
@@ -112,6 +112,7 @@ async function cargarDatosUsuario(ciUser:any) {
       }
       const resData: any = await res.json();
       setUsuarioBKData(resData.data[0]);
+      setUsuarioData(resData.data[0]);
     } catch (error) {
       //errorAlert("Ocurrió un error al traer los datos");
     }
@@ -175,17 +176,17 @@ async function cargarDatosUsuario(ciUser:any) {
   return (
     <Layout>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Registrar Usuario</PageTitle>
+        <PageTitle>Editar datos de Usuario</PageTitle>
         <SectionTitle>Datos Generales del usuario</SectionTitle>
 
         <div>
           <Label className=" mb-2">
             <span className="text-lg">CI del usuario</span>
             <Input
-              value={usuarioData.ciUsuario===""?usuarioBKData.ci : usuarioData.ciUsuario}
+              value={usuarioData.ci}
               className="mt-1"
               placeholder="Escriba aquí el ci del servicio"
-              onChange={(e) => handleChange1(e, "ciUsuario")}
+              onChange={(e) => handleChange1(e, "ci")}
               //valid={ciValid===true? ciValid :ciValid===false? ciValid: null}
             />
             {ciValid === true ? (
@@ -205,7 +206,7 @@ async function cargarDatosUsuario(ciUser:any) {
           <Label className=" mb-2">
             <span className="text-lg">Contraseña del usuario</span>
             <Input
-              value={usuarioData.clave}
+              value={nuevoUsuarioData.clave}
               className="mt-1"
               placeholder="Escriba aquí la contraseña del usuario"
               onChange={(e) => handleChange2(e, "clave")}
@@ -257,7 +258,7 @@ async function cargarDatosUsuario(ciUser:any) {
 
           <div>
             <Button size="large" onClick={registrarServicio}>
-              Registrar
+              Editar
             </Button>
           </div>
         </div>

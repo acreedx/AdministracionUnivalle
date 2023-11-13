@@ -28,6 +28,7 @@ import { ToastContainer } from "react-toastify";
 
 function RegistrarUsuarioPageModal() {
   const [ciValid, setValid]: any = useState();
+  const [claveValid,setClaveValid]:any = useState();
 
   const router = useRouter();
   const [usuarioData, setUsuarioData] = useState<IRegistrarUsuario>({
@@ -46,40 +47,33 @@ function RegistrarUsuarioPageModal() {
     }));
     console.log(usuarioData);
   };
+  const handleChange3 = (e: ChangeEvent<HTMLInputElement>) => {
+    if(e.target.value==usuarioData.clave){
+      setClaveValid(true);
+    }else{
+      setClaveValid(false);
+    }
+  };
+  const validateCi=()=>{
+  if (usuarioData.ciUsuario == "") {
+        setValid(null);
+      } else {
+        const aux:any=usuariosData.find((element:any)=>element.ci==usuarioData.ciUsuario);
+        if(aux==undefined){
+          setValid(true)
+        }
+        if(aux!=undefined){
+          setValid(false)
+        }
+      }
+  }
   const handleChange1 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    e.preventDefault();
-
     setUsuarioData((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
 
-    if (usuarioData.ciUsuario == "") {
-      setValid(null);
-    } else {
-      usuariosData.every((data: any) => {
-        if (data.ci == usuarioData.ciUsuario) {
-          setValid(false);
-          return false;
-        }
-        if (data.ci != usuarioData.ciUsuario) {
-          setValid(true);
-        }
-      });
-    }
-
-    // usuariosData.map((data: any) => {
-    //   // data.ci == usuarioData.ciUsuario
-    //   //   ? setValid(false)
-    //   //   : usuarioData.ciUsuario === ""
-    //   //   ? setValid(null)
-    //   //   : data.ci !== usuarioData.ciUsuario && usuarioData.ciUsuario !== ""
-    //   //   ? setValid(true)
-    //   //   : setValid(null);
-    // });
-
-    console.log(ciValid);
-    console.log(usuarioData.ciUsuario);
+    validateCi();
   };
   const clearData = () => {
     setUsuarioData({
@@ -176,23 +170,8 @@ function RegistrarUsuarioPageModal() {
               <HelperText>El carnet de identidad debe ser unico</HelperText>
             )}
           </Label>
-          <Label className=" mb-2">
-            <span className="text-lg">Contraseña del usuario</span>
-            <Input
-              value={usuarioData.clave}
-              className="mt-1"
-              placeholder="Escriba aquí la contraseña del usuario"
-              onChange={(e) => handleChange2(e, "clave")}
-            />
-          </Label>
-          <Label className=" mb-2">
-            <span className="text-lg">Confirmar contraseña</span>
-            <Input
-              className="mt-1"
-              placeholder="Vuelva a escribir la contraseña"
-              // onChange={(e) => handleChange2(e, "ciUsuario")}
-            />
-          </Label>
+          
+          
           <Label className=" mb-2">
             <span className="text-lg">Nombres del usuario</span>
             <Input
@@ -222,6 +201,46 @@ function RegistrarUsuarioPageModal() {
             </Select>
           </Label>
         </div>
+        </div>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+          <SectionTitle>Contraseña del Usuario</SectionTitle>
+          <div>
+                <Label className=" mb-2">
+            <span className="text-lg">Contraseña</span>
+            <Input
+              type="password"
+              value={usuarioData.clave}
+              className="mt-1"
+              placeholder="Escriba aquí la contraseña del usuario"
+              onChange={(e) => handleChange2(e, "clave")}
+            />
+          </Label>
+          
+          <Label className=" mb-2">
+            <span className="text-lg">Confirmar contraseña</span>
+            <Input
+              type="password"
+              className="mt-1"
+              placeholder="Vuelva a escribir la contraseña"
+              onChange={(e) => handleChange3(e)}
+            />
+            {claveValid === true ? (
+              <HelperText valid={claveValid}>
+                La contraseña coincide
+              </HelperText>
+            ) : claveValid === false ? (
+              <HelperText valid={claveValid}>
+                La contraseña no coincide
+              </HelperText>
+            ) : claveValid === null ? (
+              <HelperText>La contraseña debe ser igual</HelperText>
+            ) : (
+              <HelperText>La contraseña debe ser igual</HelperText>
+            )}
+          </Label>
+          </div>
+        </div>
+        
         <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
           <div>
             <Button size="large" onClick={clearData}>
@@ -236,7 +255,6 @@ function RegistrarUsuarioPageModal() {
           </div>
         </div>
         <ToastContainer />
-      </div>
     </Layout>
   );
 }
