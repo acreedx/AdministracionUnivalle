@@ -16,7 +16,13 @@ export interface IListarUsuario{
       estado:boolean;
     }
   ]
-    
+}
+export interface IObtenerUsuario{
+  ci:string;
+  nombres:string;
+  apellidos:string;
+  cargo:number;
+  estado:boolean;
 }
 export interface IListarCargos{
   data:
