@@ -169,6 +169,19 @@ const routes: IRoute[] = [
       },
     ],
   },
+   {
+    path: "/usuarios",
+    icon: "BienestarIcon",
+    name: "Usuarios",
+    routes: [
+      {
+        path: "/usuarios/registrar",
+        name: "Registrar",
+      }
+      
+    ],
+    exact: true,
+  },
   {
     path: "/bienestarUniversitario",
     icon: "BienestarIcon",
