@@ -50,7 +50,9 @@ function AgregarObjPerdidoPage() {
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al registrar los datos");
-            router.back();
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
           } else {
             throw new Error("Error al registrar los datos");
           }
@@ -89,10 +91,10 @@ function AgregarObjPerdidoPage() {
   };
 
   return (
-    <Layout>
+    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <PageTitle>Agregar Objeto Perdido - Bienestar Universitario</PageTitle>
 
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <div>
         <Label>
           <span>Nombre o descripción del objeto perdido</span>
           <Input
@@ -105,12 +107,29 @@ function AgregarObjPerdidoPage() {
         </Label>
 
         <Label className="mt-4">
-          <span>Imagen del objeto perdido</span>
+          <span className=" text-lg">Imagen del objeto perdido</span>
+          <div className="text-center mb-5">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="flex flex-col items-center space-y-2">
+                <span>Imagen</span>
+                <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={
+                      objPerImg === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : URL.createObjectURL(objPerImg)
+                    }
+                    alt="Imagen del objeto perdido"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <Input
             type="file"
-            ref={inputFileImg}
-            accept="image/png, image/jpeg"
             className="mt-1"
+            accept="image/jpeg, image/png"
             placeholder="Imagen para el servicio"
             onChange={(e) => setImg(e.target.files?.[0] || null)}
           />
@@ -118,12 +137,6 @@ function AgregarObjPerdidoPage() {
       </div>
 
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
-        <div>
-          <Link href={"/bienestarUniversitario/listarObjPerdidos"}>
-            <Button size="large">Volver</Button>
-          </Link>
-        </div>
-
         <div>
           <Button size="large" onClick={clearData}>
             Limpiar campos
@@ -137,7 +150,7 @@ function AgregarObjPerdidoPage() {
         </div>
       </div>
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
 

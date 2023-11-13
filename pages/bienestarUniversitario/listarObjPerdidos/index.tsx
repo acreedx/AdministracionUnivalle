@@ -30,6 +30,8 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import Modal from "../../../components/modal";
+import AgregarObjPerdidoPage from "../agregarObjPerdido/index";
 
 function ObjetosPerdidos() {
   const router = useRouter();
@@ -162,10 +164,11 @@ function ObjetosPerdidos() {
             Listado de objetos perdidos - Bienestar Universitario
           </PageTitle>
 
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/agregarObjPerdido">
-              <Button size="large">Agregar Objeto Perdido</Button>
-            </Link>
+          <div className="flex mb-8">
+            <Modal
+              pageRender={<AgregarObjPerdidoPage />}
+              buttonName="Agregar objeto perdido"
+            />
           </div>
 
           {dataTable2.length > 0 ? (

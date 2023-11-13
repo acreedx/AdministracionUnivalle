@@ -30,10 +30,10 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
-import Modal from '../../../components/modal'
-import RegistrarPage from '../registrar/index'
+import Modal from "../../../components/modal";
+import RegistrarPage from "../registrar/index";
 
-function BienestarUniversitario() {
+function GabinetePsicoPedagogico() {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -161,8 +161,11 @@ function BienestarUniversitario() {
             Listado de servicios - Gabinete Psico-Pedagógico
           </PageTitle>
 
-          <div className=" flex  mb-5">
-            <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
+          <div className=" flex mb-5">
+            <Modal
+              pageRender={<RegistrarPage />}
+              buttonName="Registrar Nuevo Servicio"
+            />
           </div>
           {dataTable2.length > 0 ? (
             <>
@@ -359,4 +362,4 @@ function BienestarUniversitario() {
   );
 }
 
-export default BienestarUniversitario;
+export default GabinetePsicoPedagogico;
