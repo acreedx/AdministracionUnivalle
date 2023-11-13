@@ -6,6 +6,8 @@ import SectionTitle from "example/components/Typography/SectionTitle";
 import {
   Table,
   TableHeader,
+  TableFooter,
+  Pagination,
   TableCell,
   TableBody,
   TableRow,
@@ -16,22 +18,18 @@ import {
   Input,
   CardBody,
   Card,
+  Avatar,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon, PlusIcon } from "icons";
-import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
-import URL from "utils/demo/api";
+import { ICajasData } from "utils/demo/cajasData";
 import Layout from "example/containers/Layout";
-
 import SweetAlert from "react-bootstrap-sweetalert";
 import { ServicesProvider } from "./providers/servicesProvider";
 import SearchBar from "components/searchBar";
+
 function Cajas() {
   const router = useRouter();
   const [state, setState] = useState("");
-  const route = "Servicios/getServicioByModule/";
-  const deleteServiceRoute = "Servicios/deleteServicio/";
-  const restoreServiceRoute = "Servicios/restoreServicio/";
-  const moduleName = "Cajas";
   const resultsPerPage = 10;
   const servicesProvider = new ServicesProvider();
   const [services, setServices] = useState<ICajasData[]>([]);
@@ -65,21 +63,11 @@ function Cajas() {
   }, [pageTable]);
 
   const handleSubmitDesactivate = async () => {
-    await fetch(`${URL.baseUrl}${deleteServiceRoute}${selectedService}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await servicesProvider.DeleteService(selectedService);
     router.reload();
   };
   const handleSubmitActivate = async () => {
-    await fetch(`${URL.baseUrl}${restoreServiceRoute}${selectedService}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await servicesProvider.RestoreService(selectedService);
     router.reload();
   };
   const handleActiveChange = (e: any) => {
@@ -90,10 +78,22 @@ function Cajas() {
     setServices(filtro);
   };
   const filterServices = (e: any) => {
-    const filtro = servicesOriginal
-      .filter((cont) => cont.status == state)
-      .filter((cont) => cont.name.includes(e));
-    setServices(filtro);
+    if(state == "success" || state == "danger" )
+    {
+      const filtro = servicesOriginal
+        .filter((cont) => cont.status == state)
+        .filter((cont) => cont.name.includes(e));
+      setServices(filtro);
+      return;
+    }
+    if(e && e.trim() !== '')
+    {
+      const filtro = servicesOriginal
+        .filter((cont) => cont.name.includes(e));
+      setServices(filtro);
+      return;
+    }
+    setServices(servicesOriginal);
   };
   return (
     <Layout>
@@ -112,7 +112,9 @@ function Cajas() {
               searchFunction={(e: any) => {
                 filterServices(e);
               }}
-              cleanFunction={() => {}}
+              cleanFunction={() => {
+                filterServices("");
+              }}
             />
           </CardBody>
         </Card>
@@ -145,14 +147,13 @@ function Cajas() {
         <Table>
           <TableHeader>
             <tr>
+              <TableCell>Imagen</TableCell>
               <TableCell>Servicio</TableCell>
-              <TableCell>Ubicación</TableCell>
               <TableCell>Encargado</TableCell>
               <TableCell>Telefono de Referencia</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Editar</TableCell>
               <TableCell>Manejo</TableCell>
-              <TableCell>Requisitos</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
@@ -161,14 +162,18 @@ function Cajas() {
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                      <Avatar
+                        className="hidden mr-3 md:block"
+                        src={servicio.imagenUrl}
+                        size="large"
+                      />
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.ubicacion}</p>
+                      <p className="font-semibold">{servicio.name}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -238,20 +243,18 @@ function Cajas() {
                     </Button>
                   )}
                 </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/administracion/cajas/[id]/[name]`}
-                    as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                  >
-                    <Button layout="link" size="small" aria-label="Ver">
-                      <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                  </Link>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
+        <TableFooter>
+          <Pagination
+            totalResults={totalResults}
+            resultsPerPage={resultsPerPage}
+            onChange={onPageChangeTable2}
+            label="Tabla de navegación"
+          />
+        </TableFooter>
       </TableContainer>
       {/*Alerta 1 - Activar Servicio*/}
       {showAlertActivate && (
