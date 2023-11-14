@@ -94,6 +94,17 @@ const routes: IRoute[] = [
     ],
   },
   {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Dirección de carrera",
+    routes: [
+      {
+        path: "/administracion/direccionDeCarrera/carrera",
+        name: "Carreras",
+      },
+    ],
+  },
+  {
     icon: "PagesIcon",
     name: "Servicios",
     routes: [
@@ -238,7 +249,6 @@ const routes: IRoute[] = [
         path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
-     
     ],
     exact: true,
   },
