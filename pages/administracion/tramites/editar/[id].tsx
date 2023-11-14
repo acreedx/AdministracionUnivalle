@@ -29,6 +29,10 @@ function ModificarTramite({ id }: props) {
   const route = "Servicios/getTramiteById/";
 
   const [name, setname] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [requisitoError, setRequisitoError] = useState<boolean>(false);
+  const [enchargedError, setEnchargedError] = useState<string | null>(null);
+  const [cellphoneError, setCellphoneError] = useState<string | null>(null);
 
   var [serviceImg, setImg]: any = useState(null);
 
@@ -74,11 +78,23 @@ function ModificarTramite({ id }: props) {
   };
 
 
-  const handleRequisitoChange = (e: any, index: any) => {
-    const nuevosRequisistos = [...requisitos];
-    nuevosRequisistos[index].description = e.target.value;
-    setRequisitos(nuevosRequisistos);
+  const handleRequisitoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+
+    if (containsInvalidChars) {
+      setRequisitoError(true); // Establece el estado de error si contiene caracteres no válidos.
+    } else if (inputValue.trim() === '') {
+      setRequisitoError(true); // Establece el estado de error si el campo está vacío.
+    } else {
+      const nuevosRequisitos = [...requisitos];
+      nuevosRequisitos[index] = { ...nuevosRequisitos[index], description: inputValue }; // Actualiza solo la descripción del requisito.
+      setRequisitos(nuevosRequisitos);
+      setRequisitoError(false); // Limpia el estado de error si no contiene caracteres no válidos y no está vacío.
+    }
   };
+
 
 
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
@@ -347,6 +363,50 @@ function ModificarTramite({ id }: props) {
     }
   }, [service]);
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
+
+    if (containsInvalidChars) {
+      setNameError("No se permiten números o caracteres especiales.");
+    } else if (inputValue.trim() === '') {
+      setNameError("El nombre del trámite no puede estar vacío.");
+    } else {
+      setNameError(null); // Limpiar el mensaje de error si el valor es válido.
+    }
+
+    setname(inputValue);
+  };
+
+  const handleEnchargedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
+    const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
+
+    if (containsInvalidChars) {
+      setEnchargedError("No se permiten números ni caracteres especiales.");
+    } else if (inputValue.trim() === '') {
+      setEnchargedError("Este campo no puede estar vacío.");
+    } else {
+      setEnchargedError(null); // Limpia el mensaje de error si todo está bien.
+    }
+
+    setencharged(inputValue);
+  };
+
+  const handleCellphoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si solo contiene dígitos.
+    const isValidPhoneNumber = /^[0-9]{7,8}$/.test(inputValue);
+
+    if (!isValidPhoneNumber) {
+      setCellphoneError("El número de teléfono debe tener 8 dígitos y solo contener números.");
+    } else {
+      setCellphoneError(null); // Limpia el mensaje de error si todo está bien.
+    }
+
+    setcellphone(inputValue);
+  };
 
   const handleAlertCancel = () => {
     setShowAlert(false);
@@ -360,13 +420,14 @@ function ModificarTramite({ id }: props) {
         <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
 
           <Label>
-            <span>Nombre del tramite</span>
+            <span>Nombre del trámite</span>
             <Input
-              className="mt-1"
-              placeholder="Ingresa el nombre del tramite"
+              className={`mt-1 ${nameError ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el nombre del trámite"
               value={name}
-              onChange={(e) => setname(e.target.value)}
+              onChange={handleNameChange}
             />
+            {nameError && <span className="text-red-500">{nameError}</span>}
           </Label>
 
           <Label className="mt-4">
@@ -417,20 +478,23 @@ function ModificarTramite({ id }: props) {
           <Label className="mt-4">
             <span>Encargado</span>
             <Input
-              className="mt-1"
-              value={encharged}
-              placeholder="Ingresa el nombre completo del encargado"
-              onChange={(e) => setencharged(e.target.value)}
-            />
+            className={`mt-1 ${enchargedError ? 'border-red-500' : ''}`}
+            placeholder="Ingresa el nombre completo del encargado"
+            value={encharged}
+            onChange={handleEnchargedChange}
+          />
+          {enchargedError && <span className="text-red-500">{enchargedError}</span>}
+
           </Label>
           <Label className="mt-4">
             <span>Teléfono de referencia</span>
             <Input
-              className="mt-1"
-              value={cellphone}
+              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
               placeholder="Ingresa el teléfono de referencia del encargado"
-              onChange={(e) => setcellphone(e.target.value)}
+              value={cellphone}
+              onChange={handleCellphoneChange}
             />
+            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
           </Label>
           <Label className="mt-4">
             <span>Seleccione una categoria de tramite</span>
@@ -479,11 +543,14 @@ function ModificarTramite({ id }: props) {
                     <MinusIcon />
                   </button>
                   <Input
-                    className="mt-1 mb-1"
+                    className={`mt-1 mb-1 ${requisitoError ? 'border-red-500' : ''}`}
                     placeholder="Ingresa el requisito"
-                    value={requisito.description}
+                    value={requisito.description} // Usa solo la propiedad 'description' del objeto 'requisito'
                     onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
                   />
+                  {requisitoError && (
+                    <span className="text-red-500">No se permiten números o caracteres especiales y no puede estar vacío.</span>
+                  )}
 
                 </div>
                 {requisito.pasosRequisito.map((paso, pasoIndex) => (

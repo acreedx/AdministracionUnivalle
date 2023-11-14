@@ -1,19 +1,18 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Button, Input, Label } from "@roketid/windmill-react-ui";
+import { Input, Label } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
-import Link from "next/link";
 
 function CrearCategoria() {
   const [name, setname] = useState("");
 
   const [description, setDescription] = useState("");
-
-
+  const [hasError, setHasError] = useState<boolean>(false);
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [nameError, setNameError] = useState<boolean>(false);
   const router = useRouter();
 
   const createCategoryRoute = "Categoria/addCategoria"
@@ -42,6 +41,30 @@ function CrearCategoria() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    if (!containsInvalidChars) {
+      setname(inputValue);
+      setNameError(false); // Limpiar el error si no contiene caracteres no válidos.
+    } else {
+      setNameError(true); // Establecer el estado de error si contiene caracteres no válidos.
+    }
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    if (!containsInvalidChars) {
+      setDescription(inputValue);
+      setHasError(false); // Limpiar el error si no contiene caracteres no válidos.
+    } else {
+      setHasError(true); // Establecer el estado de error si contiene caracteres no válidos.
+    }
+  };
+
+
 
   return (
     <Layout>
@@ -53,20 +76,28 @@ function CrearCategoria() {
             <Input
               type="text"
               required
-              className="mt-1"
+              className={`mt-1 ${nameError ? 'border-red-500' : ''}`}
               placeholder="Ingresa el nombre de la categoria"
-              onChange={(e) => setname(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleNameChange(e)}
+              value={name}
             />
+            {nameError && (
+              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+            )}
           </Label>
           <Label className="mt-4">
             <span>Descripcion de la categoria</span>
             <Input
               type="text"
               required
-              className="mt-1"
+              className={`mt-1 ${hasError ? 'border-red-500' : ''}`}
               placeholder="Ingresa la descripcion de la categoria"
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleDescriptionChange(e)}
+              value={description}
             />
+            {hasError && (
+              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+            )}
           </Label>
           <Label className="mt-4">
 
