@@ -1,9 +1,10 @@
 import React, { useState, ChangeEvent, useEffect } from "react";
 import {
-  IRegistrarUsuario,
   IListarCargos,
   IListarUsuario,
   IObtenerUsuario,
+  IEditarUsuario,
+  IEditarClave
 } from "../../../utils/interfaces/usuarios";
 import {
   Input,
@@ -27,96 +28,142 @@ import { uploadFile } from "../../../firebase/config";
 import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
 
-function RegistrarUsuarioPageModal() {
-  const [ciValid, setValid]: any = useState();
+function EditarUsuarioPageModal() {
+
+  const [nameValid, setNameValid] = useState<boolean | undefined>(undefined);
+  const [nameText, setNameValidText] = useState<string>("");
+
+  const [lastNameValid, setlastNameValid] = useState<boolean | undefined>(undefined);
+  const [lastNameText, setlastNameValidText] = useState<string>("");
+  
+  const [claveValid, setClaveValid] = useState<boolean | undefined>(undefined);
+  const [claveText, setClaveText] = useState<string>("");
+
+  const [claveConfValid, setClaveConfValid] = useState<boolean | undefined>(undefined);
+  const [claveConfText, setClaveConfText] = useState<string>("");
+
 
   const router = useRouter();
-  const {ci}= router.query;
-  const strCi = ci?.toString();
-  const [nuevoUsuarioData, setNuevoUsuarioData] = useState<IRegistrarUsuario>({
-    ciUsuario: "",
-    clave: "",
-    nombres: "",
-    apellidos: "",
-    cargoId: 0,
-  });
+  const {ci} = router.query;
+  const strCi=ci?.toString();
   const [usuarioData, setUsuarioData] = useState<IObtenerUsuario>({
     ci: "",
     nombres: "",
     apellidos: "",
-    cargo: 0,
-    estado:true
+    cargo: "",
+    estado:true,
   });
-  const [usuarioBKData, setUsuarioBKData] = useState<IObtenerUsuario>({
+  const [usuarioBkData, setUsuarioBkData] = useState<IObtenerUsuario>({
     ci: "",
     nombres: "",
     apellidos: "",
-    cargo: 0,
-    estado:true
+    cargo: "",
+    estado:true,
   });
-
+  const [nuevoUsuarioData, setNuevoUsuarioData] = useState<IEditarUsuario>({
+    nombres: "",
+    apellidos: "",
+  });
+  const [nuevaClaveData, setNuevaClaveData] = useState<IEditarClave>({
+    clave: "",
+  });
   const [cargosData, setCargosData] = useState<IListarCargos[]>([]);
   const [usuariosData, setUsuariosData] = useState<IListarUsuario[]>([]);
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setUsuarioData((prevData: any) => ({
-      ...prevData,
-      [campo]: e.target.value,
-    }));
-    console.log(usuarioData);
-  };
-  const handleChange1 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    e.preventDefault();
-
-    setUsuarioData((prevData: any) => ({
-      ...prevData,
-      [campo]: e.target.value,
-    }));
-
-    if (usuarioData.ci == "") {
-      setValid(null);
-    } else {
-      usuariosData.every((data: any) => {
-        if (data.ci == usuarioData.ci) {
-          setValid(false);
-          return false;
+     if(campo=="nombres"){
+      if (e.target.value.length >100) {
+      setNameValid(false);
+      setNameValidText("Los nombres del usuario no puede superar los 100 caracteres");
+      }else{
+        if(onlyLetersAndNumbers(e.target.value)){        
+          setNameValid(true);
+          setNameValidText("Los nombres del usuario ingresados son validos");    
+        } else{
+          setNameValid(false);
+          setNameValidText("Los nombres del usuario no deben contener caracteres especiales");
         }
-        if (data.ci != usuarioData.ci) {
-          setValid(true);
-        }
-      });
-    }
-
-    // usuariosData.map((data: any) => {
-    //   // data.ci == usuarioData.ciUsuario
-    //   //   ? setValid(false)
-    //   //   : usuarioData.ciUsuario === ""
-    //   //   ? setValid(null)
-    //   //   : data.ci !== usuarioData.ciUsuario && usuarioData.ciUsuario !== ""
-    //   //   ? setValid(true)
-    //   //   : setValid(null);
-    // });
-
-    console.log(ciValid);
-    console.log(usuarioData.ci);
-  };
-  const clearData = () => {
-    setUsuarioData(usuarioBKData);
-  };
-async function cargarDatosUsuario(ciUser:any) {
-    try {
-      const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Usuarios/getUserById/${ciUser}`
-      );
-      if (!res.ok) {
-        throw new Error("Error al obtener los datos del modulo.");
       }
-      const resData: any = await res.json();
-      setUsuarioBKData(resData.data[0]);
-      setUsuarioData(resData.data[0]);
-    } catch (error) {
-      //errorAlert("Ocurrió un error al traer los datos");
+      if (e.target.value.length == 0) {
+        setNameValid(undefined);
+        setNameValidText("");
+      }
+    }else if(campo=="apellidos"){
+      if (e.target.value.length >100) {
+      setlastNameValid(false);
+      setlastNameValidText("El apellido del usuario no puede superar los 100 caracteres");
+      }else{
+        if(onlyLetersAndNumbers(e.target.value)){        
+          setlastNameValid(true);
+          setlastNameValidText("Los apellidos del usuario ingresados son validos");    
+        } else{
+          setlastNameValid(false);
+          setlastNameValidText("Los apellidos del usuario no deben contener caracteres especiales");
+        }
+      }
+      if (e.target.value.length == 0) {
+        setlastNameValid(undefined);
+        setlastNameValidText("");
+      }
     }
+    setUsuarioData((prevData: any) => ({
+      ...prevData,
+      [campo]: e.target.value,
+    }));
+  
+  };
+  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    if(campo=="clave"){
+      if(e.target.value.length>50){
+        setClaveValid(false)
+        setClaveText("La contraseña no puede superar los 50 caracteres")
+      }else{
+        if(e.target.value.length<5){
+          setClaveValid(false)
+          setClaveText("La contraseña no puede ser menor a los 5 caracteres")
+        }else{
+          setClaveValid(true)
+          setClaveText("Contraseña valida")
+        }
+      }
+    }
+
+    setNuevaClaveData((prevData: any) => ({
+      ...prevData,
+      [campo]: e.target.value,
+    }));
+    console.log(nuevoUsuarioData);
+  };
+  const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
+    setNuevoUsuarioData((prevData: any) => ({
+      ...prevData,
+      [campo]: e.target.value,
+    }));
+    
+  };
+  const handleChange4 = (e: ChangeEvent<HTMLInputElement>) => {
+   if(e.target.value==nuevaClaveData.clave){
+      setClaveConfValid(true);
+      setClaveConfText("La contraseña coincide");
+    }else{
+      setClaveConfValid(false);
+      setClaveConfText("La contraseña no coincide");
+    }
+    if(e.target.value.length==0){
+      setClaveConfValid(undefined);
+      setClaveConfText("");
+    }
+    
+  };
+  function onlyNumbers(str: string) {
+    return /^[0-9]*$/.test(str);
   }
+  function onlyLetersAndNumbers(str: string) {
+    return /^[A-Za-z0-9ñáéíóúü ]*$/.test(str);
+  }
+  const clearData = () => {
+    setUsuarioData(usuarioBkData);
+  };
+
   async function cargarDatosCargos() {
     try {
       const res = await fetch(
@@ -131,11 +178,10 @@ async function cargarDatosUsuario(ciUser:any) {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
-  
   async function cargarDatosUsuarios() {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Usuarios/getAllUsers`
+        `https://apisistemaunivalle.somee.com/api/Usuarios/getAllUsers`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -146,23 +192,52 @@ async function cargarDatosUsuario(ciUser:any) {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
+  async function cargarDatosUsuario(userCI:any) {
+    try {
+      const res = await fetch(
+        `https://apisistemaunivalle.somee.com/api/Usuarios/getUserById/${userCI}`
+      );
+      if (!res.ok) {
+        throw new Error("Error al obtener los datos del modulo.");
+      }
+      const resData: any = await res.json();
+      setUsuarioData(resData.data[0]);
+      setUsuarioBkData(resData.data[0])
+    } catch (error) {
+      //errorAlert("Ocurrió un error al traer los datos");
+    }
+  }
   useEffect(() => {
     cargarDatosUsuario(strCi);
     cargarDatosCargos();
     cargarDatosUsuarios();
   }, []);
 
-  const registrarServicio = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
-      method: "POST",
+  const editarUsuario = () => {
+     if(nameValid==false){
+      errorAlert("Error al registrar Nombres no validos");
+      return;
+    }
+    if(lastNameValid==false){
+      errorAlert("Error al registrar Apellidos no validos");
+      return;
+    }
+    if(claveValid==false || !claveConfValid==false){
+      errorAlert("Error al registrar contraseña no valida");
+      return;
+    }
+    nuevoUsuarioData.nombres=usuarioData.nombres;
+    nuevoUsuarioData.apellidos=usuarioData.apellidos;
+    fetch(`https://apisistemaunivalle.somee.com/api/Usuarios/updateUser/${strCi}`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(usuarioData),
+      body: JSON.stringify(nuevoUsuarioData),
     })
       .then((response) => {
         if (response.ok) {
-          successAlert("Éxito al registrar los datos");
+          successAlert("Éxito al editar los datos");
           setTimeout(() => {
             window.location.reload();
           }, 2000);
@@ -173,10 +248,14 @@ async function cargarDatosUsuario(ciUser:any) {
       .catch(() => errorAlert("Error al registrar los datos"));
   };
 
+  function editarClave(): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <Layout>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Editar datos de Usuario</PageTitle>
+        <PageTitle>Editar Datos Usuario</PageTitle>
         <SectionTitle>Datos Generales del usuario</SectionTitle>
 
         <div>
@@ -186,40 +265,12 @@ async function cargarDatosUsuario(ciUser:any) {
               value={usuarioData.ci}
               className="mt-1"
               placeholder="Escriba aquí el ci del servicio"
-              onChange={(e) => handleChange1(e, "ci")}
-              //valid={ciValid===true? ciValid :ciValid===false? ciValid: null}
+              disabled={true}
             />
-            {ciValid === true ? (
-              <HelperText valid={ciValid}>
-                Es un carnet de identidad válido
-              </HelperText>
-            ) : ciValid === false ? (
-              <HelperText valid={ciValid}>
-                Este carnet de identidad ya existe
-              </HelperText>
-            ) : ciValid === null ? (
-              <HelperText>El carnet de identidad debe ser unico</HelperText>
-            ) : (
-              <HelperText>El carnet de identidad debe ser unico</HelperText>
-            )}
+        
           </Label>
-          <Label className=" mb-2">
-            <span className="text-lg">Contraseña del usuario</span>
-            <Input
-              value={nuevoUsuarioData.clave}
-              className="mt-1"
-              placeholder="Escriba aquí la contraseña del usuario"
-              onChange={(e) => handleChange2(e, "clave")}
-            />
-          </Label>
-          <Label className=" mb-2">
-            <span className="text-lg">Confirmar contraseña</span>
-            <Input
-              className="mt-1"
-              placeholder="Vuelva a escribir la contraseña"
-              // onChange={(e) => handleChange2(e, "ciUsuario")}
-            />
-          </Label>
+          
+          
           <Label className=" mb-2">
             <span className="text-lg">Nombres del usuario</span>
             <Input
@@ -227,7 +278,11 @@ async function cargarDatosUsuario(ciUser:any) {
               className="mt-1"
               placeholder="Escriba aquí los nombres del usuario"
               onChange={(e) => handleChange2(e, "nombres")}
+              valid={nameValid}
             />
+            {nameValid != null && (
+            <HelperText valid={nameValid}>{nameText}</HelperText>
+            )}
           </Label>
           <Label className=" mb-2">
             <span className="text-lg">Apellidos del usuario</span>
@@ -236,11 +291,17 @@ async function cargarDatosUsuario(ciUser:any) {
               className="mt-1"
               placeholder="Escriba aquí los apellidos del usuario"
               onChange={(e) => handleChange2(e, "apellidos")}
+              valid={lastNameValid}
             />
+            {lastNameValid != null && (
+            <HelperText valid={lastNameValid}>{lastNameText}</HelperText>
+            )}
           </Label>
           <Label className=" mb-2">
             <span className="text-lg">Cargo del usuario</span>
-            <Select className="mt-1">
+            <Select 
+            //value={usuarioData.cargo}
+            className="mt-1" onChange={(e) => handleChange5(e, "cargoId")}>
               {cargosData.map((datos: any, i) => (
                 <option key={i} value={datos.id}>
                   {datos.nombrecargo}
@@ -248,24 +309,68 @@ async function cargarDatosUsuario(ciUser:any) {
               ))}
             </Select>
           </Label>
-        </div>
-        <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
+          <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
+          <div>
+            <Button size="large" onClick={editarUsuario}>
+              Editar
+            </Button>
+          </div>
           <div>
             <Button size="large" onClick={clearData}>
               Limpiar campos
             </Button>
           </div>
 
+          
+        </div>
+        </div>
+        </div>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+          <SectionTitle>Cambiar contraseña del Usuario</SectionTitle>
           <div>
-            <Button size="large" onClick={registrarServicio}>
-              Editar
+            <Label className=" mb-2">
+            <span className="text-lg">Contraseña</span>
+            <Input
+              type="password"
+              value={nuevaClaveData.clave}
+              className="mt-1"
+              placeholder="Escriba aquí la contraseña del usuario"
+              onChange={(e) => handleChange3(e, "clave")}
+              valid={claveValid}
+            />
+            {claveValid != null && (
+            <HelperText valid={claveValid}>{claveText}</HelperText>
+            )}
+          </Label>
+          
+          <Label className=" mb-2">
+            <span className="text-lg">Confirmar contraseña</span>
+            <Input
+              type="password"
+              className="mt-1"
+              placeholder="Vuelva a escribir la contraseña"
+              onChange={(e) => handleChange4(e)}
+              valid={claveConfValid}
+            />
+            {claveConfValid != null && (
+            <HelperText valid={claveConfValid}>{claveConfText}</HelperText>
+            )}
+          </Label>
+          <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
+
+          <div>
+            <Button size="large" onClick={editarClave}>
+              Editar Contraseña
             </Button>
           </div>
         </div>
+          </div>
+        </div>
+        
+        
         <ToastContainer />
-      </div>
     </Layout>
   );
 }
 
-export default RegistrarUsuarioPageModal;
+export default EditarUsuarioPageModal;

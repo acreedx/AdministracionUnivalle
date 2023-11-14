@@ -27,8 +27,20 @@ import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
 
 function RegistrarUsuarioPageModal() {
-  const [ciValid, setValid]: any = useState();
-  const [claveValid,setClaveValid]:any = useState();
+  const [ciValid, setCiValid] = useState<boolean | undefined>(undefined);
+  const [CiText, setCiValidText] = useState<string>("");
+
+  const [nameValid, setNameValid] = useState<boolean | undefined>(undefined);
+  const [nameText, setNameValidText] = useState<string>("");
+
+  const [lastNameValid, setlastNameValid] = useState<boolean | undefined>(undefined);
+  const [lastNameText, setlastNameValidText] = useState<string>("");
+  
+  const [claveValid, setClaveValid] = useState<boolean | undefined>(undefined);
+  const [claveText, setClaveText] = useState<string>("");
+
+  const [claveConfValid, setClaveConfValid] = useState<boolean | undefined>(undefined);
+  const [claveConfText, setClaveConfText] = useState<string>("");
 
   const router = useRouter();
   const [usuarioData, setUsuarioData] = useState<IRegistrarUsuario>({
@@ -40,41 +52,127 @@ function RegistrarUsuarioPageModal() {
   });
   const [cargosData, setCargosData] = useState<IListarCargos[]>([]);
   const [usuariosData, setUsuariosData] = useState<IListarUsuario[]>([]);
+
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    if(campo=="nombres"){
+      if (e.target.value.length >100) {
+      setNameValid(false);
+      setNameValidText("Los nombres del usuario no puede superar los 100 caracteres");
+      }else{
+        if(onlyLetersAndNumbers(e.target.value)){        
+          setNameValid(true);
+          setNameValidText("Los nombres del usuario ingresados son validos");    
+        } else{
+          setNameValid(false);
+          setNameValidText("Los nombres del usuario no deben contener caracteres especiales");
+        }
+      }
+      if (e.target.value.length == 0) {
+        setNameValid(undefined);
+        setNameValidText("");
+      }
+    }else if(campo=="apellidos"){
+      if (e.target.value.length >100) {
+      setlastNameValid(false);
+      setlastNameValidText("El apellido del usuario no puede superar los 100 caracteres");
+      }else{
+        if(onlyLetersAndNumbers(e.target.value)){        
+          setlastNameValid(true);
+          setlastNameValidText("Los apellidos del usuario ingresados son validos");    
+        } else{
+          setlastNameValid(false);
+          setlastNameValidText("Los apellidos del usuario no deben contener caracteres especiales");
+        }
+      }
+      if (e.target.value.length == 0) {
+        setlastNameValid(undefined);
+        setlastNameValidText("");
+      }
+    }else if(campo=="clave"){
+      if(e.target.value.length>50){
+        setClaveValid(false)
+        setClaveText("La contraseña no puede superar los 50 caracteres")
+      }else{
+        if(e.target.value.length<5){
+          setClaveValid(false)
+          setClaveText("La contraseña no puede ser menor a los 5 caracteres")
+        }else{
+          setClaveValid(true)
+          setClaveText("Contraseña valida")
+        }
+      }
+
+      if (e.target.value.length == 0) {
+        setClaveValid(undefined);
+        setClaveText("");
+      }
+    }
+    
     setUsuarioData((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
     console.log(usuarioData);
   };
+  
   const handleChange3 = (e: ChangeEvent<HTMLInputElement>) => {
     if(e.target.value==usuarioData.clave){
-      setClaveValid(true);
+      setClaveConfValid(true);
+      setClaveConfText("La contraseña coincide");
     }else{
-      setClaveValid(false);
+      setClaveConfValid(false);
+      setClaveConfText("La contraseña no coincide");
+    }
+    if(e.target.value.length==0){
+      setClaveConfValid(undefined);
+      setClaveConfText("");
     }
   };
-  const validateCi=()=>{
-  if (usuarioData.ciUsuario == "") {
-        setValid(null);
-      } else {
-        const aux:any=usuariosData.find((element:any)=>element.ci==usuarioData.ciUsuario);
-        if(aux==undefined){
-          setValid(true)
-        }
-        if(aux!=undefined){
-          setValid(false)
-        }
-      }
-  }
+  
+
+
   const handleChange1 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+     if (e.target.value.length >8) {
+      setCiValid(false);
+      setCiValidText("El carnet de identidad no puede superar los 8 digitos");
+    }else{
+      if(onlyNumbers(e.target.value)){        
+        const aux:any=usuariosData.find((element:any)=>element.ci==e.target.value);
+        if(aux==undefined){
+            setCiValid(true);
+            setCiValidText("Carnet de identidad ingresado valido");
+          }else{
+            setCiValid(false);
+            setCiValidText("El carnet de identidad ya esta registrado");
+          }
+      } else{
+        setCiValid(false);
+        setCiValidText("El nombre solo debe contener números");
+      }
+    }
+    if (e.target.value.length == 0) {
+      setCiValid(undefined);
+      setCiValidText("");
+    }
+
+    setUsuarioData((prevData: any) => ({
+      ...prevData,
+      [campo]: e.target.value,
+    }))
+  };
+  const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
     setUsuarioData((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
-
-    validateCi();
+    
   };
+  function onlyNumbers(str: string) {
+    return /^[0-9]*$/.test(str);
+  }
+  function onlyLetersAndNumbers(str: string) {
+    return /^[A-Za-z0-9ñáéíóúü ]*$/.test(str);
+  }
   const clearData = () => {
     setUsuarioData({
       ...usuarioData,
@@ -96,6 +194,15 @@ function RegistrarUsuarioPageModal() {
       }
       const resData: any = await res.json();
       setCargosData(resData.data);
+      setUsuarioData(
+        {
+        ciUsuario: "",
+        clave: "",
+        nombres: "",
+        apellidos: "",
+        cargoId:resData.data[0].id
+      }
+      )
     } catch (error) {
       //errorAlert("Ocurrió un error al traer los datos");
     }
@@ -120,7 +227,23 @@ function RegistrarUsuarioPageModal() {
   }, []);
 
   const registrarServicio = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+    if(!ciValid){
+      errorAlert("Error al registrar CI no valido");
+      return;
+    }
+    if(!nameValid){
+      errorAlert("Error al registrar Nombres no validos");
+      return;
+    }
+    if(!lastNameValid){
+      errorAlert("Error al registrar Apellidos no validos");
+      return;
+    }
+    if(!claveValid || !claveConfValid){
+      errorAlert("Error al registrar contraseña no valida");
+      return;
+    }
+    fetch("http://apisistemaunivalle.somee.com/api/Usuarios/addUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,7 +254,7 @@ function RegistrarUsuarioPageModal() {
         if (response.ok) {
           successAlert("Éxito al registrar los datos");
           setTimeout(() => {
-            window.location.reload();
+            router.push('/usuarios/listarUsuarios');
           }, 2000);
         } else {
           throw new Error("Error al cambiar los datos del servicio");
@@ -154,21 +277,12 @@ function RegistrarUsuarioPageModal() {
               className="mt-1"
               placeholder="Escriba aquí el ci del servicio"
               onChange={(e) => handleChange1(e, "ciUsuario")}
-              //valid={ciValid===true? ciValid :ciValid===false? ciValid: null}
+              valid={ciValid}
             />
-            {ciValid === true ? (
-              <HelperText valid={ciValid}>
-                Es un carnet de identidad válido
-              </HelperText>
-            ) : ciValid === false ? (
-              <HelperText valid={ciValid}>
-                Este carnet de identidad ya existe
-              </HelperText>
-            ) : ciValid === null ? (
-              <HelperText>El carnet de identidad debe ser unico</HelperText>
-            ) : (
-              <HelperText>El carnet de identidad debe ser unico</HelperText>
+            {ciValid != null && (
+            <HelperText valid={ciValid}>{CiText}</HelperText>
             )}
+
           </Label>
           
           
@@ -179,7 +293,11 @@ function RegistrarUsuarioPageModal() {
               className="mt-1"
               placeholder="Escriba aquí los nombres del usuario"
               onChange={(e) => handleChange2(e, "nombres")}
+              valid={nameValid}
             />
+            {nameValid != null && (
+            <HelperText valid={nameValid}>{nameText}</HelperText>
+            )}
           </Label>
           <Label className=" mb-2">
             <span className="text-lg">Apellidos del usuario</span>
@@ -188,11 +306,16 @@ function RegistrarUsuarioPageModal() {
               className="mt-1"
               placeholder="Escriba aquí los apellidos del usuario"
               onChange={(e) => handleChange2(e, "apellidos")}
+              valid={lastNameValid}
             />
+            {lastNameValid != null && (
+            <HelperText valid={lastNameValid}>{lastNameText}</HelperText>
+            )}
           </Label>
           <Label className=" mb-2">
             <span className="text-lg">Cargo del usuario</span>
-            <Select className="mt-1">
+            <Select value={usuarioData.cargoId}
+            className="mt-1" onChange={(e) => handleChange5(e, "cargoId")}>
               {cargosData.map((datos: any, i) => (
                 <option key={i} value={datos.id}>
                   {datos.nombrecargo}
@@ -205,7 +328,7 @@ function RegistrarUsuarioPageModal() {
         <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
           <SectionTitle>Contraseña del Usuario</SectionTitle>
           <div>
-                <Label className=" mb-2">
+            <Label className=" mb-2">
             <span className="text-lg">Contraseña</span>
             <Input
               type="password"
@@ -213,7 +336,11 @@ function RegistrarUsuarioPageModal() {
               className="mt-1"
               placeholder="Escriba aquí la contraseña del usuario"
               onChange={(e) => handleChange2(e, "clave")}
+              valid={claveValid}
             />
+            {claveValid != null && (
+            <HelperText valid={claveValid}>{claveText}</HelperText>
+            )}
           </Label>
           
           <Label className=" mb-2">
@@ -223,19 +350,10 @@ function RegistrarUsuarioPageModal() {
               className="mt-1"
               placeholder="Vuelva a escribir la contraseña"
               onChange={(e) => handleChange3(e)}
+              valid={claveConfValid}
             />
-            {claveValid === true ? (
-              <HelperText valid={claveValid}>
-                La contraseña coincide
-              </HelperText>
-            ) : claveValid === false ? (
-              <HelperText valid={claveValid}>
-                La contraseña no coincide
-              </HelperText>
-            ) : claveValid === null ? (
-              <HelperText>La contraseña debe ser igual</HelperText>
-            ) : (
-              <HelperText>La contraseña debe ser igual</HelperText>
+            {claveConfValid != null && (
+            <HelperText valid={claveConfValid}>{claveConfText}</HelperText>
             )}
           </Label>
           </div>
@@ -243,16 +361,17 @@ function RegistrarUsuarioPageModal() {
         
         <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
           <div>
+            <Button size="large" onClick={registrarServicio}>
+              Registrar
+            </Button>
+          </div>
+          <div>
             <Button size="large" onClick={clearData}>
               Limpiar campos
             </Button>
           </div>
 
-          <div>
-            <Button size="large" onClick={registrarServicio}>
-              Registrar
-            </Button>
-          </div>
+          
         </div>
         <ToastContainer />
     </Layout>

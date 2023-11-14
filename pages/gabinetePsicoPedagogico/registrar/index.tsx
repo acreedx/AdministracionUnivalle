@@ -65,7 +65,7 @@ function RegistrarServicioPageModal() {
         if (response.ok) {
           successAlert("Éxito al registrar los datos");
            setTimeout(() => {
-          window.location.reload();
+            router.push('/usuarios/listarUsuarios');
         }, 2000);
         } else {
           throw new Error("Error al cambiar los datos del servicio");

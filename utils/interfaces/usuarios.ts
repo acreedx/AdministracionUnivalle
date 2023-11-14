@@ -5,6 +5,14 @@ export interface IRegistrarUsuario{
     apellidos:string;
     cargoId:number;
 }
+export interface IEditarUsuario{
+    nombres:string;
+    apellidos:string;
+    // cargoId:number;
+}
+export interface IEditarClave{
+    clave:string;
+}
 export interface IListarUsuario{
   data:
   [
@@ -21,7 +29,7 @@ export interface IObtenerUsuario{
   ci:string;
   nombres:string;
   apellidos:string;
-  cargo:number;
+  cargo:string;
   estado:boolean;
 }
 export interface IListarCargos{
