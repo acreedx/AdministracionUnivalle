@@ -145,8 +145,7 @@ function CrearTramite() {
         handleChangeLocationImg(existingLocations[i].locationIMG, index)
         console.log(locationCroquisImg)
       } 
-    }
-      
+    }  
   };
   const handleSetCommonLocationCroquisImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
@@ -271,7 +270,7 @@ function CrearTramite() {
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Solicitudes");
 
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
@@ -308,8 +307,8 @@ function CrearTramite() {
         body: JSON.stringify({
           nombre: name,
           moduloId: moduleId,
-          imageUrl: "",
-          //      imagenUrl: await uploadFile(serviceImg, "servicios/"),
+          //imageUrl: "",
+          imagenUrl: await uploadFile(serviceImg, "servicios/"),
           idCategoria: selectedCategoryId
         }),
       });
