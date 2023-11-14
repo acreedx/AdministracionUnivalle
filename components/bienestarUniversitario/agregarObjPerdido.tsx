@@ -1,46 +1,28 @@
-import React, { useState, ChangeEvent, useEffect, useRef } from "react";
-import {
-  ICrearServicio,
-  IListarServicios,
-} from "../../../utils/interfaces/servicios";
-import {
-  Input,
-  Label,
-  HelperText,
-  Textarea,
-  Alert,
-} from "@roketid/windmill-react-ui";
+import React, { useState, useRef, ChangeEvent } from "react";
+import { HelperText, Input, Label } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
-import SectionTitle from "example/components/Typography/SectionTitle";
-import Layout from "example/containers/Layout";
-import {
-  successAlert,
-  errorAlert,
-  warningAlert,
-} from "../../../components/alerts";
-
-import { uploadFile } from "../../../firebase/config";
-import { useRouter } from "next/router";
+import { successAlert, errorAlert, warningAlert } from "../alerts";
 import { ToastContainer } from "react-toastify";
+import { uploadFile } from "../../firebase/config";
+import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
+import { useRouter } from "next/router";
 import {
-  checkValidation,
   onlyLettersAndNumbers,
   resetDefaultValFlags,
   validateImg,
+  checkValidation,
 } from "utils/functions/validations";
 
-function RegistrarServicioPageModal() {
-  const [serviceImg, setImg]: any = useState(null);
-
+function AgregarObjPerdidoPage() {
   const router = useRouter();
-
-  const [servicioData, setServicioData] = useState<ICrearServicio>({
-    nombre: "",
-    moduloId: 16,
-    imagenUrl: null,
-  });
   const inputFileImg: any = useRef(null);
+  const [objPerImg, setImg]: any = useState(null);
+  const [objPerdido, setObjPerdido] = useState<IAddObjPerdido>({
+    titulo: "",
+    archivo: "",
+  });
+
   const [flags, setFlags] = useState({
     nombre: undefined,
     imagen: undefined,
@@ -50,27 +32,7 @@ function RegistrarServicioPageModal() {
     imagen: "",
   });
 
-  const [users, setUsers] = useState<IListarServicios[]>([]);
-
-  const getData = async (url: string) => {
-    try {
-      const query = await fetch(url);
-      if (query.ok) {
-        const response: any = await query.json();
-        if (response.data != null) {
-          setUsers(response.data);
-        } else {
-          throw new Error();
-        }
-      } else {
-        throw new Error();
-      }
-    } catch (e) {
-      errorAlert("Ocurrió un error");
-    }
-  };
-
-  const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     const value = e.target.value;
     const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
     let valid: any = true;
@@ -99,62 +61,10 @@ function RegistrarServicioPageModal() {
     setFlags((prev) => ({ ...prev, nombre: valid }));
     setTextErrors((prev) => ({ ...prev, nombre: validText }));
 
-    setServicioData((prevData: any) => ({
+    setObjPerdido((prevData: any) => ({
       ...prevData,
       [campo]: value,
     }));
-  };
-
-  const clearValidations = () => {
-    setFlags(resetDefaultValFlags(flags, undefined));
-    setTextErrors(resetDefaultValFlags(textErrors, ""));
-  };
-
-  const clearData = () => {
-    setServicioData({
-      ...servicioData,
-      nombre: "",
-      moduloId: 1,
-      imagenUrl: null,
-    });
-    clearImg();
-    clearValidations();
-  };
-
-  const registrarServicio = () => {
-    if (users.find((u: any) => u.nombre === servicioData.nombre)) {
-      warningAlert("El servicio ingresado ya existe");
-    } else {
-      if (checkValidation(flags) && servicioData.imagenUrl != null) {
-        fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(servicioData),
-        })
-          .then((response) => {
-            if (response.ok) {
-              successAlert("Éxito al registrar los datos");
-              setTimeout(() => {
-                window.location.reload();
-              }, 2000);
-            } else {
-              throw new Error("Error al cambiar los datos del servicio");
-            }
-          })
-          .catch(() => errorAlert("Error al registrar los datos"));
-      } else {
-        warningAlert("Rellene todos los campos de manera correcta");
-      }
-    }
-  };
-
-  const clearImg = () => {
-    setImg(null);
-    if (inputFileImg.current) {
-      inputFileImg.current.value = null;
-    }
   };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -193,34 +103,85 @@ function RegistrarServicioPageModal() {
     }));
   };
 
-  const subirArchivos = async () => {
-    servicioData.imagenUrl = null;
-    if (serviceImg != null) {
-      servicioData.imagenUrl = await uploadFile(serviceImg, "servicios/");
+  const registrarObjPer = () => {
+    if (checkValidation(flags) && objPerdido.archivo != null) {
+      fetch(
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            titulo: objPerdido.titulo,
+            archivo: objPerdido.archivo,
+            serviciosId: 1,
+            estado: true,
+          }),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al registrar los datos");
+            setTimeout(() => {
+              window.location.reload();
+            }, 2000);
+          } else {
+            throw new Error("Error al registrar los datos");
+          }
+        })
+        .catch((e) => {
+          errorAlert("Error al registrar los datos");
+        });
+    } else {
+      warningAlert("Rellene todos los campos de manera correcta");
     }
-    registrarServicio();
   };
 
-  useEffect(() => {
-    getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
-    );
-  }, []);
+  const clearValidations = () => {
+    setFlags(resetDefaultValFlags(flags, undefined));
+    setTextErrors(resetDefaultValFlags(textErrors, ""));
+  };
+
+  const clearImg = () => {
+    setImg(null);
+    if (inputFileImg.current) {
+      inputFileImg.current.value = null;
+    }
+  };
+
+  const clearData = () => {
+    setObjPerdido({
+      ...objPerdido,
+      titulo: "",
+      archivo: "",
+    });
+    clearImg();
+    clearValidations();
+  };
+
+  const subirArchivos = async () => {
+    objPerdido.archivo = "";
+    if (objPerImg != null) {
+      objPerdido.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
+    }
+    registrarObjPer();
+  };
 
   return (
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <PageTitle>Registrar servicio - Consultorio Odontologico</PageTitle>
-      <SectionTitle>Datos Generales*</SectionTitle>
+      <PageTitle>Agregar Objeto Perdido - Bienestar Universitario</PageTitle>
 
       <div>
         <Label>
-          <span className="text-lg">Nombre del servicio</span>
+          <span>Nombre o descripción del objeto perdido</span>
           <Input
-            value={servicioData.nombre}
+            value={objPerdido.titulo}
             className="mt-1"
             valid={flags.nombre}
-            placeholder="Escriba aquí el nombre del servicio"
-            onChange={(e) => handleChange2(e, "nombre")}
+            placeholder="Escriba aquí el nombre o la descripción de la imagen"
+            accept="image/jpeg, image/png"
+            onChange={(e) => handleChange(e, "titulo")}
           />
           {flags.nombre != null && (
             <HelperText valid={flags.nombre}>{textErrors.nombre}</HelperText>
@@ -228,9 +189,7 @@ function RegistrarServicioPageModal() {
         </Label>
 
         <Label className="mt-4">
-          <span className=" text-lg">
-            Imagen de referencia para el servicio
-          </span>
+          <span className=" text-lg">Imagen del objeto perdido</span>
           <div className="text-center mb-5">
             <div className="flex items-center justify-center space-x-4">
               <div className="flex flex-col items-center space-y-2">
@@ -239,11 +198,11 @@ function RegistrarServicioPageModal() {
                   <img
                     className="w-full h-full object-cover"
                     src={
-                      serviceImg === null
+                      objPerImg === null
                         ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
-                        : URL.createObjectURL(serviceImg)
+                        : URL.createObjectURL(objPerImg)
                     }
-                    alt="Imagen de Ubicación Nueva"
+                    alt="Imagen del objeto perdido"
                   />
                 </div>
               </div>
@@ -254,8 +213,8 @@ function RegistrarServicioPageModal() {
             valid={flags.imagen}
             type="file"
             className="mt-1"
-            placeholder="Imagen para el servicio"
             accept="image/jpeg, image/png"
+            placeholder="Imagen del objeto perdido"
             onChange={(e) => handleImageChange(e)}
           />
           {flags.imagen != null && (
@@ -263,6 +222,7 @@ function RegistrarServicioPageModal() {
           )}
         </Label>
       </div>
+
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
           <Button size="large" onClick={clearData}>
@@ -281,4 +241,4 @@ function RegistrarServicioPageModal() {
   );
 }
 
-export default RegistrarServicioPageModal;
+export default AgregarObjPerdidoPage;

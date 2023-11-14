@@ -30,6 +30,10 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
+import Modal from "../../../components/modal";
+import ModalEdit from "../../../components/modalEdit";
+import AgregarObjPerdidoPage from "components/bienestarUniversitario/agregarObjPerdido";
+import EditarObjPerdidoPage from "components/bienestarUniversitario/editarObjPerdido";
 
 function ObjetosPerdidos() {
   const router = useRouter();
@@ -85,7 +89,7 @@ function ObjetosPerdidos() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+      "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -94,7 +98,7 @@ function ObjetosPerdidos() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Publicaciones/${
+        `https://apisistemaunivalle.somee.com/api/Publicaciones/${
           action ? "DeletePublicaciones" : "RestorePublicaciones"
         }/?id=${selectedObj}`,
         {
@@ -145,11 +149,11 @@ function ObjetosPerdidos() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Publicaciones/getDisabledPublicacionesbyServicioId/1"
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/getDisabledPublicacionesbyServicioId/1"
       );
     }
   };
@@ -162,10 +166,11 @@ function ObjetosPerdidos() {
             Listado de objetos perdidos - Bienestar Universitario
           </PageTitle>
 
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/agregarObjPerdido">
-              <Button size="large">Agregar Objeto Perdido</Button>
-            </Link>
+          <div className="flex mb-8">
+            <Modal
+              pageRender={<AgregarObjPerdidoPage />}
+              buttonName="Agregar objeto perdido"
+            />
           </div>
 
           {dataTable2.length > 0 ? (
@@ -251,22 +256,32 @@ function ObjetosPerdidos() {
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <Link
-                                      href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
-                                      }}
-                                    >
-                                      <Button
-                                        layout="link"
-                                        size="small"
-                                        aria-label="Edit"
-                                      >
+                                    <ModalEdit
+                                      pageRender={
+                                        <EditarObjPerdidoPage
+                                          id={parseInt(datos.identificador)}
+                                        />
+                                      }
+                                      buttonContent={
                                         <EditIcon
                                           className="w-5 h-5"
                                           aria-hidden="true"
                                         />
-                                      </Button>
-                                    </Link>
+                                      }
+                                    />
+                                    {/* <Button
+                                      layout="link"
+                                      size="small"
+                                      aria-label="Edit"
+                                      onClick={() => {
+                                        <Modal />;
+                                      }}
+                                    >
+                                      <EditIcon
+                                        className="w-5 h-5"
+                                        aria-hidden="true"
+                                      />
+                                    </Button> */}
                                   </>
                                 )}
                                 <Button

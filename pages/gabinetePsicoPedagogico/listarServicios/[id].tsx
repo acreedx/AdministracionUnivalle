@@ -30,8 +30,10 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
+import Modal from "../../../components/modal";
+import RegistrarPage from "../registrar/index";
 
-function BienestarUniversitario() {
+function GabinetePsicoPedagogico() {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -156,13 +158,14 @@ function BienestarUniversitario() {
       {!isLoading ? (
         <>
           <PageTitle>
-            Listado de servicios - Gabinete Psico Pedagógico
+            Listado de servicios - Gabinete Psico-Pedagógico
           </PageTitle>
 
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/registrar">
-              <Button size="large">Registrar servicio</Button>
-            </Link>
+          <div className=" flex mb-5">
+            <Modal
+              pageRender={<RegistrarPage />}
+              buttonName="Registrar Nuevo Servicio"
+            />
           </div>
           {dataTable2.length > 0 ? (
             <>
@@ -253,7 +256,7 @@ function BienestarUniversitario() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                                        pathname: `/gabinetePsicoPedagogico/editar/${datos.identificador}`,
                                       }}
                                     >
                                       <Button
@@ -359,4 +362,4 @@ function BienestarUniversitario() {
   );
 }
 
-export default BienestarUniversitario;
+export default GabinetePsicoPedagogico;
