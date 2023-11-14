@@ -6,7 +6,6 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
-import URLS from "utils/demo/api";
 import { ICajasData, convertJSONService } from "utils/demo/cajasData";
 import { GetServerSidePropsContext } from "next";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -47,13 +46,7 @@ function EditarServicio({ id }: props) {
     useState<boolean>(false);
   const [validationMessage, setvalidationMessage] = useState<string>("");
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
-  const [requirementOriginal, setrequirementOriginal] = useState<
-    IRequirementData[]
-  >([]);
   const [locations, setLocations] = useState<IUbicacionesData[]>([]);
-  const [locationsOriginal, setLocationsOriginal] = useState<
-    IUbicacionesData[]
-  >([]);
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index].description = value;
@@ -64,17 +57,25 @@ function EditarServicio({ id }: props) {
     newLocations[index].name = value;
     setLocations(newLocations);
   };
+  const handleRemoveRequirement = (index: number) => {
+    const newRequirements = [...requirements];
+    newRequirements.splice(index, 1);
+    setRequirements(newRequirements);
+  };
+  const handleRemoveLocation = (index: number) => {
+    const newLocations = [...locations];
+    newLocations.splice(index, 1);
+    setLocations(newLocations);
+  };
   useEffect(() => {
     async function doFetch() {
       try {
         setService(await servicesProvider.GetOneService(id));
         setRequirements(await requirementsProvider.GetRequirementsList(id));
-        setrequirementOriginal([...requirements]);
         setLocations(await ubicacionesProvider.GetUbicacionesList(id));
-        setLocationsOriginal([...locations]);
       } catch {
         (e: any) => {
-          console.log(e);
+          errorAlert(e);
         };
       }
     }
@@ -86,28 +87,23 @@ function EditarServicio({ id }: props) {
     if (formIsValid) {
       try {
         if (serviceImg) {
-          const uploadedImageUrl = await uploadFile(
+          const imgUrlNew: string = await uploadFile(
             serviceImg,
             "ubicaciones/imagenes/"
           );
-          setimgUrl(uploadedImageUrl);
+          await servicesProvider.UpdateService(name, imgUrlNew, id);
+        } else {
+          await servicesProvider.UpdateService(name, imgUrl, id);
         }
-        await servicesProvider.UpdateService(name, imgUrl, id);
-        await requirementsProvider.UpdateRequirements(
-          id,
-          requirements,
-          requirementOriginal
-        );
+        await requirementsProvider.UpdateRequirements(id, requirements);
         await referencesProvider.UpdateReference(
           service!.enchargedId,
           encharged,
           cellphone
         );
-        await ubicacionesProvider.UpdateUbicaciones(
-          id,
-          locations,
-          locationsOriginal
-        );
+        await ubicacionesProvider.UpdateUbicaciones(id, locations);
+        setShowAlert(false);
+        setShowAlertValidation(false);
         router.back();
       } catch (e: any) {
         setShowAlert(false);
@@ -145,14 +141,6 @@ function EditarServicio({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
-
-  const handleAlertConfirm = () => {
-    handleSubmit();
-  };
-
-  const handleAlertCancel = () => {
-    setShowAlert(false);
-  };
 
   return (
     <Layout>
@@ -246,13 +234,26 @@ function EditarServicio({ id }: props) {
         <SectionTitle>Requisitos</SectionTitle>
         {requirements.map((requirement, index) => (
           <div key={index}>
-            <Input
-              type="text"
-              className="mt-1 mb-4"
-              value={requirement.description}
-              placeholder="Ingresa el nombre del requisito"
-              onChange={(e) => handleRequirementChange(index, e.target.value)}
-            />
+            <div className="flex flex-row items-center">
+              <Input
+                type="text"
+                className="mt-1 mb-4"
+                value={requirement.description}
+                placeholder="Ingresa el nombre del requisito"
+                onChange={(e) => handleRequirementChange(index, e.target.value)}
+              />
+
+              <div className="ml-4">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handleRemoveRequirement(index);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </div>
           </div>
         ))}
         <div className="flex flex-row-reverse ...">
@@ -272,13 +273,28 @@ function EditarServicio({ id }: props) {
         <SectionTitle>Ubicaciones</SectionTitle>
         {locations.map((location, index) => (
           <div key={index}>
-            <Input
-              type="text"
-              className="mt-1 mb-4"
-              value={location.name}
-              placeholder="Ingresa una ubicación"
-              onChange={(e) => handleLocationChange(index, e.target.value)}
-            />
+            <div className="flex flex-row items-center">
+              <Input
+                type="text"
+                className="mt-1 mb-4"
+                value={location.name}
+                placeholder="Ingresa una ubicación"
+                onChange={(e) => {
+                  handleLocationChange(index, e.target.value);
+                }}
+              />
+
+              <div className="ml-4">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handleRemoveLocation(index);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </div>
           </div>
         ))}
         <div className="flex flex-row-reverse ...">
@@ -317,8 +333,13 @@ function EditarServicio({ id }: props) {
           confirmBtnText="Confirmar"
           cancelBtnText="Cancelar"
           showCancel
-          onConfirm={handleAlertConfirm}
-          onCancel={handleAlertCancel}
+          onConfirm={() => {
+            handleSubmit();
+          }}
+          onCancel={() => {
+            setShowAlertValidation(false);
+            setShowAlert(false);
+          }}
         >
           Esta seguro que desea actualizar este servicio?
         </SweetAlert>

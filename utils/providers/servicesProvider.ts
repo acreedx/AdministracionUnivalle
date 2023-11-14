@@ -18,6 +18,7 @@ class ServicesProvider {
 
   private services: ICajasData[] = [];
   public async ServicesList(): Promise<ICajasData[]> {
+    this.services = [];
     await fetch(`${URL.baseUrl}${this.getServiceRoute}${this.moduleName}`)
       .then((res) => res.json())
       .catch((e: any) => {
@@ -62,7 +63,10 @@ class ServicesProvider {
       body: JSON.stringify({
         nombre: name,
         imagenUrl: imgUrl,
+        idCategoria: null,
       }),
+    }).catch((e: any) => {
+      throw e;
     });
   }
   public async CreateService(name: string, imgUrl: string): Promise<Number> {

@@ -243,14 +243,6 @@ function Cajas() {
             ))}
           </TableBody>
         </Table>
-        <TableFooter>
-          <Pagination
-            totalResults={totalResults}
-            resultsPerPage={resultsPerPage}
-            onChange={onPageChangeTable2}
-            label="Tabla de navegación"
-          />
-        </TableFooter>
       </TableContainer>
       {/*Alerta 1 - Activar Servicio*/}
       {showAlertActivate && (

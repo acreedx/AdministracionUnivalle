@@ -36,6 +36,17 @@ function CrearServicio() {
     newLocations[index] = value;
     setLocations(newLocations);
   };
+  const handleRemoveRequirement = (index: number) => {
+    const newRequirements = [...requirements];
+    newRequirements.splice(index, 1);
+    setRequirements(newRequirements);
+  };
+  const handleRemoveLocation = (index: number) => {
+    const newLocations = [...locations];
+    newLocations.splice(index, 1);
+    setLocations(newLocations);
+  };
+
   const handleSubmit = async () => {
     ValidateForm();
     if (formIsValid) {
@@ -55,7 +66,8 @@ function CrearServicio() {
           ServiceId
         );
         await requirementsProvider.CreateRequirements(requirements, ServiceId);
-        router.back();
+
+        router.push("../cajas");
       } catch (e: any) {
         setShowAlert(false);
         setShowAlertValidation(false);
@@ -143,13 +155,25 @@ function CrearServicio() {
         <SectionTitle>Requisitos</SectionTitle>
         {requirements.map((requirement, index) => (
           <div key={index}>
-            <Input
-              type="text"
-              className="mt-1 mb-4"
-              value={requirement}
-              placeholder="Ingresa el nombre del requisito"
-              onChange={(e) => handleRequirementChange(index, e.target.value)}
-            />
+            <div className="flex flex-row items-center">
+              <Input
+                type="text"
+                className="mt-1 mb-4"
+                value={requirement}
+                placeholder="Ingresa el nombre del requisito"
+                onChange={(e) => handleRequirementChange(index, e.target.value)}
+              />
+              <div className="ml-4">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handleRemoveRequirement(index);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </div>
           </div>
         ))}
         <div className="flex flex-row-reverse ...">
@@ -169,13 +193,25 @@ function CrearServicio() {
         <SectionTitle>Ubicaciones</SectionTitle>
         {locations.map((location, index) => (
           <div key={index}>
-            <Input
-              type="text"
-              className="mt-1 mb-4"
-              value={location}
-              placeholder="Ingresa una ubicación"
-              onChange={(e) => handleLocationChange(index, e.target.value)}
-            />
+            <div className="flex flex-row items-center">
+              <Input
+                type="text"
+                className="mt-1 mb-4"
+                value={location}
+                placeholder="Ingresa una ubicación"
+                onChange={(e) => handleLocationChange(index, e.target.value)}
+              />
+              <div className="ml-4">
+                <Button
+                  size="small"
+                  onClick={() => {
+                    handleRemoveLocation(index);
+                  }}
+                >
+                  -
+                </Button>
+              </div>
+            </div>
           </div>
         ))}
         <div className="flex flex-row-reverse ...">
