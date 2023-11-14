@@ -1,163 +1,217 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import { Input, Label } from "@roketid/windmill-react-ui";
+import { Button, Input, Label } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
-import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
+import SectionTitle from "example/components/Typography/SectionTitle";
+import { ReferencesProvider } from "./providers/referencesProvider";
+import { UbicacionesProvider } from "./providers/ubicacionesProvider";
+import { ServicesProvider } from "./providers/servicesProvider";
+import { RequirementsProvider } from "./providers/requirementsProvider";
+import { errorAlert } from "components/alerts";
+import { uploadFile } from "../../../firebase/config";
+import { ToastContainer } from "react-toastify";
 
 function CrearServicio() {
   const [name, setname] = useState("");
-
-  const [ubicacion, setubicacion] = useState("");
-
   const [encharged, setencharged] = useState("");
-
   const [cellphone, setcellphone] = useState("");
-  const [imgUrl, setimgUrl] = useState("");
-
   const [showAlert, setShowAlert] = useState<boolean>(false);
-
+  const [requirements, setRequirements] = useState<string[]>([]);
+  const [locations, setLocations] = useState<string[]>([]);
   const [showAlertValidation, setShowAlertValidation] =
     useState<boolean>(false);
   const [validationMessage, setvalidationMessage] = useState<string>("");
-
+  const [formIsValid, setformIsValid] = useState(Boolean);
   const router = useRouter();
-  const createServiceRoute = "Servicios/addServicio";
-  const createUbicacionRoute = "Ubicaciones/addUbicaciones";
-  const createReferencesRoute = "Referencia/addReferences";
-  const moduleId = 2;
-
+  const [serviceImg, setImg]: any = useState(null);
+  const referenceProvider = new ReferencesProvider();
+  const ubicacionesProvider = new UbicacionesProvider();
+  const servicesProvider = new ServicesProvider();
+  const requirementsProvider = new RequirementsProvider();
+  const handleRequirementChange = (index: number, value: string) => {
+    const newRequirements = [...requirements];
+    newRequirements[index] = value;
+    setRequirements(newRequirements);
+  };
+  const handleLocationChange = (index: number, value: string) => {
+    const newLocations = [...locations];
+    newLocations[index] = value;
+    setLocations(newLocations);
+  };
   const handleSubmit = async () => {
+    ValidateForm();
+    if (formIsValid) {
+      try {
+        const uploadedImageUrl = await uploadFile(
+          serviceImg,
+          "ubicaciones/imagenes/"
+        );
+        const ServiceId = await servicesProvider.CreateService(
+          name,
+          uploadedImageUrl
+        );
+        await ubicacionesProvider.CreateUbicaciones(locations, ServiceId);
+        await referenceProvider.CreateReference(
+          encharged,
+          cellphone,
+          ServiceId
+        );
+        await requirementsProvider.CreateRequirements(requirements, ServiceId);
+        router.back();
+      } catch (e: any) {
+        setShowAlert(false);
+        setShowAlertValidation(false);
+        errorAlert(e);
+      }
+    }
+  };
+  function ValidateForm() {
     if (name == "" || name == null) {
       setvalidationMessage("Debe rellenar el campo de Nombre");
       setShowAlertValidation(true);
-      return;
-    }
-    if (imgUrl == "" || imgUrl == null) {
-      setvalidationMessage("Debe rellenar el campo de Imagen");
-      setShowAlertValidation(true);
-      return;
-    }
-    if (ubicacion == "" || ubicacion == null) {
-      setvalidationMessage("Debe rellenar el campo de Ubicación");
-      setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
     if (encharged == "" || encharged == null) {
       setvalidationMessage("Debe rellenar el campo de Encargado");
       setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
     if (cellphone == "" || cellphone == null) {
       setvalidationMessage("Debe rellenar el campo de Teléfono");
       setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
-    const newService = await fetch(`${URL.baseUrl}${createServiceRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: name,
-        moduloId: moduleId,
-        imagenUrl: imgUrl,
-        idCategoria: null,
-      }),
-    });
-    const dataNewService = await newService.json();
-    const newServiceId = dataNewService.data.id;
-    await fetch(`${URL.baseUrl}${createUbicacionRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        descripcion: ubicacion,
-        imagen: "",
-        video: "",
-        serviciosId: newServiceId,
-        estado: true,
-      }),
-    });
-    await fetch(`${URL.baseUrl}${createReferencesRoute}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: encharged,
-        numerocel: cellphone,
-        serviciosId: newServiceId,
-        estado: true,
-      }),
-    });
-    router.back();
-  };
+    setformIsValid(true);
+  }
   return (
     <Layout>
       <PageTitle>Crear un nuevo servicio</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <form id="miFormulario" onSubmit={handleSubmit}>
-          <Label>
-            <span>Nombre del servicio</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el nombre del servicio"
-              onChange={(e) => setname(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Imagen</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la URL de la imagen"
-              onChange={(e) => setimgUrl(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Ubicación</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la ubicación del servicio"
-              onChange={(e) => setubicacion(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el encargado del servicio"
-              onChange={(e) => setencharged(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              type="number"
-              className="mt-1"
-              placeholder="Ingresa el teléfono de referencia"
-              onChange={(e) => setcellphone(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <div className="relative text-gray-500 focus-within:text-purple-600">
-              <input
-                disabled
-                className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
-              />
-              <button
-                type={"button"}
-                onClick={() => setShowAlert(true)}
-                className="absolute inset-y-0 right-0 px-4 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
-              >
-                Crear
-              </button>
+        <Label>
+          <span>Nombre del servicio</span>
+          <Input
+            className="mt-1"
+            placeholder="Ingresa el nombre del servicio"
+            onChange={(e) => setname(e.target.value)}
+          />
+        </Label>
+        <Label className="mt-4">
+          <span className=" text-lg">Imagen de referencia del tramite</span>
+          <div className="text-center">
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                <img
+                  className="w-full h-full object-cover"
+                  src={
+                    serviceImg === null
+                      ? "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg"
+                      : URL.createObjectURL(serviceImg)
+                  }
+                  alt="Imagen de Ubicación Nueva"
+                />
+              </div>
             </div>
-          </Label>
-        </form>
+          </div>
+        </Label>
+        <Input
+          type="file"
+          accept=".jpg, .jpeg, .png"
+          className="mt-4"
+          placeholder="Imagen del servicio"
+          onChange={(e) => setImg(e.target.files?.[0] || null)}
+        />
+        <Label className="mt-4">
+          <span>Encargado</span>
+          <Input
+            className="mt-1"
+            placeholder="Ingresa el encargado del servicio"
+            onChange={(e) => setencharged(e.target.value)}
+          />
+        </Label>
+        <Label className="mt-4">
+          <span>Teléfono de referencia</span>
+          <Input
+            type="number"
+            className="mt-1"
+            placeholder="Ingresa el teléfono de referencia"
+            onChange={(e) => setcellphone(e.target.value)}
+          />
+        </Label>
       </div>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <SectionTitle>Requisitos</SectionTitle>
+        {requirements.map((requirement, index) => (
+          <div key={index}>
+            <Input
+              type="text"
+              className="mt-1 mb-4"
+              value={requirement}
+              placeholder="Ingresa el nombre del requisito"
+              onChange={(e) => handleRequirementChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button
+              size="small"
+              onClick={() => {
+                setRequirements([...requirements, ""]);
+              }}
+            >
+              +
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <SectionTitle>Ubicaciones</SectionTitle>
+        {locations.map((location, index) => (
+          <div key={index}>
+            <Input
+              type="text"
+              className="mt-1 mb-4"
+              value={location}
+              placeholder="Ingresa una ubicación"
+              onChange={(e) => handleLocationChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button
+              size="small"
+              onClick={() => {
+                setLocations([...locations, ""]);
+              }}
+            >
+              +
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Label className="mb-4">
+        <div className="relative text-gray-500 focus-within:text-purple-600">
+          <input
+            className="block w-full py-2 pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
+            disabled
+          />
+          <button
+            type={"button"}
+            onClick={() => setShowAlert(true)}
+            className="absolute inset-y-0 right-0 px-4 py-2 text-lg font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+          >
+            Crear
+          </button>
+        </div>
+      </Label>
+
       {showAlert && (
         <SweetAlert
           warning
@@ -188,6 +242,7 @@ function CrearServicio() {
           {validationMessage}
         </SweetAlert>
       )}
+      <ToastContainer />
     </Layout>
   );
 }

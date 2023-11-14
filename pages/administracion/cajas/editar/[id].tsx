@@ -10,6 +10,14 @@ import URLS from "utils/demo/api";
 import { ICajasData, convertJSONService } from "utils/demo/cajasData";
 import { GetServerSidePropsContext } from "next";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import { ServicesProvider } from "../providers/servicesProvider";
+import { RequirementsProvider } from "../providers/requirementsProvider";
+import { UbicacionesProvider } from "../providers/ubicacionesProvider";
+import { IRequirementData } from "utils/demo/requirementData";
+import { ReferencesProvider } from "../providers/referencesProvider";
+import { uploadFile } from "../../../../firebase/config";
+import { ToastContainer } from "react-toastify";
+import { errorAlert } from "components/alerts";
 
 interface props {
   id: number;
@@ -24,110 +32,118 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 }
 
 function EditarServicio({ id }: props) {
-  const route = "Servicios/getServicioById/";
   const router = useRouter();
   const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [formIsValid, setformIsValid] = useState<boolean>();
   const [service, setService] = useState<ICajasData>();
-
   const [name, setname] = useState("");
-
   const [imgUrl, setimgUrl] = useState("");
-  const [ubicacion, setubicacion] = useState("");
-
+  const [serviceImg, setImg]: any = useState(null);
   const [encharged, setencharged] = useState("");
-
   const [cellphone, setcellphone] = useState("");
 
   const [showAlertValidation, setShowAlertValidation] =
     useState<boolean>(false);
   const [validationMessage, setvalidationMessage] = useState<string>("");
+  const serviceProvider = new ServicesProvider();
+  const requirementProvider = new RequirementsProvider();
+  const locationsProvider = new UbicacionesProvider();
+  const referencesProvider = new ReferencesProvider();
+  const [requirements, setRequirements] = useState<IRequirementData[]>([]);
+  const [requirementOriginal, setrequirementOriginal] = useState<
+    IRequirementData[]
+  >([]);
+  const [locations, setLocations] = useState<IUbicacionesData[]>([]);
+  const [locationsOriginal, setLocationsOriginal] = useState<
+    IUbicacionesData[]
+  >([]);
+  const handleRequirementChange = (index: number, value: string) => {
+    const newRequirements = [...requirements];
+    newRequirements[index].description = value;
+    setRequirements(newRequirements);
+  };
+  const handleLocationChange = (index: number, value: string) => {
+    const newLocations = [...locations];
+    newLocations[index].name = value;
+    setLocations(newLocations);
+  };
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URLS.baseUrl}${route}${id}`)
-        .then((res) => res.json())
-        .then((res) => setService(convertJSONService(res.data[0])));
+      try {
+        setService(await serviceProvider.GetOneService(id));
+        setRequirements(await requirementProvider.GetRequirementsList(id));
+        setrequirementOriginal([...requirements]);
+        setLocations(await locationsProvider.GetUbicacionesList(id));
+        setLocationsOriginal([...locations]);
+      } catch {
+        (e: any) => {
+          console.log(e);
+        };
+      }
     }
     doFetch();
   }, []);
 
-  const updateServiceRoute = "Servicios/updateServicio/";
-  const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
-  const updateReferencesRoute = "Referencia/UpdateReferences/";
-
   const handleSubmit = async () => {
+    ValidateForm();
+    if (formIsValid) {
+      try {
+        if (serviceImg) {
+          const uploadedImageUrl = await uploadFile(
+            serviceImg,
+            "ubicaciones/imagenes/"
+          );
+          setimgUrl(uploadedImageUrl);
+        }
+        await serviceProvider.UpdateService(name, imgUrl, id);
+        await requirementProvider.UpdateRequirements(
+          id,
+          requirements,
+          requirementOriginal
+        );
+        await referencesProvider.UpdateReference(
+          service!.enchargedId,
+          encharged,
+          cellphone
+        );
+        await locationsProvider.UpdateUbicaciones(
+          id,
+          locations,
+          locationsOriginal
+        );
+        router.back();
+      } catch (e: any) {
+        setShowAlert(false);
+        setShowAlertValidation(false);
+        errorAlert(e);
+      }
+    }
+  };
+  function ValidateForm() {
     if (name == "" || name == null) {
       setvalidationMessage("Debe rellenar el campo de Nombre");
       setShowAlertValidation(true);
-      return;
-    }
-    if (imgUrl == "" || imgUrl == null) {
-      setvalidationMessage("Debe rellenar el campo de Imagen");
-      setShowAlertValidation(true);
-      return;
-    }
-    if (ubicacion == "" || ubicacion == null) {
-      setvalidationMessage("Debe rellenar el campo de Ubicación");
-      setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
     if (encharged == "" || encharged == null) {
       setvalidationMessage("Debe rellenar el campo de Encargado");
       setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
     if (cellphone == "" || cellphone == null) {
       setvalidationMessage("Debe rellenar el campo de Teléfono");
       setShowAlertValidation(true);
+      setformIsValid(false);
       return;
     }
-    await fetch(`${URLS.baseUrl}${updateServiceRoute}${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: name,
-        imagenUrl: imgUrl,
-      }),
-    });
-    await fetch(
-      `${URLS.baseUrl}${updateUbicacionRoute}${service?.ubicacionId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descripcion: ubicacion,
-          imagen: "",
-          video: "",
-          serviciosId: id,
-          estado: service?.status == "success" ? true : false,
-        }),
-      }
-    );
-    await fetch(
-      `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: id,
-        }),
-      }
-    );
-    router.back();
-  };
-
+    setformIsValid(true);
+  }
   useEffect(() => {
     if (service?.name) {
       setname(service!.name);
       setimgUrl(service!.imagenUrl);
-      setubicacion(service!.ubicacion == null ? "" : service!.ubicacion);
       setencharged(service!.encharged);
       setcellphone(service!.cellphone);
     }
@@ -140,8 +156,7 @@ function EditarServicio({ id }: props) {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
-  
-  const [serviceImg, setImg]: any = useState(null);
+
   return (
     <Layout>
       <PageTitle>Editar un servicio</PageTitle>
@@ -157,86 +172,130 @@ function EditarServicio({ id }: props) {
       </div>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <SectionTitle>Datos generales</SectionTitle>
-          <Label>
-            <span>Nombre del servicio</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el nombre del servicio"
-              value={name}
-              onChange={(e) => setname(e.target.value)}
-            />
-          </Label>
-          
-          <Label className="mt-4">
-            <span className=" text-lg">Imagen de referencia del tramite</span>
-            <div className="text-center">
-              <div className="flex items-center justify-center space-x-4">
-                <div className="flex flex-col items-center space-y-2">
-                  <span>Imagen Actual</span>
-                  <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
-                    <img
-                      className="w-full h-full object-cover"
-                      src={service?.imagenUrl === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : service?.imagenUrl}
-                      alt="Imagen de Ubicación actual"
-                    />
-                  </div>
+        <Label>
+          <span>Nombre del servicio</span>
+          <Input
+            className="mt-1"
+            placeholder="Ingresa el nombre del servicio"
+            value={name}
+            onChange={(e) => setname(e.target.value)}
+          />
+        </Label>
+
+        <Label className="mt-4">
+          <span className=" text-lg">Imagen de referencia del tramite</span>
+          <div className="text-center">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="flex flex-col items-center space-y-2">
+                <span>Imagen Actual</span>
+                <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={
+                      service?.imagenUrl === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : service?.imagenUrl
+                    }
+                    alt="Imagen de Ubicación actual"
+                  />
                 </div>
-                <div className="flex flex-col items-center space-y-2">
-                  <span >Nueva Imagen</span>
-                  <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
-                    <img
-                      className="w-full h-full object-cover"
-                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(serviceImg)}
-                      alt="Imagen de Ubicación Nueva"
-                    />
-                  </div>
+              </div>
+              <div className="flex flex-col items-center space-y-2">
+                <span>Nueva Imagen</span>
+                <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={
+                      serviceImg === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : URL.createObjectURL(serviceImg)
+                    }
+                    alt="Imagen de Ubicación Nueva"
+                  />
                 </div>
               </div>
             </div>
-            
-          </Label>
+          </div>
+        </Label>
+        <Input
+          type="file"
+          accept=".jpg, .jpeg, .png"
+          className="mt-4"
+          placeholder="Imagen del servicio"
+          onChange={(e) => setImg(e.target.files?.[0] || null)}
+        />
+        <Label className="mt-4">
+          <span>Encargado</span>
           <Input
-              type="file"
-              accept=".jpg, .jpeg, .png"
-              className="mt-4"
-              placeholder="Imagen del servicio"
-              onChange={e => setImg(e.target.files?.[0] || null)}
-            />
-          <Label className="mt-4">
-            <span>Ubicación</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la ubicación del servicio"
-              value={ubicacion}
-              onChange={(e) => setubicacion(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa el encargado del servicio"
-              value={encharged}
-              onChange={(e) => setencharged(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              className="mt-1"
-              type="number"
-              placeholder="Ingresa el teléfono de referencia"
-              value={cellphone}
-              onChange={(e) => setcellphone(e.target.value)}
-            />
-          </Label>
+            className="mt-1"
+            placeholder="Ingresa el encargado del servicio"
+            value={encharged}
+            onChange={(e) => setencharged(e.target.value)}
+          />
+        </Label>
+        <Label className="mt-4">
+          <span>Teléfono de referencia</span>
+          <Input
+            className="mt-1"
+            type="number"
+            placeholder="Ingresa el teléfono de referencia"
+            value={cellphone}
+            onChange={(e) => setcellphone(e.target.value)}
+          />
+        </Label>
       </div>
-      
+
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <SectionTitle>Requisitos</SectionTitle>
+        {requirements.map((requirement, index) => (
+          <div key={index}>
+            <Input
+              type="text"
+              className="mt-1 mb-4"
+              value={requirement.description}
+              placeholder="Ingresa el nombre del requisito"
+              onChange={(e) => handleRequirementChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button
+              size="small"
+              onClick={() => {
+                setRequirements([...requirements, { id: 0, description: "" }]);
+              }}
+            >
+              +
+            </Button>
+          </div>
+        </div>
       </div>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <SectionTitle>Ubicaciones</SectionTitle>
+        {locations.map((location, index) => (
+          <div key={index}>
+            <Input
+              type="text"
+              className="mt-1 mb-4"
+              value={location.name}
+              placeholder="Ingresa una ubicación"
+              onChange={(e) => handleLocationChange(index, e.target.value)}
+            />
+          </div>
+        ))}
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button
+              size="small"
+              onClick={() => {
+                setLocations([...locations, { id: 0, name: "" }]);
+              }}
+            >
+              +
+            </Button>
+          </div>
+        </div>
       </div>
 
       <Label className="mb-4">
@@ -280,6 +339,8 @@ function EditarServicio({ id }: props) {
           {validationMessage}
         </SweetAlert>
       )}
+
+      <ToastContainer />
     </Layout>
   );
 }

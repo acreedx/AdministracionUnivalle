@@ -49,6 +49,10 @@ const routes: IRoute[] = [
         path: "/administracion/cajas/crearcontacto",
         name: "Crear Contacto",
       },
+      {
+        path: "/administracion/cajas/datosgenerales",
+        name: "Datos Generales",
+      },
     ],
   },
   {
