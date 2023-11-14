@@ -31,7 +31,9 @@ import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
 import Modal from "../../../components/modal";
-import AgregarObjPerdidoPage from "../agregarObjPerdido/index";
+import ModalEdit from "../../../components/modalEdit";
+import AgregarObjPerdidoPage from "components/bienestarUniversitario/agregarObjPerdido";
+import EditarObjPerdidoPage from "components/bienestarUniversitario/editarObjPerdido";
 
 function ObjetosPerdidos() {
   const router = useRouter();
@@ -254,22 +256,32 @@ function ObjetosPerdidos() {
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <Link
-                                      href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
-                                      }}
-                                    >
-                                      <Button
-                                        layout="link"
-                                        size="small"
-                                        aria-label="Edit"
-                                      >
+                                    <ModalEdit
+                                      pageRender={
+                                        <EditarObjPerdidoPage
+                                          id={parseInt(datos.identificador)}
+                                        />
+                                      }
+                                      buttonContent={
                                         <EditIcon
                                           className="w-5 h-5"
                                           aria-hidden="true"
                                         />
-                                      </Button>
-                                    </Link>
+                                      }
+                                    />
+                                    {/* <Button
+                                      layout="link"
+                                      size="small"
+                                      aria-label="Edit"
+                                      onClick={() => {
+                                        <Modal />;
+                                      }}
+                                    >
+                                      <EditIcon
+                                        className="w-5 h-5"
+                                        aria-hidden="true"
+                                      />
+                                    </Button> */}
                                   </>
                                 )}
                                 <Button

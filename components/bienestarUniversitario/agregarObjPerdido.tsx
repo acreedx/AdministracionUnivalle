@@ -1,18 +1,18 @@
 import React, { useState, useRef, ChangeEvent } from "react";
-import { Input, Label } from "@roketid/windmill-react-ui";
+import { HelperText, Input, Label } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
-import Layout from "example/containers/Layout";
-import {
-  successAlert,
-  errorAlert,
-  warningAlert,
-} from "../../../components/alerts";
+import { successAlert, errorAlert, warningAlert } from "../alerts";
 import { ToastContainer } from "react-toastify";
-import { uploadFile } from "../../../firebase/config";
+import { uploadFile } from "../../firebase/config";
 import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
-import Link from "next/link";
 import { useRouter } from "next/router";
+import {
+  onlyLettersAndNumbers,
+  resetDefaultValFlags,
+  validateImg,
+  checkValidation,
+} from "utils/functions/validations";
 
 function AgregarObjPerdidoPage() {
   const router = useRouter();
@@ -23,15 +23,81 @@ function AgregarObjPerdidoPage() {
     archivo: "",
   });
 
+  const [flags, setFlags] = useState({
+    nombre: undefined,
+    imagen: undefined,
+  });
+  const [textErrors, setTextErrors] = useState({
+    nombre: "",
+    imagen: "",
+  });
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    const value = e.target.value;
+    let valid: any = true;
+    let validText = "";
+
+    if (value.length === 0) {
+      valid = undefined;
+    } else if (!onlyLettersAndNumbers(value) || value.length >= 50) {
+      valid = false;
+    }
+
+    if (!onlyLettersAndNumbers(value)) {
+      validText = "El nombre solo debe contener números y letras";
+    } else if (value.length >= 50) {
+      validText = "El nombre solo puede tener 50 caracteres como máximo";
+    } else {
+      validText = "Nombre ingresado válido";
+    }
+
+    setFlags((prev) => ({ ...prev, nombre: valid }));
+    setTextErrors((prev) => ({ ...prev, nombre: validText }));
+
     setObjPerdido((prevData: any) => ({
       ...prevData,
-      [campo]: e.target.value,
+      [campo]: value,
+    }));
+  };
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let imgRes = validateImg(value);
+
+    if (imgRes == 0) {
+      valid = undefined;
+    } else if (imgRes === 2 || imgRes === 3) {
+      valid = false;
+    }
+
+    if (imgRes == 1) {
+      setImg(value);
+    } else {
+      clearImg();
+    }
+
+    validText =
+      imgRes === 1
+        ? "Imagen válida"
+        : imgRes === 2
+        ? "Solo se permite imágenes con tamaño menor a 10MB"
+        : imgRes === 3
+        ? "Solo se permiten imágenes jpg y png"
+        : "";
+
+    setFlags((prev) => ({ ...prev, imagen: valid }));
+    setTextErrors((prev) => ({
+      ...prev,
+      imagen: validText,
     }));
   };
 
   const registrarObjPer = () => {
-    if (objPerdido.titulo != null && objPerdido.archivo != null) {
+    if (checkValidation(flags) && objPerdido.archivo != null) {
       fetch(
         "http://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
         {
@@ -62,11 +128,17 @@ function AgregarObjPerdidoPage() {
           errorAlert("Error al registrar los datos");
         });
     } else {
-      warningAlert("Rellene todos los campos");
+      warningAlert("Rellene todos los campos de manera correcta");
     }
   };
 
+  const clearValidations = () => {
+    setFlags(resetDefaultValFlags(flags, undefined));
+    setTextErrors(resetDefaultValFlags(textErrors, ""));
+  };
+
   const clearImg = () => {
+    setImg(null);
     if (inputFileImg.current) {
       inputFileImg.current.value = null;
     }
@@ -78,8 +150,8 @@ function AgregarObjPerdidoPage() {
       titulo: "",
       archivo: "",
     });
-    setImg(null);
     clearImg();
+    clearValidations();
   };
 
   const subirArchivos = async () => {
@@ -100,10 +172,13 @@ function AgregarObjPerdidoPage() {
           <Input
             value={objPerdido.titulo}
             className="mt-1"
-            maxLength={50}
+            valid={flags.nombre}
             placeholder="Escriba aquí el nombre o la descripción de la imagen"
             onChange={(e) => handleChange(e, "titulo")}
           />
+          {flags.nombre != null && (
+            <HelperText valid={flags.nombre}>{textErrors.nombre}</HelperText>
+          )}
         </Label>
 
         <Label className="mt-4">
@@ -127,12 +202,17 @@ function AgregarObjPerdidoPage() {
             </div>
           </div>
           <Input
+            ref={inputFileImg}
+            valid={flags.imagen}
             type="file"
             className="mt-1"
             accept="image/jpeg, image/png"
-            placeholder="Imagen para el servicio"
-            onChange={(e) => setImg(e.target.files?.[0] || null)}
+            placeholder="Imagen del objeto perdido"
+            onChange={(e) => handleImageChange(e)}
           />
+          {flags.imagen != null && (
+            <HelperText valid={flags.imagen}>{textErrors.imagen}</HelperText>
+          )}
         </Label>
       </div>
 
