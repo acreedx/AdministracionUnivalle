@@ -18,6 +18,7 @@ import { ReferencesProvider } from "../providers/referencesProvider";
 import { uploadFile } from "../../../../firebase/config";
 import { ToastContainer } from "react-toastify";
 import { errorAlert } from "components/alerts";
+import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
 interface props {
   id: number;
