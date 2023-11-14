@@ -2,6 +2,8 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+
+import { FaRedo } from "react-icons/fa";
 import {
   Table,
   TableHeader,
@@ -19,8 +21,7 @@ import {
   CardBody,
   Card,
 } from "@roketid/windmill-react-ui";
-import { EditIcon, TrashIcon } from "icons";
-import { FaRedo } from "react-icons/fa";
+import { EditIcon, ModalsIcon, TrashIcon } from "icons";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { IListarServicios } from "utils/interfaces/servicios";
@@ -30,8 +31,9 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
-import Modal from '../../../components/modal'
-import RegistrarPage from '../registrar/index'
+import Modal from "../../../components/modal";
+import RegistrarPage from "../registrar/index";
+import RegistrarServicioPageModal from "../registrar";
 
 function BienestarUniversitario() {
   const router = useRouter();
@@ -164,7 +166,10 @@ function BienestarUniversitario() {
           <PageTitle>Listado de servicios - Bienestar Universitario</PageTitle>
 
           <div className=" flex  mb-5">
-            <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
+            <Modal
+              pageRender={<RegistrarPage />}
+              buttonName="Registrar Nuevo Servicio"
+            />
           </div>
           {dataTable2.length > 0 ? (
             <>
