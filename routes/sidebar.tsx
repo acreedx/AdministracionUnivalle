@@ -192,15 +192,11 @@ const routes: IRoute[] = [
       },
       {
         path: "/bienestarUniversitario/listarObjPerdidos/",
-        name: "Listar Objetos Perdidos",
-      },
-      {
-        path: "/bienestarUniversitario/agregarObjPerdido",
-        name: "Agregar Objeto Perdido",
+        name: "Objetos Perdidos",
       },
       {
         path: "/bienestarUniversitario/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
