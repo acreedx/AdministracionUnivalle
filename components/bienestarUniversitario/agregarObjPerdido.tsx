@@ -34,6 +34,7 @@ function AgregarObjPerdidoPage() {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
     let valid: any = true;
     let validText = "";
 
@@ -42,7 +43,7 @@ function AgregarObjPerdidoPage() {
     } else if (
       !onlyLettersAndNumbers(value) ||
       value.length >= 50 ||
-      (value.length > 0 && value.trim().length == 0)
+      (emptyStringValue || [])[1].length > 0
     ) {
       valid = false;
     }
@@ -51,6 +52,8 @@ function AgregarObjPerdidoPage() {
       validText = "El nombre solo debe contener números y letras";
     } else if (value.length >= 50) {
       validText = "El nombre solo puede tener 50 caracteres como máximo";
+    } else if ((emptyStringValue || [])[1].length > 0) {
+      validText = "El nombre no puede tener espacios al inicio";
     } else {
       validText = "Nombre ingresado válido";
     }
@@ -80,7 +83,6 @@ function AgregarObjPerdidoPage() {
 
     if (imgRes == 1) {
       setImg(value);
-      console.log(value);
     } else {
       clearImg();
     }
@@ -178,6 +180,7 @@ function AgregarObjPerdidoPage() {
             className="mt-1"
             valid={flags.nombre}
             placeholder="Escriba aquí el nombre o la descripción de la imagen"
+            accept="image/jpeg, image/png"
             onChange={(e) => handleChange(e, "titulo")}
           />
           {flags.nombre != null && (

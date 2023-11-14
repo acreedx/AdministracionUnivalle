@@ -1,5 +1,8 @@
-import React, { useState, ChangeEvent } from "react";
-import { ICrearServicio } from "../../../utils/interfaces/servicios";
+import React, { useState, ChangeEvent, useEffect, useRef } from "react";
+import {
+  ICrearServicio,
+  IListarServicios,
+} from "../../../utils/interfaces/servicios";
 import {
   Input,
   Label,
@@ -20,6 +23,12 @@ import {
 import { uploadFile } from "../../../firebase/config";
 import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
+import {
+  checkValidation,
+  onlyLettersAndNumbers,
+  resetDefaultValFlags,
+  validateImg,
+} from "utils/functions/validations";
 
 function RegistrarServicioPageModal() {
   const [serviceImg, setImg]: any = useState(null);
@@ -30,42 +39,157 @@ function RegistrarServicioPageModal() {
     moduloId: 14,
     imagenUrl: null,
   });
+  const inputFileImg: any = useRef(null);
+  const [flags, setFlags] = useState({
+    nombre: undefined,
+    imagen: undefined,
+  });
+  const [textErrors, setTextErrors] = useState({
+    nombre: "",
+    imagen: "",
+  });
+
+  const [users, setUsers] = useState<IListarServicios[]>([]);
+
+  const getData = async (url: string) => {
+    try {
+      const query = await fetch(url);
+      if (query.ok) {
+        const response: any = await query.json();
+        if (response.data != null) {
+          setUsers(response.data);
+        } else {
+          throw new Error();
+        }
+      } else {
+        throw new Error();
+      }
+    } catch (e) {
+      errorAlert("Ocurrió un error");
+    }
+  };
+
   const handleChange2 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+    let valid: any = true;
+    let validText = "";
+
+    if (value.length === 0) {
+      valid = undefined;
+    } else if (
+      !onlyLettersAndNumbers(value) ||
+      value.length >= 50 ||
+      (emptyStringValue || [])[1].length > 0
+    ) {
+      valid = false;
+    }
+
+    if (!onlyLettersAndNumbers(value)) {
+      validText = "El nombre solo debe contener números y letras";
+    } else if (value.length >= 50) {
+      validText = "El nombre solo puede tener 50 caracteres como máximo";
+    } else if ((emptyStringValue || [])[1].length > 0) {
+      validText = "El nombre no puede tener espacios al inicio";
+    } else {
+      validText = "Nombre ingresado válido";
+    }
+
+    setFlags((prev) => ({ ...prev, nombre: valid }));
+    setTextErrors((prev) => ({ ...prev, nombre: validText }));
+
     setServicioData((prevData: any) => ({
       ...prevData,
-      [campo]: e.target.value,
+      [campo]: value,
     }));
-    console.log(servicioData);
+  };
+
+  const clearValidations = () => {
+    setFlags(resetDefaultValFlags(flags, undefined));
+    setTextErrors(resetDefaultValFlags(textErrors, ""));
   };
 
   const clearData = () => {
     setServicioData({
       ...servicioData,
       nombre: "",
-      moduloId: 14,
+      moduloId: 1,
       imagenUrl: null,
     });
+    clearImg();
+    clearValidations();
   };
 
   const registrarServicio = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(servicioData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          successAlert("Éxito al registrar los datos");
-          setTimeout(() => {
-            window.location.reload();
-          }, 2000);
-        } else {
-          throw new Error("Error al cambiar los datos del servicio");
-        }
-      })
-      .catch(() => errorAlert("Error al registrar los datos"));
+    if (users.find((u: any) => u.nombre === servicioData.nombre)) {
+      warningAlert("El servicio ingresado ya existe");
+    } else {
+      if (checkValidation(flags) && servicioData.imagenUrl != null) {
+        fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(servicioData),
+        })
+          .then((response) => {
+            if (response.ok) {
+              successAlert("Éxito al registrar los datos");
+              setTimeout(() => {
+                window.location.reload();
+              }, 2000);
+            } else {
+              throw new Error("Error al cambiar los datos del servicio");
+            }
+          })
+          .catch(() => errorAlert("Error al registrar los datos"));
+      } else {
+        warningAlert("Rellene todos los campos de manera correcta");
+      }
+    }
+  };
+
+  const clearImg = () => {
+    setImg(null);
+    if (inputFileImg.current) {
+      inputFileImg.current.value = null;
+    }
+  };
+
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let imgRes = validateImg(value);
+
+    if (imgRes == 0) {
+      valid = undefined;
+    } else if (imgRes === 2 || imgRes === 3) {
+      valid = false;
+    }
+
+    if (imgRes == 1) {
+      setImg(value);
+    } else {
+      clearImg();
+    }
+
+    validText =
+      imgRes === 1
+        ? "Imagen válida"
+        : imgRes === 2
+        ? "Solo se permite imágenes con tamaño menor a 10MB"
+        : imgRes === 3
+        ? "Solo se permiten imágenes jpg y png"
+        : "";
+
+    setFlags((prev) => ({ ...prev, imagen: valid }));
+    setTextErrors((prev) => ({
+      ...prev,
+      imagen: validText,
+    }));
   };
 
   const subirArchivos = async () => {
@@ -75,6 +199,12 @@ function RegistrarServicioPageModal() {
     }
     registrarServicio();
   };
+
+  useEffect(() => {
+    getData(
+      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/14"
+    );
+  }, []);
 
   return (
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -87,9 +217,13 @@ function RegistrarServicioPageModal() {
           <Input
             value={servicioData.nombre}
             className="mt-1"
+            valid={flags.nombre}
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange2(e, "nombre")}
           />
+          {flags.nombre != null && (
+            <HelperText valid={flags.nombre}>{textErrors.nombre}</HelperText>
+          )}
         </Label>
 
         <Label className="mt-4">
@@ -115,11 +249,17 @@ function RegistrarServicioPageModal() {
             </div>
           </div>
           <Input
+            ref={inputFileImg}
+            valid={flags.imagen}
             type="file"
             className="mt-1"
             placeholder="Imagen para el servicio"
-            onChange={(e) => setImg(e.target.files?.[0] || null)}
+            accept="image/jpeg, image/png"
+            onChange={(e) => handleImageChange(e)}
           />
+          {flags.imagen != null && (
+            <HelperText valid={flags.imagen}>{textErrors.imagen}</HelperText>
+          )}
         </Label>
       </div>
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">

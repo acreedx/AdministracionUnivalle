@@ -86,7 +86,7 @@ function EditarObjPerdidoPage(props: { id: number }) {
     } else if (value.length >= 50) {
       validText = "El nombre solo puede tener 50 caracteres como máximo";
     } else if (value.length == 0 || (emptyStringValue || [])[1].length > 0) {
-      validText = "El nombre no puede ser vacío";
+      validText = "El nombre no puede tener espacios al inicio";
     } else {
       validText = "Nombre ingresado válido";
     }
