@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, {FC, useState, useEffect, ChangeEvent } from "react";
+import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import {
@@ -21,29 +22,37 @@ import {
 import { EditIcon, TrashIcon } from "icons";
 import { FaRedo } from "react-icons/fa";
 
+import SweetAlert from "react-bootstrap-sweetalert";
+import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
+import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
-import { isValidUrl } from "utils/functions/url";
-import SweetAlert from "react-bootstrap-sweetalert";
-import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
-import Modal from "../../../components/modal";
-import ModalEdit from "../../../components/modalEdit";
-import AgregarObjPerdidoPage from "components/bienestarUniversitario/agregarObjPerdido";
-import EditarObjPerdidoPage from "components/bienestarUniversitario/editarObjPerdido";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 
-function ObjetosPerdidos() {
+interface RequisitosProps {
+  pathEnable:string;
+  pathDisable:string;
+  title:string;
+}
+
+const EliminarRequisitos: FC<RequisitosProps> = ({
+ pathEnable,
+ pathDisable,
+ title,
+}) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState<number>(0);
   const [pageTable2, setPageTable2] = useState(1);
 
-  const [dataTable, setTotalData] = useState<IObjetosPerdidos[]>([]);
-  const [dataTable2, setUserInfo] = useState<IObjetosPerdidos[]>([]);
-  const [dataTableSearch, setSearch] = useState<IObjetosPerdidos[]>([]);
+  const [dataTable, setTotalData] = useState<IListarServicios[]>([]);
+  const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
+  const [dataTableSearch, setSearch] = useState<IListarServicios[]>([]);
   const [TotalResult, setTotal] = useState(Number);
   const [searchPage, setSearchPage] = useState(1);
 
@@ -52,10 +61,6 @@ function ObjetosPerdidos() {
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [selectedObj, setSelectedObj] = useState<number>(0);
   const [activeInactive, setActiveInactive] = useState<string>();
-
-  function onPageChangeTable2(p: number) {
-    setPageTable2(p);
-  }
 
   const getData = async (url: string) => {
     try {
@@ -89,7 +94,7 @@ function ObjetosPerdidos() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+      `http://apisistemaunivalle.somee.com/api/${pathEnable}`
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -98,9 +103,9 @@ function ObjetosPerdidos() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Publicaciones/${
-          action ? "DeletePublicaciones" : "RestorePublicaciones"
-        }/?id=${selectedObj}`,
+        `http://apisistemaunivalle.somee.com/api/Requisitos/${
+          action ? "deleteRequisito" : "restoreRequisito"
+        }/${selectedObj}`,
         {
           method: "PUT",
           headers: {
@@ -129,8 +134,8 @@ function ObjetosPerdidos() {
   };
 
   const searchObjs = (parameter: string) => {
-    const filteredData = dataTable.filter((obj) =>
-      obj.titulo.toLowerCase().includes(parameter.toLowerCase())
+    const filteredData: any = dataTable.filter((obj: any) =>
+      obj.nombre.toLowerCase().includes(parameter.toLowerCase())
     );
     setSearch(filteredData);
     setTotal(filteredData.length);
@@ -149,29 +154,20 @@ function ObjetosPerdidos() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+        `http://apisistemaunivalle.somee.com/api/${pathEnable}`
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "https://apisistemaunivalle.somee.com/api/Publicaciones/getDisabledPublicacionesbyServicioId/1"
+        `http://apisistemaunivalle.somee.com/api/${pathDisable}`
       );
     }
   };
 
   return (
-    <Layout>
+    <div>
       {!isLoading ? (
         <>
-          <PageTitle>
-            Listado de objetos perdidos - Bienestar Universitario
-          </PageTitle>
-
-          <div className="flex mb-8">
-            <Modal
-              pageRender={<AgregarObjPerdidoPage />}
-              buttonName="Agregar objeto perdido"
-            />
-          </div>
+          <PageTitle>Lista de Requisitos - {title}</PageTitle>
 
           {dataTable2.length > 0 ? (
             <>
@@ -215,9 +211,8 @@ function ObjetosPerdidos() {
                   <Table>
                     <TableHeader>
                       <tr>
-                        <TableCell>Imagen</TableCell>
-                        <TableCell>Objeto Perdido</TableCell>
-                        <TableCell>Estado</TableCell>
+                        <TableCell>Titulo</TableCell>
+                        <TableCell>Pertenece</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -230,58 +225,19 @@ function ObjetosPerdidos() {
                         .map((datos: any, i) => (
                           <TableRow key={i}>
                             <TableCell>
-                              <div className="flex items-center text-sm">
-                                {isValidUrl(datos.archivo) ? (
-                                  <Avatar
-                                    className="hidden mr-3 md:block"
-                                    src={datos.archivo}
-                                    size="large"
-                                  />
-                                ) : (
-                                  <span className="text-center">-</span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
                               <div>
-                                <p>{datos.titulo}</p>
+                                <p>{datos.descripcion}</p>
                               </div>
                             </TableCell>
-                            <TableCell>
-                              <Badge type={datos.estado ? "success" : "danger"}>
-                                <p>{datos.estado ? "Activo" : "Inactivo"}</p>
-                              </Badge>
+                           <TableCell>
+                              <div>
+                                <p>{datos.modulo}</p>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <ModalEdit
-                                      pageRender={
-                                        <EditarObjPerdidoPage
-                                          id={parseInt(datos.identificador)}
-                                        />
-                                      }
-                                      buttonContent={
-                                        <EditIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      }
-                                    />
-                                    {/* <Button
-                                      layout="link"
-                                      size="small"
-                                      aria-label="Edit"
-                                      onClick={() => {
-                                        <Modal />;
-                                      }}
-                                    >
-                                      <EditIcon
-                                        className="w-5 h-5"
-                                        aria-hidden="true"
-                                      />
-                                    </Button> */}
                                   </>
                                 )}
                                 <Button
@@ -369,10 +325,9 @@ function ObjetosPerdidos() {
           <PageTitle>Cargando datos...</PageTitle>
         </div>
       )}
-
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
 
-export default ObjetosPerdidos;
+export default EliminarRequisitos;

@@ -4,14 +4,20 @@ import { Button } from "@roketid/windmill-react-ui";
 
 interface ModalProps {
   pageRender: any;
-  buttonName: any;
+  buttonContent: any;
 }
-const ModalPage: FC<ModalProps> = ({ pageRender, buttonName }) => {
+const ModalEditPage: FC<ModalProps> = ({ pageRender, buttonContent }) => {
   const [showModal, setShowModal] = useState(false);
   return (
     <>
-      <Button type="button" onClick={() => setShowModal(true)}>
-        {buttonName}
+      <Button
+        layout="link"
+        size="small"
+        aria-label="Edit"
+        type="button"
+        onClick={() => setShowModal(true)}
+      >
+        {buttonContent}
       </Button>
 
       {showModal ? (
@@ -32,4 +38,4 @@ const ModalPage: FC<ModalProps> = ({ pageRender, buttonName }) => {
     </>
   );
 };
-export default ModalPage;
+export default ModalEditPage;

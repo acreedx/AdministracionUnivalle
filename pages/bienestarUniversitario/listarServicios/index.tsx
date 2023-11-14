@@ -32,6 +32,8 @@ import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
 import RegistrarServicioPageModal from "../registrar";
+import Modal from "../../../components/modal";
+import RegistrarPage from "../registrar/index";
 
 function BienestarUniversitario() {
   const router = useRouter();
@@ -356,7 +358,7 @@ function BienestarUniversitario() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
                                       }}
                                     >
                                       <Button
