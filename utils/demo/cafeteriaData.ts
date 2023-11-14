@@ -1,8 +1,8 @@
 interface ICafeteriaData {
-  Id: number; 
+  Id: number;
   Titulo: string; //nombre
-  Descripcion_1: string;  //descripcion
-  Descripcion_2: Number;  //precio
+  Descripcion_1: string; //descripcion
+  Descripcion_2: Number; //precio
   archivo: string; //image
 
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;

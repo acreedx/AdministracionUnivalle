@@ -7,12 +7,15 @@ export interface IProductData {
   estado: boolean;
   descripcionPublicacion:[
     {
+      idDescripcion: Number;
       contenido: string;
     },
     {
+      idDescripcion: Number;
       contenido: string;
     },
     {
+      idDescripcion: Number;
       contenido: string;
     }
   ];

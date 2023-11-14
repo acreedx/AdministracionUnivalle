@@ -6,41 +6,37 @@ import SectionTitle from "example/components/Typography/SectionTitle";
 import {
   Table,
   TableHeader,
+  TableFooter,
+  Pagination,
   TableCell,
   TableBody,
   TableRow,
-  TableFooter,
   TableContainer,
   Badge,
   Button,
-  Pagination,
+  Label,
+  Input,
+  CardBody,
+  Card,
+  Avatar,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon, PlusIcon } from "icons";
-import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
-import URL from "utils/demo/api";
+import { ICajasData } from "utils/demo/cajasData";
 import Layout from "example/containers/Layout";
-
 import SweetAlert from "react-bootstrap-sweetalert";
+import SearchBar from "components/searchBar";
+import servicesProvider from "../../../utils/providers/servicesProvider";
 
 function Cajas() {
   const router = useRouter();
-
-  const route = "Servicios/getServicioByModule/";
-  const deleteServiceRoute = "Servicios/deleteServicio/";
-  const restoreServiceRoute = "Servicios/restoreServicio/";
-  const moduleName = "Cajas";
+  const [state, setState] = useState("");
   const resultsPerPage = 10;
+  const [services, setServices] = useState<ICajasData[]>([]);
+  const [servicesOriginal, setServicesOriginal] = useState<ICajasData[]>([]);
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${route}${moduleName}`)
-        .then((res) => res.json())
-        .catch((e: any) => {
-          console.log(`Error ${e}`);
-        })
-        .then((res) => setServices(convertJSONListService(res.data)))
-        .catch((e: any) => {
-          console.log(`Error ${e}`);
-        });
+      setServices(await servicesProvider.ServicesList());
+      setServicesOriginal(await servicesProvider.ServicesList());
     }
     doFetch();
   }, []);
@@ -50,7 +46,6 @@ function Cajas() {
     useState<boolean>(false);
   const [showAlertActivate, setShowAlertActivate] = useState<boolean>(false);
   const [pageTable, setPageTable] = useState(1);
-  const [services, setServices] = useState<ICajasData[]>([]);
   const totalResults = services.length;
 
   function onPageChangeTable2(p: number) {
@@ -67,40 +62,94 @@ function Cajas() {
   }, [pageTable]);
 
   const handleSubmitDesactivate = async () => {
-    await fetch(`${URL.baseUrl}${deleteServiceRoute}${selectedService}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await servicesProvider.DeleteService(selectedService);
     router.reload();
   };
   const handleSubmitActivate = async () => {
-    await fetch(`${URL.baseUrl}${restoreServiceRoute}${selectedService}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    await servicesProvider.RestoreService(selectedService);
     router.reload();
+  };
+  const handleActiveChange = (e: any) => {
+    setState(e.target.value);
+    const filtro = servicesOriginal.filter(
+      (cont) => cont.status == e.target.value
+    );
+    setServices(filtro);
+  };
+  const filterServices = (e: any) => {
+    if (state == "success" || state == "danger") {
+      const filtro = servicesOriginal
+        .filter((cont) => cont.status == state)
+        .filter((cont) => cont.name.includes(e));
+      setServices(filtro);
+      return;
+    }
+    if (e && e.trim() !== "") {
+      const filtro = servicesOriginal.filter((cont) => cont.name.includes(e));
+      setServices(filtro);
+      return;
+    }
+    setServices(servicesOriginal);
   };
   return (
     <Layout>
       <PageTitle>Cajas</PageTitle>
-
+      <div className="mb-8">
+        <Link href="/administracion/cajas/crear">
+          <Button size="large">Registrar servicio</Button>
+        </Link>
+      </div>
       <SectionTitle>Listado de servicios de cajas</SectionTitle>
-      <TableContainer className="my-8">
+      <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
+        <Card className="shadow-md sm:w-3/4">
+          <CardBody>
+            <SearchBar
+              placeHolder="Buscar servicio de cajas"
+              searchFunction={(e: any) => {
+                filterServices(e);
+              }}
+              cleanFunction={() => {
+                filterServices("");
+              }}
+            />
+          </CardBody>
+        </Card>
+        <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+          <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+            <Label radio>
+              <Input
+                type="radio"
+                value="success"
+                name="activeInactive"
+                checked={state === "success"}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Activos</span>
+            </Label>
+            <Label radio>
+              <Input
+                type="radio"
+                value="danger"
+                name="activeInactive"
+                checked={state === "danger"}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Inactivos</span>
+            </Label>
+          </CardBody>
+        </Card>
+      </div>
+      <TableContainer className="mb-8">
         <Table>
           <TableHeader>
             <tr>
+              <TableCell>Imagen</TableCell>
               <TableCell>Servicio</TableCell>
-              <TableCell>Ubicación</TableCell>
               <TableCell>Encargado</TableCell>
               <TableCell>Telefono de Referencia</TableCell>
               <TableCell>Estado</TableCell>
               <TableCell>Editar</TableCell>
               <TableCell>Manejo</TableCell>
-              <TableCell>Requisitos</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
@@ -109,14 +158,18 @@ function Cajas() {
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                      <Avatar
+                        className="hidden mr-3 md:block"
+                        src={servicio.imagenUrl}
+                        size="large"
+                      />
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{servicio.ubicacion}</p>
+                      <p className="font-semibold">{servicio.name}</p>
                     </div>
                   </div>
                 </TableCell>
@@ -185,16 +238,6 @@ function Cajas() {
                       <PlusIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   )}
-                </TableCell>
-                <TableCell>
-                  <Link
-                    href={`/administracion/cajas/[id]/[name]`}
-                    as={`/administracion/cajas/${servicio.id}/${servicio.name}`}
-                  >
-                    <Button layout="link" size="small" aria-label="Ver">
-                      <MenuIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                  </Link>
                 </TableCell>
               </TableRow>
             ))}
