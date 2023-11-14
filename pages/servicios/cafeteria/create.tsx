@@ -153,7 +153,41 @@ function Forms() {
       })
       .catch(() => errorAlert("Error al registrar los datos"));
   };
+  ///////////////////////////////////////////
+  const validarFormulario = () => {
+  if (!productoData.titulo.trim()) {
+    alert("El campo 'Nombre' no puede estar vacío");
+    return false;
+  }
+   if (!productoData.descripcionPublicacion || productoData.descripcionPublicacion[0].contenido === "") {
+    alert("Debe seleccionar una 'Categoria'");
+    return false;
+  }
+  if (!productoData.descripcionPublicacion[2].contenido.trim()) {
+    alert("El campo 'Descripcion' no puede estar vacío");
+    return false;
+  }
+  if (!productoData.descripcionPublicacion[1].contenido) {
+    alert("El campo 'Precio' no puede estar vacío");
+    return false;
+  }
+  if (parseFloat(productoData.descripcionPublicacion[1].contenido) < 0) {
+  alert("El precio no puede ser un número negativo");
+  return false;
+  }
+  if (!serviceImg) {
+    alert("Por favor, añada una imagen de referencia del producto");
+    return false;
+  }
+  // Continuar con más validaciones si son necesarias
+  return true;
+};
+
+  //////////////////////////////////////////
   const subirArchivos = async () =>{
+    if(!validarFormulario()){
+      return;
+    }
     productoData.archivo= null;
     if(serviceImg != null)
     {
@@ -230,8 +264,6 @@ function Forms() {
               <Button>  <Link href={'/servicios/cafeteria'} > Regresar </Link></Button>
             </div>
           </div>
-
-
         </form>
       </div>
     </Layout>

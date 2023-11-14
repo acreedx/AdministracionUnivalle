@@ -195,8 +195,43 @@ function EditarProducto({ id }: props) {
   const handleChange1 = (e: ChangeEvent<HTMLSelectElement>) => {
     setCategoria(e.target.value)
   };
-  
+  ////////////////////
+   const validarFormulario = () => {
+    console.log(categoria)
+  if (!titulo.trim()) {
+    alert("El campo 'Nombre' no puede estar vacío");
+    return false;
+  }
+   if (!categoria.trim()) {
+    alert("Debe seleccionar una 'Categoria'");
+    return false;
+  }
+  if (!descripcion.trim()) {
+    alert("El campo 'Descripcion' no puede estar vacío");
+    return false;
+  }
+  if (!precio) {
+    alert("El campo 'Precio' no puede estar vacío");
+    return false;
+  }
+  if (precio < 0) {
+  alert("El precio no puede ser un número negativo");
+  return false;
+  }
+  if (!productoData.archivo) {
+    alert("Por favor, añada una imagen de referencia del producto");
+    return false;
+  }
+  // Continuar con más validaciones si son necesarias
+
+  return true;
+};
+
+  //////////////////
   const subirArchivos = async () =>{
+    if(!validarFormulario()){
+      return;
+    }
     productoData.archivo= null;
     if(serviceImg != null)
     {
