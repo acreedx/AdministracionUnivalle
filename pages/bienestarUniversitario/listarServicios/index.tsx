@@ -66,7 +66,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     const getData = async () => {
       const query = await fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+        "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
       );
       const response: any = await query.json();
       setTotal(response.data.length);
@@ -111,7 +111,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+      "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -120,7 +120,7 @@ function BienestarUniversitario() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/${
+        `https://apisistemaunivalle.somee.com/api/Servicios/${
           action ? "deleteServicio" : "restoreServicio"
         }/${selectedObj}`,
         {
@@ -171,11 +171,11 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+        "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/1"
+        "https://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/1"
       );
     }
   };

@@ -115,7 +115,7 @@ function EditarDatosGeneralesPage() {
   async function cargarDatosModulo(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
+        `https://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -135,7 +135,7 @@ function EditarDatosGeneralesPage() {
 async function cargarDatosUbicacion(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos de la ubicación.");
@@ -162,7 +162,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -184,7 +184,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -295,7 +295,7 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
       }
       console.log(postModul)
       fetch(
-        `http://apisistemaunivalle.somee.com/api/Modulos/updateModulo/${id}`,
+        `https://apisistemaunivalle.somee.com/api/Modulos/updateModulo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -340,7 +340,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
         {
           method: "POST",
           headers: {
@@ -369,7 +369,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -423,7 +423,7 @@ const editarUbicacion = async (idMod: number) => {
               
         };
           fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
+          `https://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
           {
             method: "POST",
             headers: {
@@ -453,7 +453,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postReq)
           fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
+          `https://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
           {
             method: "PUT",
             headers: {
@@ -505,7 +505,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postRef)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+        `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
         {
           method: "POST",
           headers: {
@@ -529,7 +529,7 @@ const editarUbicacion = async (idMod: number) => {
           numerocel:req.numero,
         };
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+        `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
         {
           method: "PUT",
           headers: {
