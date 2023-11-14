@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect } from 'react'
 import { Doughnut, Line } from 'react-chartjs-2'
 
+import { useRouter } from 'next/router'
 import CTA from 'example/components/CTA'
 import InfoCard from 'example/components/Cards/InfoCard'
 import ChartCard from 'example/components/Chart/ChartCard'
@@ -10,6 +12,7 @@ import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
+import { isAuthenticated } from "utils/auth/auth";
 
 import {
   TableBody,
@@ -44,6 +47,19 @@ import {
 } from 'chart.js'
 
 function Dashboard() {
+
+  const router = useRouter();
+
+  //Autentificacion
+  useEffect(() => {
+    // Dentro de useEffect para ejecutarse después de que el componente se haya montado
+    const usuarioAutenticado = isAuthenticated();
+    if (!usuarioAutenticado) {
+      // Si no está autenticado, redirige a la página de inicio de sesión
+      router.push("/login");
+    }
+  }, []);
+
   Chart.register(
     ArcElement,
     CategoryScale,
@@ -53,25 +69,25 @@ function Dashboard() {
     Title,
     Tooltip,
     Legend
-  )
+  );
 
-  const [page, setPage] = useState(1)
-  const [data, setData] = useState<ITableData[]>([])
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState<ITableData[]>([]);
 
   // pagination setup
-  const resultsPerPage = 10
-  const totalResults = response.length
+  const resultsPerPage = 10;
+  const totalResults = response.length;
 
   // pagination change control
   function onPageChange(p: number) {
-    setPage(p)
+    setPage(p);
   }
 
   // on page change, load new sliced data
   // here you would make another server request for new data
   useEffect(() => {
-    setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage))
-  }, [page])
+    setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage));
+  }, [page]);
 
   return (
     <Layout>
@@ -188,7 +204,7 @@ function Dashboard() {
         </ChartCard>
       </div>
     </Layout>
-  )
+  );
 }
 
 export default Dashboard

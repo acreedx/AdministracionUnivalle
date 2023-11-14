@@ -1,4 +1,7 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
+
+import { getUserData } from 'utils/auth/auth'
+
 import SidebarContext from 'context/SidebarContext'
 import {
   SearchIcon,
@@ -18,6 +21,15 @@ function Header() {
 
   const [isNotificationsMenuOpen, setIsNotificationsMenuOpen] = useState(false)
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const [userData, setUserData] = useState<{
+    nombre: string;
+    apellido: string;
+  } | null>(null);
+
+  useEffect(() => {
+    const userDataFromStorage = getUserData();
+    setUserData(userDataFromStorage);
+  }, []);
 
   function handleNotificationsClick() {
     setIsNotificationsMenuOpen(!isNotificationsMenuOpen)
@@ -59,7 +71,7 @@ function Header() {
               onClick={toggleMode}
               aria-label="Toggle color mode"
             >
-              {mode === 'dark' ? (
+              {mode === "dark" ? (
                 <SunIcon className="w-5 h-5" aria-hidden="true" />
               ) : (
                 <MoonIcon className="w-5 h-5" aria-hidden="true" />
@@ -95,7 +107,7 @@ function Header() {
                 <span>Sales</span>
                 <Badge type="danger">2</Badge>
               </DropdownItem>
-              <DropdownItem onClick={() => alert('Alerts!')}>
+              <DropdownItem onClick={() => alert("Alerts!")}>
                 <span>Alerts</span>
               </DropdownItem>
             </Dropdown>
@@ -108,6 +120,8 @@ function Header() {
               aria-label="Account"
               aria-haspopup="true"
             >
+              <span
+                className="border-white rounded-full dark:border-gray-800 mr-3">Hola, {`${userData?.nombre} ${userData?.apellido}`}</span>
               <Avatar
                 className="align-middle"
                 src="https://images.unsplash.com/photo-1502378735452-bc7d86632805?ixlib=rb-0.3.5&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=200&fit=max&s=aa3a807e1bbdfd4364d1f449eaa96d82"
@@ -121,15 +135,21 @@ function Header() {
               onClose={() => setIsProfileMenuOpen(false)}
             >
               <DropdownItem tag="a" href="#">
-                <OutlinePersonIcon className="w-4 h-4 mr-3" aria-hidden="true" />
+                <OutlinePersonIcon
+                  className="w-4 h-4 mr-3"
+                  aria-hidden="true"
+                />
                 <span>Profile</span>
               </DropdownItem>
               <DropdownItem tag="a" href="#">
                 <OutlineCogIcon className="w-4 h-4 mr-3" aria-hidden="true" />
                 <span>Settings</span>
               </DropdownItem>
-              <DropdownItem onClick={() => alert('Log out!')}>
-                <OutlineLogoutIcon className="w-4 h-4 mr-3" aria-hidden="true" />
+              <DropdownItem onClick={() => alert("Log out!")}>
+                <OutlineLogoutIcon
+                  className="w-4 h-4 mr-3"
+                  aria-hidden="true"
+                />
                 <span>Log out</span>
               </DropdownItem>
             </Dropdown>
@@ -137,7 +157,7 @@ function Header() {
         </ul>
       </div>
     </header>
-  )
+  );
 }
 
 export default Header
