@@ -212,7 +212,7 @@ async function cargarDatosUbicacion(id: number) {
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-  }, []);
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setModuloData({
@@ -593,9 +593,9 @@ const editarUbicacion = async (idMod: number) => {
   }
   const handleDeleteRequisitos = (id:number) => {
     if(id<0){
-      requisitosData.data.pop();
+      const indexAEliminar=requisitosData.data.findIndex((ex)=>ex.identificador===id);
+      requisitosData.data.splice(indexAEliminar, 1);
       setInputsReq([...inputsReq]);
-      console.log(requisitosData.data)
     }
     
   }
@@ -607,13 +607,13 @@ const editarUbicacion = async (idMod: number) => {
     };
     referenciaData.data.push(newReference);
     setInputsRef([...inputsRef]);
-    console.log(referenciaData.data)
+
   }
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
-      referenciaData.data.pop();
+      const indexAEliminar=referenciaData.data.findIndex((ex)=>ex.identificador===id);
+      referenciaData.data.splice(indexAEliminar,1);
       setInputsRef([...inputsRef]);
-      console.log(referenciaData.data)
     }
     
   }
@@ -842,7 +842,7 @@ const editarUbicacion = async (idMod: number) => {
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
            <Link href={{
-            pathname: `/gabineteMedico/listarServicios/15`,
+            pathname: `/gabineteMedico/listarServicios`,
           }}>
           <Button size="large">Volver</Button>
           </Link>

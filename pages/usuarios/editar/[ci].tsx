@@ -46,6 +46,7 @@ function EditarUsuarioPageModal() {
   const router = useRouter();
   const {ci} = router.query;
   const strCi=ci?.toString();
+
   const [usuarioData, setUsuarioData] = useState<IObtenerUsuario>({
     ci: "",
     nombres: "",
@@ -208,10 +209,11 @@ function EditarUsuarioPageModal() {
     }
   }
   useEffect(() => {
+    
     cargarDatosUsuario(strCi);
     cargarDatosCargos();
     cargarDatosUsuarios();
-  }, []);
+  }, [ci]);
 
   const editarUsuario = () => {
      if(nameValid==false){

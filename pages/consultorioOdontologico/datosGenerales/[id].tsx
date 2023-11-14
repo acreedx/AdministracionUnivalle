@@ -207,7 +207,7 @@ async function cargarDatosUbicacion(id: number) {
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-  }, []);
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setModuloData({
@@ -574,18 +574,17 @@ const editarUbicacion = async (idMod: number) => {
               }  
           ]  
       }]
-
     };
     requisitosData.data.push(newRequisito.data[0]);
     countReq--;
     setInputsReq([...inputsReq]);
-    console.log(requisitosData.data)
+  
   }
   const handleDeleteRequisitos = (id:number) => {
     if(id<0){
-      requisitosData.data.pop();
+      const indexAEliminar=requisitosData.data.findIndex((ex)=>ex.identificador===id);
+      requisitosData.data.splice(indexAEliminar, 1);
       setInputsReq([...inputsReq]);
-      console.log(requisitosData.data)
     }
     
   }
@@ -599,11 +598,12 @@ const editarUbicacion = async (idMod: number) => {
     setInputsRef([...inputsRef]);
     console.log(referenciaData.data)
   }
+
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
-      referenciaData.data.pop();
+      const indexAEliminar=referenciaData.data.findIndex((ex)=>ex.identificador===id);
+      referenciaData.data.splice(indexAEliminar,1);
       setInputsRef([...inputsRef]);
-      console.log(referenciaData.data)
     }
     
   }
