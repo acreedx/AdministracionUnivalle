@@ -266,8 +266,9 @@ function RegistrarUsuarioPageModal() {
 
   return (
     <Layout>
+      <PageTitle>Registrar Usuario</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Registrar Usuario</PageTitle>
+        
         <SectionTitle>Datos Generales del usuario</SectionTitle>
 
         <div>
