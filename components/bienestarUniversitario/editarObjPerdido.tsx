@@ -43,15 +43,13 @@ function EditarObjPerdidoPage(props: { id: number }) {
 
   async function cargarDatosObj(id: number) {
     try {
-      console.log(id);
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
+        `https://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
       }
       const resData = await res.json();
-      console.log(resData);
       setObjPerData({
         titulo: resData.data[0].titulo,
         archivo: resData.data[0].archivo,
@@ -67,6 +65,8 @@ function EditarObjPerdidoPage(props: { id: number }) {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+
     let valid: any = true;
     let validText = "";
 
@@ -75,7 +75,8 @@ function EditarObjPerdidoPage(props: { id: number }) {
     } else if (
       !onlyLettersAndNumbers(value) ||
       value.length >= 50 ||
-      value.length == 0
+      value.length == 0 ||
+      (emptyStringValue || [])[1].length > 0
     ) {
       valid = false;
     }
@@ -84,7 +85,7 @@ function EditarObjPerdidoPage(props: { id: number }) {
       validText = "El nombre solo debe contener números y letras";
     } else if (value.length >= 50) {
       validText = "El nombre solo puede tener 50 caracteres como máximo";
-    } else if (value.length == 0) {
+    } else if (value.length == 0 || (emptyStringValue || [])[1].length > 0) {
       validText = "El nombre no puede ser vacío";
     } else {
       validText = "Nombre ingresado válido";
@@ -150,7 +151,7 @@ function EditarObjPerdidoPage(props: { id: number }) {
     if (send) {
       objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
       fetch(
-        `http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
+        `https://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
         {
           method: "PUT",
           headers: {
@@ -175,41 +176,6 @@ function EditarObjPerdidoPage(props: { id: number }) {
         })
         .catch(() => errorAlert("Error al cambiar los datos del servicio"));
     }
-    // if (
-    //   objPerData.titulo !== objPerBkData.titulo ||
-    //   checkValidation(flags) ||
-    //   objPerImg != null
-    // ) {
-    //   if (objPerData.archivo != null) {
-    //     objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
-    //     fetch(
-    //       `http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
-    //       {
-    //         method: "PUT",
-    //         headers: {
-    //           "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify({
-    //           archivo: objPerData.archivo,
-    //           titulo: objPerData.titulo,
-    //           serviciosId: 1,
-    //         }),
-    //       }
-    //     )
-    //       .then((response) => {
-    //         if (response.ok) {
-    //           successAlert("Éxito al editar los datos");
-    //         } else {
-    //           throw new Error();
-    //         }
-    //       })
-    //       .catch(() => errorAlert("Error al cambiar los datos del servicio"));
-    //   } else {
-    //     warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    //   }
-    // } else {
-    //   warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    // }
   };
 
   const clearImg = () => {

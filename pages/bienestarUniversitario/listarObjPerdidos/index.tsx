@@ -89,7 +89,7 @@ function ObjetosPerdidos() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+      "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -98,7 +98,7 @@ function ObjetosPerdidos() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Publicaciones/${
+        `https://apisistemaunivalle.somee.com/api/Publicaciones/${
           action ? "DeletePublicaciones" : "RestorePublicaciones"
         }/?id=${selectedObj}`,
         {
@@ -149,11 +149,11 @@ function ObjetosPerdidos() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyServicioId/1"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Publicaciones/getDisabledPublicacionesbyServicioId/1"
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/getDisabledPublicacionesbyServicioId/1"
       );
     }
   };

@@ -1,5 +1,5 @@
 export function onlyLettersAndNumbers(str: string) {
-  return /^[A-Za-z0-9\s]*$/.test(str);
+  return /^[A-Za-z0-9ñáéíóúü ]*$/.test(str);
 }
 
 export function validateImg(selectedFile?: File) {

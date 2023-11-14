@@ -39,7 +39,11 @@ function AgregarObjPerdidoPage() {
 
     if (value.length === 0) {
       valid = undefined;
-    } else if (!onlyLettersAndNumbers(value) || value.length >= 50) {
+    } else if (
+      !onlyLettersAndNumbers(value) ||
+      value.length >= 50 ||
+      (value.length > 0 && value.trim().length == 0)
+    ) {
       valid = false;
     }
 
@@ -76,6 +80,7 @@ function AgregarObjPerdidoPage() {
 
     if (imgRes == 1) {
       setImg(value);
+      console.log(value);
     } else {
       clearImg();
     }
@@ -99,7 +104,7 @@ function AgregarObjPerdidoPage() {
   const registrarObjPer = () => {
     if (checkValidation(flags) && objPerdido.archivo != null) {
       fetch(
-        "http://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
+        "https://apisistemaunivalle.somee.com/api/Publicaciones/AddPublicaciones",
         {
           method: "POST",
           headers: {
@@ -124,7 +129,6 @@ function AgregarObjPerdidoPage() {
           }
         })
         .catch((e) => {
-          console.log(e);
           errorAlert("Error al registrar los datos");
         });
     } else {
