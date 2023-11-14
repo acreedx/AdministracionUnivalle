@@ -19,7 +19,7 @@ import {
   CardBody,
   Card,
 } from "@roketid/windmill-react-ui";
-import { EditIcon, TrashIcon } from "icons";
+import { EditIcon, TrashIcon,TablesIcon } from "icons";
 import { FaRedo } from "react-icons/fa";
 
 import SweetAlert from "react-bootstrap-sweetalert";
@@ -88,7 +88,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Usuarios/getActiveUsers"
+      "https://apisistemaunivalle.somee.com/api/Usuarios/getActiveUsers"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -97,7 +97,7 @@ function BienestarUniversitario() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Usuarios/${
+        `https://apisistemaunivalle.somee.com/api/Usuarios/${
           action ? "deleteUser" : "restoreUser"
         }/${selectedObj}`,
         {
@@ -148,11 +148,11 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Usuarios/getActiveUsers"
+        "https://apisistemaunivalle.somee.com/api/Usuarios/getActiveUsers"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Usuarios/getDisabledUsers"
+        "https://apisistemaunivalle.somee.com/api/Usuarios/getDisabledUsers"
       );
     }
   };
@@ -215,6 +215,7 @@ function BienestarUniversitario() {
                         <TableCell>Apellidos</TableCell>
                         <TableCell>Cargo</TableCell>
                         <TableCell>Estado</TableCell>
+                        <TableCell>Permisos</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -248,6 +249,30 @@ function BienestarUniversitario() {
                               <Badge type={datos.estado ? "success" : "danger"}>
                                 <p>{datos.estado ? "Activo" : "Inactivo"}</p>
                               </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center space-x-4">
+                                {datos.estado && (
+                                  <>
+                                    <Link
+                                      href={{
+                                        pathname: `/usuarios/permisos/${datos.ci}`,
+                                      }}
+                                    >
+                                      <Button
+                                        layout="link"
+                                        size="small"
+                                        aria-label="Edit"
+                                      >
+                                        <TablesIcon
+                                          className="w-5 h-5"
+                                          aria-hidden="true"
+                                        />
+                                      </Button>
+                                    </Link>
+                                  </>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-4">

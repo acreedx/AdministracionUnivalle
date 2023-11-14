@@ -10,6 +10,9 @@ export interface IEditarUsuario{
     apellidos:string;
     // cargoId:number;
 }
+export interface IAddPermiso{
+  modulo: string | null;
+}
 export interface IEditarClave{
     clave:string;
 }
@@ -42,4 +45,23 @@ export interface IListarCargos{
     }
   ];
     
+}
+export interface IListarPermisos{
+  modulos:
+      [
+        {
+          id:number;
+          modulo:string;
+        }
+      ]
+}
+export interface IListarModulos{
+  data:
+  [
+    {
+      identificador:number;
+      nombre:string;
+      estado:boolean;
+    }
+  ];
 }

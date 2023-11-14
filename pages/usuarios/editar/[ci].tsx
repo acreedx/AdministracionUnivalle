@@ -168,7 +168,7 @@ function EditarUsuarioPageModal() {
   async function cargarDatosCargos() {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Cargos/getActiveCargos`
+        `https://apisistemaunivalle.somee.com/api/Cargos/getActiveCargos`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -299,7 +299,7 @@ function EditarUsuarioPageModal() {
             <HelperText valid={lastNameValid}>{lastNameText}</HelperText>
             )}
           </Label>
-          <Label className=" mb-2">
+          {/* <Label className=" mb-2">
             <span className="text-lg">Cargo del usuario</span>
             <Select 
             //value={usuarioData.cargo}
@@ -310,7 +310,7 @@ function EditarUsuarioPageModal() {
                 </option>
               ))}
             </Select>
-          </Label>
+          </Label> */}
           <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
           <div>
             <Button size="large" onClick={editarUsuario}>

@@ -187,7 +187,7 @@ function RegistrarUsuarioPageModal() {
   async function cargarDatosCargos() {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Cargos/getActiveCargos`
+        `https://apisistemaunivalle.somee.com/api/Cargos/getActiveCargos`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -210,7 +210,7 @@ function RegistrarUsuarioPageModal() {
   async function cargarDatosUsuarios() {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Usuarios/getAllUsers`
+        `https://apisistemaunivalle.somee.com/api/Usuarios/getAllUsers`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -243,18 +243,19 @@ function RegistrarUsuarioPageModal() {
       errorAlert("Error al registrar contraseña no valida");
       return;
     }
-    fetch("http://apisistemaunivalle.somee.com/api/Usuarios/addUser", {
+    fetch("https://apisistemaunivalle.somee.com/api/Usuarios/addUser", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(usuarioData),
     })
-      .then((response) => {
+      .then(async(response) => {
         if (response.ok) {
+          const res:any= await response.json();
           successAlert("Éxito al registrar los datos");
           setTimeout(() => {
-            router.push('/usuarios/listarUsuarios');
+            router.push(`/usuarios/permisos/${res.data.ciUsuario}`);
           }, 2000);
         } else {
           throw new Error("Error al cambiar los datos del servicio");
