@@ -36,6 +36,8 @@ function Categorias() {
 
   const resultsPerPage = 10;
 
+  
+
   useEffect(() => {
     async function doFetch() {
       fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}`)
@@ -50,6 +52,11 @@ function Categorias() {
   const [pageTable, setPageTable] = useState(1);
   const [services, setCategories] = useState<ICategoriasData[]>([]);
   const totalResults = services.length;
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredCategories = services.filter((categoria) =>
+    categoria.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   function onPageChangeTable2(p: number) {
     setPageTable(p);
@@ -128,6 +135,13 @@ function Categorias() {
           </Button>
         </Link>
       </div>
+      <input
+        type="text"
+        placeholder="Buscar por nombre..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="mb-4 p-2 border rounded"
+      />
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
@@ -140,7 +154,7 @@ function Categorias() {
             </tr>
           </TableHeader>
           <TableBody>
-            {services.map((categoria, i) => (
+            {filteredCategories.map((categoria, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">

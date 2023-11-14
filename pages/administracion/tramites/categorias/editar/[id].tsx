@@ -27,7 +27,8 @@ function EditarCategoria({ id }: props) {
   const router = useRouter();
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [service, setService] = useState<ICategoriasData>();
-
+  const [nameError, setNameError] = useState<boolean>(false); // Estado de error para el campo de nombre
+  const [descriptionError, setDescriptionError] = useState<boolean>(false);
   const [name, setname] = useState("");
   const [description, setdescription] = useState("");
 
@@ -87,6 +88,30 @@ function EditarCategoria({ id }: props) {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+  
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    if (!containsInvalidChars) {
+      setname(inputValue);
+      setNameError(false); // Limpiar el error si no contiene caracteres no válidos.
+    } else {
+      setNameError(true); // Establecer el estado de error si contiene caracteres no válidos.
+    }
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    if (!containsInvalidChars) {
+      setdescription(inputValue);
+      setDescriptionError(false); // Limpiar el error si no contiene caracteres no válidos.
+    } else {
+      setDescriptionError(true); // Establecer el estado de error si contiene caracteres no válidos.
+    }
+  };
+
+
 
   return (
     <Layout>
@@ -106,21 +131,27 @@ function EditarCategoria({ id }: props) {
           <Label>
             <span>Nombre de la categoria</span>
             <Input
-              className="mt-1"
+              className={`mt-1 ${nameError ? 'border-red-500' : ''}`}
               placeholder="Ingresa el nombre de la categoria"
               value={name}
-              onChange={(e) => setname(e.target.value)}
+              onChange={(e) => handleNameChange(e)}
             />
+            {nameError && (
+              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+            )}
           </Label>
 
           <Label className="mt-4">
             <span>Descripcion</span>
             <Input
-              className="mt-1"
+              className={`mt-1 ${descriptionError ? 'border-red-500' : ''}`}
               placeholder="Ingresa la descripcion de la categoria"
               value={description}
-              onChange={(e) => setdescription(e.target.value)}
+              onChange={(e) => handleDescriptionChange(e)}
             />
+            {descriptionError && (
+              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+            )}
           </Label>
 
           <Label className="mt-4">

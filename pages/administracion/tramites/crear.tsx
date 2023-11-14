@@ -13,6 +13,10 @@ import { uploadFile } from "../../../firebase/config";
 function CrearTramite() {
 
   const [name, setname] = useState("");
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [requisitoError, setRequisitoError] = useState<boolean>(false);
+  const [cellphoneError, setCellphoneError] = useState<string | null>(null);
+
   const [serviceImg, setImg]: any = useState(null);
   const [locationImg, setLocationImage]: any = useState(null);
   const [locationCroquisImg, setLocationCroquisImage]: any = useState(null);
@@ -59,10 +63,18 @@ function CrearTramite() {
     setRequisitos(nuevosRequisitos);
     setPasoRequisitos(nuevosPasosRequisitos);
   };
-  const handleRequisitoChange = (e: any, index: any) => {
-    const nuevosRequisistos = [...requisitos];
-    nuevosRequisistos[index] = e.target.value;
-    setRequisitos(nuevosRequisistos);
+  const handleRequisitoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    if (!containsInvalidChars) {
+      const nuevosRequisistos = [...requisitos];
+      nuevosRequisistos[index] = inputValue;
+      setRequisitos(nuevosRequisistos);
+      setRequisitoError(false); // Limpia el estado de error si no contiene caracteres no válidos.
+    } else {
+      setRequisitoError(true); // Establece el estado de error si contiene caracteres no válidos.
+    }
   };
 
    const handleLocationChange = (e: any, index: any) => {
@@ -238,6 +250,33 @@ function CrearTramite() {
     handleSubmit();
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
+
+    if (containsInvalidChars) {
+      setNameError("No se permiten números o caracteres especiales.");
+    } else {
+      setNameError(null); // Limpiar el mensaje de error si el valor es válido.
+    }
+
+    setname(inputValue);
+  };
+
+  const handleCellphoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    // Utiliza una expresión regular para verificar si solo contiene dígitos.
+    const isValidPhoneNumber = /^[0-9]{7,8}$/.test(inputValue);
+
+    if (!isValidPhoneNumber) {
+      setCellphoneError("El número de teléfono debe tener 8 dígitos y solo contener números.");
+    } else {
+      setCellphoneError(null); // Limpia el mensaje de error si todo está bien.
+    }
+
+    setcellphone(inputValue);
+  };
+
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
@@ -247,13 +286,16 @@ function CrearTramite() {
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <form id="miFormulario" onSubmit={handleSubmit}>
           <Label>
-            <span>Nombre del tramite</span>
+            <span>Nombre del trámite</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el nombre del tramite"
-              onChange={(e) => setname(e.target.value)}
+              placeholder="Ingresa el nombre del trámite"
+              value={name}
+              onChange={(e) => handleNameChange(e)}
             />
           </Label>
+          {nameError && <span className="text-red-500">{nameError}</span>}
+          
 
           <Label className="mt-4">
             <span className=" text-lg">Imagen de referencia para el servicio</span>
@@ -304,12 +346,15 @@ function CrearTramite() {
                     <MinusIcon />
                   </button>
                   <Input
-                    className="mt-1 mb-1"
+                    className={`mt-1 mb-1 ${requisitoError ? 'border-red-500' : ''}`}
                     placeholder="Ingresa el requisito"
                     value={requisito}
                     onChange={(e) => handleRequisitoChange(e, requisitoIndex)}
                     key={`requisito-${requisitoIndex}`}
                   />
+                  {requisitoError && (
+                    <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+                  )}
                 </div>
                 {pasoRequisito[requisitoIndex] && pasoRequisito[requisitoIndex].map((pasoRequisito, pasoIndex) => (
                   <div className="flex items-center ml-20" key={pasoIndex}>
@@ -345,18 +390,23 @@ function CrearTramite() {
           <Label className="mt-4">
             <span>Encargado</span>
             <Input
-              className="mt-1"
+              className={`mt-1 ${/[^A-Za-z\s]/.test(encharged) ? 'border-red-500' : ''}`}
               placeholder="Ingresa el nombre completo del encargado"
               onChange={(e) => setencharged(e.target.value)}
             />
+            {/[^A-Za-z\s]/.test(encharged) && (
+              <span className="text-red-500">No se permiten números ni caracteres especiales.</span>
+            )}
           </Label>
           <Label className="mt-4">
             <span>Teléfono de referencia</span>
             <Input
-              className="mt-1"
+              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
               placeholder="Ingresa el teléfono de referencia del encargado"
-              onChange={(e) => setcellphone(e.target.value)}
+              value={cellphone}
+              onChange={handleCellphoneChange}
             />
+            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
           </Label>
 
           <Label className="mt-4">

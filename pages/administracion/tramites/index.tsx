@@ -29,6 +29,8 @@ import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
 function Tramites() {
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [state, setState] = useState("activos");
   const route = "Servicios/getTramiteByModuleActive/";
   const routeInactives = "Servicios/getTramiteByModuleInactive/";
@@ -132,6 +134,12 @@ function Tramites() {
           </Button>
         </Link>
       </div>
+      <input
+        type="text"
+        placeholder="Buscar..."
+        className="mb-4 mt-2 p-2 border rounded"
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
@@ -147,7 +155,19 @@ function Tramites() {
             </tr>
           </TableHeader>
           <TableBody>
-            {services.map((servicio, i) => (
+            {services
+              .filter((servicio) => {
+                if (searchTerm === "") {
+                  return servicio;
+                } else if (
+                  servicio.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  servicio.encharged?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  servicio.cellphone?.toLowerCase().includes(searchTerm.toLowerCase())
+                ) {
+                  return servicio;
+                }
+              })
+            .map((servicio, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
