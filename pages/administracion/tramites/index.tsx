@@ -101,45 +101,51 @@ function Tramites() {
   return (
     <Layout>
       <PageTitle>Tramites</PageTitle>
-
-      <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
-        <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
-          <Label radio>
-            <Input
-              type="radio"
-              value="activos"
-              name="activeInactive"
-              checked={state === 'activos'}
-              onChange={(e) => handleActiveChange(e)}
-            />
-            <span className="ml-2">Activos</span>
-          </Label>
-          <Label radio>
-            <Input
-              type="radio"
-              value="inactivos"
-              name="activeInactive"
-              checked={state === 'inactivos'}
-              onChange={(e) => handleActiveChange(e)}
-            />
-            <span className="ml-2">Inactivos</span>
-          </Label>
-        </CardBody>
-      </Card>
       <SectionTitle>Listado de tramites</SectionTitle>
+      <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
+        <Card className="shadow-md sm:w-3/4">
+          <CardBody>
+            <input
+              type="text"
+              placeholder="Buscar..."
+              className="mb-4 p-2 border border-gray-600 bg-gray-700 text-white w-full rounded"
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </CardBody>
+        </Card>
+        <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+          <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+            <Label radio>
+              <Input
+                type="radio"
+                value="activos"
+                name="activeInactive"
+                checked={state === 'activos'}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Activos</span>
+            </Label>
+            <Label radio>
+              <Input
+                type="radio"
+                value="inactivos"
+                name="activeInactive"
+                checked={state === 'inactivos'}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Inactivos</span>
+            </Label>
+          </CardBody>
+        </Card>
+      </div>
       <div className="mb-1">
         <Link href={`/administracion/tramites/crear`}>
           <Button size="small">
             Registrar un nuevo tramite
           </Button>
         </Link>
-      </div>
-      <input
-        type="text"
-        placeholder="Buscar..."
-        className="mb-4 mt-2 p-2 border rounded"
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
+      </div> 
+      
       <TableContainer className="my-8">
         <Table>
           <TableHeader>

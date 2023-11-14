@@ -103,9 +103,21 @@ function Categorias() {
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
       <SectionTitle>Categorias de tramites</SectionTitle>
-      <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
-        <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
-          <Label radio>
+      <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
+        <Card className="shadow-md sm:w-3/4">
+          <CardBody>
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="mb-4 p-2 border border-gray-600 bg-gray-700 text-white w-full rounded"
+            />
+          </CardBody>
+        </Card>
+        <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+          <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+            <Label radio>
             <Input
               type="radio"
               value="activos"
@@ -125,8 +137,10 @@ function Categorias() {
             />
             <span className="ml-2">Inactivos</span>
           </Label>
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+      </div>
+      
 
       <div className="mb-1">
         <Link href={`/administracion/tramites/categorias/crear`}>
@@ -135,13 +149,7 @@ function Categorias() {
           </Button>
         </Link>
       </div>
-      <input
-        type="text"
-        placeholder="Buscar por nombre..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="mb-4 p-2 border rounded"
-      />
+      
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
