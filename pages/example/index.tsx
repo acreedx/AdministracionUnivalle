@@ -52,10 +52,8 @@ function Dashboard() {
 
   //Autentificacion
   useEffect(() => {
-    // Dentro de useEffect para ejecutarse después de que el componente se haya montado
     const usuarioAutenticado = isAuthenticated();
     if (!usuarioAutenticado) {
-      // Si no está autenticado, redirige a la página de inicio de sesión
       router.push("/login");
     }
   }, []);

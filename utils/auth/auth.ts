@@ -65,3 +65,7 @@ export const getUserData = (): { nombre: string; apellido: string } | null => {
 
   return null;
 };
+
+export const logout = (): void => {
+  localStorage.removeItem("userData");
+};
