@@ -758,7 +758,7 @@ const editarUbicacion = async (idMod: number) => {
           <div className="flex items-center justify-center space-x-4">
             <div className="flex flex-col items-center space-y-2">
               <span>Video Actual</span>
-              <div className="w-96 h-56 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+              <div className="w-96 h-48 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
                 <VideoPlayer
                   url={ubicacionData.video === null ? "" : ubicacionData.video}
                   width="384"
@@ -768,7 +768,7 @@ const editarUbicacion = async (idMod: number) => {
             </div>
             <div className="flex flex-col items-center space-y-2">
               <span>Nuevo Video</span>
-              <div className="w-96 h-56 border-2 border-gray-500 rounded-lg overflow-hidden">
+              <div className="w-96 h-48 border-2 border-gray-500 rounded-lg overflow-hidden">
                 <VideoPlayer
                   url={ubicacionData.video === null ? "" : ubicacionData.video}
                   width="384"
