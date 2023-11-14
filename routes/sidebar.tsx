@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-    ? pathname.indexOf(route.path) === 0
-    : false;
+      ? pathname.indexOf(route.path) === 0
+      : false;
 }
 
 const routes: IRoute[] = [
@@ -64,10 +64,6 @@ const routes: IRoute[] = [
         path: "/administracion/tramites",
         name: "Listar",
       },
-      {
-        path: "/administracion/tramites/inactivos",
-        name: "Listar deshabilitados",
-      },
     ],
   },
   {
@@ -78,10 +74,6 @@ const routes: IRoute[] = [
       {
         path: "/administracion/tramites/categorias",
         name: "Listar",
-      },
-      {
-        path: "/administracion/tramites/categorias/inactivos",
-        name: "Listar deshabilitados",
       },
     ],
   },

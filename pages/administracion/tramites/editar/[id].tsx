@@ -144,8 +144,11 @@ function ModificarTramite({ id }: props) {
   const getRequisitosByID = "Requisitos/getRequisitosByServiceId/";
   const deleteRequerimentRoute = "Requisitos/deleteRequisito/"
   const deleteStepRequerimentRoute = "Requisitos/deletePasoRequisito/"
+  const getPasosRequisitosByServiceIdRoute = "PasosRequisitos/getPasosRequisitosByServiceId?id="
+  const getPasosRequisitosByRequisitoId = "PasosRequisitos/getPasosRequisitosByRequisitoId/"
 
   const createRequisitoRoute = "Requisitos/addRequisito";
+  const createStepRequerimentRoute = "PasosRequisitos/addPasoRequisito";
   useEffect(() => {
     async function doFetch() {
 
@@ -208,25 +211,56 @@ function ModificarTramite({ id }: props) {
       }
 
 
-      
+
       //Filtrado de requisitos existentes en la DB
       const requisitosExistentes = await fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
         .then((res) => res.json())
         .then((res) => convertJSONListRequirement(res.data));
+      /*
+            const pasosRequisitosExistentes = await fetch(`${URLS.baseUrl}${getPasosRequisitosByServiceIdRoute}${id}`)
+              .then((res) => res.json())
+              .then((res) => res.data);
+      */
+
+      for (const requisito of requisitos) {
+        const pasosRequisitosExistentes = await getPasosRequisitosByRequisitoIdF(requisito.id)
+        console.log(getPasosRequisitosByRequisitoIdF(requisito.id))
+        const nuevosPasosParaCrear = requisito.pasosRequisito.filter((nuevoPaso) => {
+          return !pasosRequisitosExistentes.some((pasoExistente: any) => {
+            return nuevoPaso.nameStep === pasoExistente.nombre;
+          });
+        });
+
+
+        for (const nuevoPaso of nuevosPasosParaCrear) {
+          await fetch(`${URLS.baseUrl}${createStepRequerimentRoute}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              nombre: nuevoPaso.nameStep,
+              requisitoId: requisito.id,
+            }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log("Paso creado exitosamente", data);
+            })
+            .catch(error => {
+              console.error("Error al crear el paso", error);
+            });
+        }
+      }
 
       const nuevosRequisitosParaCrear = requisitos.filter((nuevoRequisito) => {
         return !requisitosExistentes.some((requisitoExistente: any) => {
-          return nuevoRequisito.description === requisitoExistente.description &&
-            nuevoRequisito.pasosRequisito == requisitoExistente.pasoRequisito;
-        });
+          return nuevoRequisito.description === requisitoExistente.description
+        })
       });
 
       for (const nuevoRequisito of nuevosRequisitosParaCrear) {
-
-        const pasosFormateados = nuevoRequisito.pasosRequisito.map((paso) => ({
-          id: paso.idStep,
-          nombre: paso.nameStep
-        }));
+        console.log("DATOS A ENVIAR nuevosRequisitos", nuevoRequisito.pasosRequisito)
         await fetch(`${URLS.baseUrl}${createRequisitoRoute}`, {
 
           method: "POST",
@@ -236,11 +270,12 @@ function ModificarTramite({ id }: props) {
           body: JSON.stringify({
             descripcion: nuevoRequisito.description,
             serviciosId: id,
-            pasos: pasosFormateados,
+
             estado: true,
           }),
         });
       }
+
 
       await fetch(
         `${URLS.baseUrl}${updateReferencesRoute}${service?.enchargedId}`,
@@ -289,6 +324,13 @@ function ModificarTramite({ id }: props) {
   };
 
 
+  const getPasosRequisitosByRequisitoIdF = async (RequisitoId: number) => {
+    return await fetch(`${URLS.baseUrl}${getPasosRequisitosByRequisitoId}${RequisitoId}`)
+      .then((res) => res.json())
+      .then((res) => res.data);
+
+
+  }
 
 
   const handleAlertConfirm = () => {
