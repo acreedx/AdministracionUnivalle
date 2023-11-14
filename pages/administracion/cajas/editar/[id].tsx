@@ -10,15 +10,15 @@ import URLS from "utils/demo/api";
 import { ICajasData, convertJSONService } from "utils/demo/cajasData";
 import { GetServerSidePropsContext } from "next";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import { ServicesProvider } from "../providers/servicesProvider";
-import { RequirementsProvider } from "../providers/requirementsProvider";
-import { UbicacionesProvider } from "../providers/ubicacionesProvider";
 import { IRequirementData } from "utils/demo/requirementData";
-import { ReferencesProvider } from "../providers/referencesProvider";
 import { uploadFile } from "../../../../firebase/config";
 import { ToastContainer } from "react-toastify";
 import { errorAlert } from "components/alerts";
 import { IUbicacionesData } from "utils/demo/ubicacionesData";
+import servicesProvider from "../../../../utils/providers/servicesProvider";
+import requirementsProvider from "../../../../utils/providers/requirementsProvider";
+import ubicacionesProvider from "../../../../utils/providers/ubicacionesProvider";
+import referencesProvider from "../../../../utils/providers/referencesProvider";
 
 interface props {
   id: number;
@@ -46,10 +46,6 @@ function EditarServicio({ id }: props) {
   const [showAlertValidation, setShowAlertValidation] =
     useState<boolean>(false);
   const [validationMessage, setvalidationMessage] = useState<string>("");
-  const serviceProvider = new ServicesProvider();
-  const requirementProvider = new RequirementsProvider();
-  const locationsProvider = new UbicacionesProvider();
-  const referencesProvider = new ReferencesProvider();
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
   const [requirementOriginal, setrequirementOriginal] = useState<
     IRequirementData[]
@@ -71,10 +67,10 @@ function EditarServicio({ id }: props) {
   useEffect(() => {
     async function doFetch() {
       try {
-        setService(await serviceProvider.GetOneService(id));
-        setRequirements(await requirementProvider.GetRequirementsList(id));
+        setService(await servicesProvider.GetOneService(id));
+        setRequirements(await requirementsProvider.GetRequirementsList(id));
         setrequirementOriginal([...requirements]);
-        setLocations(await locationsProvider.GetUbicacionesList(id));
+        setLocations(await ubicacionesProvider.GetUbicacionesList(id));
         setLocationsOriginal([...locations]);
       } catch {
         (e: any) => {
@@ -96,8 +92,8 @@ function EditarServicio({ id }: props) {
           );
           setimgUrl(uploadedImageUrl);
         }
-        await serviceProvider.UpdateService(name, imgUrl, id);
-        await requirementProvider.UpdateRequirements(
+        await servicesProvider.UpdateService(name, imgUrl, id);
+        await requirementsProvider.UpdateRequirements(
           id,
           requirements,
           requirementOriginal
@@ -107,7 +103,7 @@ function EditarServicio({ id }: props) {
           encharged,
           cellphone
         );
-        await locationsProvider.UpdateUbicaciones(
+        await ubicacionesProvider.UpdateUbicaciones(
           id,
           locations,
           locationsOriginal

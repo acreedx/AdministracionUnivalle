@@ -6,7 +6,7 @@ import {
   convertJSONService,
 } from "utils/demo/cajasData";
 
-export class ServicesProvider {
+class ServicesProvider {
   private moduleName: string = "Cajas";
   private moduleId: Number = 2;
   private getServiceRoute: string = "Servicios/getServicioByModule/";
@@ -107,3 +107,4 @@ export class ServicesProvider {
     });
   }
 }
+export default new ServicesProvider();

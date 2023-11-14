@@ -5,13 +5,13 @@ import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import { ReferencesProvider } from "./providers/referencesProvider";
-import { UbicacionesProvider } from "./providers/ubicacionesProvider";
-import { ServicesProvider } from "./providers/servicesProvider";
-import { RequirementsProvider } from "./providers/requirementsProvider";
 import { errorAlert } from "components/alerts";
 import { uploadFile } from "../../../firebase/config";
 import { ToastContainer } from "react-toastify";
+import referencesProvider from "../../../utils/providers/referencesProvider";
+import ubicacionesProvider from "../../../utils/providers/ubicacionesProvider";
+import servicesProvider from "../../../utils/providers/servicesProvider";
+import requirementsProvider from "../../../utils/providers/requirementsProvider";
 
 function CrearServicio() {
   const [name, setname] = useState("");
@@ -26,10 +26,6 @@ function CrearServicio() {
   const [formIsValid, setformIsValid] = useState(Boolean);
   const router = useRouter();
   const [serviceImg, setImg]: any = useState(null);
-  const referenceProvider = new ReferencesProvider();
-  const ubicacionesProvider = new UbicacionesProvider();
-  const servicesProvider = new ServicesProvider();
-  const requirementsProvider = new RequirementsProvider();
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index] = value;
@@ -53,7 +49,7 @@ function CrearServicio() {
           uploadedImageUrl
         );
         await ubicacionesProvider.CreateUbicaciones(locations, ServiceId);
-        await referenceProvider.CreateReference(
+        await referencesProvider.CreateReference(
           encharged,
           cellphone,
           ServiceId

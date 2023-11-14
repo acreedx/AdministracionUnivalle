@@ -1,7 +1,7 @@
 import URL from "utils/demo/api";
 import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
-export class UbicacionesProvider {
+class UbicacionesProvider {
   private createUbicacionRoute: string = "Ubicaciones/addUbicaciones";
   private GetUbicacionesRoute: string =
     "Ubicaciones/getUbicacionesbyServicioId/";
@@ -106,3 +106,4 @@ export class UbicacionesProvider {
     return this.ubicacionesList;
   }
 }
+export default new UbicacionesProvider();

@@ -1,7 +1,7 @@
 import URL from "utils/demo/api";
 import { IRequirementData } from "utils/demo/requirementData";
 
-export class RequirementsProvider {
+class RequirementsProvider {
   private createRequirementRoute: string = "Requisitos/addRequisito";
   private getRequirementsRoute: string = "Requisitos/getRequisitosByServiceId/";
   private deleteRequirementRoute: string = "Requisitos/deleteRequisito/";
@@ -106,3 +106,4 @@ export class RequirementsProvider {
     return this.requirementsList;
   }
 }
+export default new RequirementsProvider();

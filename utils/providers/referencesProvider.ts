@@ -1,6 +1,6 @@
 import URL from "utils/demo/api";
 
-export class ReferencesProvider {
+class ReferencesProvider {
   private createReferencesRoute: string = "Referencia/addReferences";
   private updateReferencesRoute: string = "Referencia/UpdateReferences/";
   public async CreateReference(
@@ -41,3 +41,4 @@ export class ReferencesProvider {
     });
   }
 }
+export default new ReferencesProvider();

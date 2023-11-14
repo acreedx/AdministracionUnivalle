@@ -24,14 +24,13 @@ import { EditIcon, TrashIcon, MenuIcon, PlusIcon } from "icons";
 import { ICajasData } from "utils/demo/cajasData";
 import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
-import { ServicesProvider } from "./providers/servicesProvider";
 import SearchBar from "components/searchBar";
+import servicesProvider from "../../../utils/providers/servicesProvider";
 
 function Cajas() {
   const router = useRouter();
   const [state, setState] = useState("");
   const resultsPerPage = 10;
-  const servicesProvider = new ServicesProvider();
   const [services, setServices] = useState<ICajasData[]>([]);
   const [servicesOriginal, setServicesOriginal] = useState<ICajasData[]>([]);
   useEffect(() => {
@@ -78,18 +77,15 @@ function Cajas() {
     setServices(filtro);
   };
   const filterServices = (e: any) => {
-    if(state == "success" || state == "danger" )
-    {
+    if (state == "success" || state == "danger") {
       const filtro = servicesOriginal
         .filter((cont) => cont.status == state)
         .filter((cont) => cont.name.includes(e));
       setServices(filtro);
       return;
     }
-    if(e && e.trim() !== '')
-    {
-      const filtro = servicesOriginal
-        .filter((cont) => cont.name.includes(e));
+    if (e && e.trim() !== "") {
+      const filtro = servicesOriginal.filter((cont) => cont.name.includes(e));
       setServices(filtro);
       return;
     }
@@ -242,7 +238,7 @@ function Cajas() {
                       <PlusIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   )}
-                </TableCell>  
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
