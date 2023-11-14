@@ -169,6 +169,23 @@ const routes: IRoute[] = [
       },
     ],
   },
+   {
+    path: "/usuarios",
+    icon: "PeopleIcon",
+    name: "Usuarios",
+    routes: [
+       {
+        path: "/usuarios/listarUsuarios",
+        name: "Listar Usuarios",
+      },
+      {
+        path: "/usuarios/registrar",
+        name: "Registrar",
+      }
+      
+    ],
+    exact: true,
+  },
   {
     path: "/bienestarUniversitario",
     icon: "BienestarIcon",
@@ -203,7 +220,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabineteMedico/listarServicios/15",
+        path: "/gabineteMedico/listarServicios",
         name: "Listar Servicios",
       },
     ],
@@ -219,7 +236,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabinetePsicoPedagogico/listarServicios/14",
+        path: "/gabinetePsicoPedagogico/listarServicios",
         name: "Listar Servicios",
       },
     ],
@@ -235,7 +252,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/consultorioOdontologico/listarServicios/16",
+        path: "/consultorioOdontologico/listarServicios",
         name: "Listar Servicios",
       },
      

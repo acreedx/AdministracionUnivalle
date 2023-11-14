@@ -61,11 +61,12 @@ function RegistrarServicioPageModal() {
         body: JSON.stringify(servicioData),
       }
     )
-      .then((response) => {
+      .then(async (response) => {
         if (response.ok) {
+          const res:any= await response.json();
           successAlert("Éxito al registrar los datos");
            setTimeout(() => {
-          window.location.reload();
+            router.push(`/bienestarUniversitario/editar/${res.data.id}`);
         }, 2000);
         } else {
           throw new Error("Error al cambiar los datos del servicio");
