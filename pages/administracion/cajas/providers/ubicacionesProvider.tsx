@@ -1,4 +1,5 @@
 import URL from "utils/demo/api";
+import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
 export class UbicacionesProvider {
   private createUbicacionRoute: string = "Ubicaciones/addUbicaciones";
