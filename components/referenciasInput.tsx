@@ -30,25 +30,30 @@ const ReferenciaInputs: FC<ReferenciaInputsProps> = ({
           ? "Nuevo Contacto"
           : `Contacto ${isNuevoContacto ? "" : index + 1}`}
       </div>
-      <span>Nombre del Contacto</span>
-      <div className="flex">
-        <Input
-          value={valueNombre === null ? "" : valueNombre}
-          placeholder="Escriba el nombre del contacto."
-          onChange={(e) => handle(e, identificador, "nombre")}
-        />
-        {flag && flag.nombre != null && (
-          <HelperText valid={flag.nombre}>{textFlag.nombre}</HelperText>
-        )}
-        <div className=" mx-1"></div>
-        <Input
-          value={valueContacto === null ? "" : valueContacto}
-          placeholder="Escriba el número del contacto."
-          onChange={(e) => handle(e, identificador, "numero")}
-        />
-        {flag && flag.numero != null && (
-          <HelperText valid={flag.numero}>{textFlag.numero}</HelperText>
-        )}
+      <div className="flex justify-between">
+        <div className="flex flex-col w-full">
+          <span>Nombre del Contacto</span>
+          <Input
+            value={valueNombre === null ? "" : valueNombre}
+            placeholder="Escriba el nombre del contacto."
+            onChange={(e) => handle(e, identificador, "nombre")}
+          />
+          {flag && flag.nombre != null && (
+            <HelperText valid={flag.nombre}>{textFlag.nombre}</HelperText>
+          )}
+        </div>
+        <div className="mx-1"></div>
+        <div className="flex flex-col w-full">
+          <span>Número del Contacto</span>
+          <Input
+            value={valueContacto === null ? "" : valueContacto}
+            placeholder="Escriba el número del contacto."
+            onChange={(e) => handle(e, identificador, "numero")}
+          />
+          {flag && flag.numero != null && (
+            <HelperText valid={flag.numero}>{textFlag.numero}</HelperText>
+          )}
+        </div>
         <div className=" mx-1"></div>
         {isNuevoContacto ? (
           <Button size="small" onClick={() => hadleDelete(identificador)}>

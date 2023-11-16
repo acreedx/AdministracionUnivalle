@@ -3,7 +3,11 @@ export function onlyLettersAndNumbers(str: string) {
 }
 
 export function onlyLetters(str: string) {
-  return /^[A-Za-z ]*$/.test(str);
+  return /^[A-Za-zñáéíóúü ]*$/.test(str);
+}
+
+export function onlyNumbers(str: string) {
+  return /^[0-9() -]*$/.test(str);
 }
 
 export function validateUbicationString(str: string) {

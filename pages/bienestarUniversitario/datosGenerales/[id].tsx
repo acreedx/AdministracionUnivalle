@@ -29,6 +29,7 @@ import {
   checkValidationEdit,
   onlyLetters,
   onlyLettersAndNumbers,
+  onlyNumbers,
   resetDefaultValFlags,
   validateImg,
   validateUbicationString,
@@ -389,27 +390,53 @@ function EditarDatosGeneralesPage() {
     const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
     let valid: any = true;
     let validText = "";
-    if (referenceBk && value === referenceBk.nombre) {
-      valid = undefined;
-    } else if (
-      !onlyLetters(value) ||
-      value.length >= 50 ||
-      (emptyStringValue || [])[1].length > 0 ||
-      value.length === 0
-    ) {
-      valid = false;
-    }
 
-    if (!onlyLetters(value)) {
-      validText = "El nombre solo debe contener números y letras";
-    } else if (value.length >= 50) {
-      validText = "El nombre solo puede tener 50 caracteres como máximo";
-    } else if ((emptyStringValue || [])[1].length > 0) {
-      validText = "El nombre no puede tener espacios al inicio";
-    } else if (value.length === 0) {
-      validText = "No se puede ingresar un nombre vacío";
-    } else {
-      validText = "Nombre ingresado válido";
+    if (campo === "nombre") {
+      if (referenceBk && value === referenceBk.nombre) {
+        valid = undefined;
+      } else if (
+        !onlyLetters(value) ||
+        value.length >= 50 ||
+        (emptyStringValue || [])[1].length > 0 ||
+        value.length === 0
+      ) {
+        valid = false;
+      }
+
+      if (!onlyLetters(value)) {
+        validText = "El nombre solo debe contener números y letras";
+      } else if (value.length >= 50) {
+        validText = "El nombre solo puede tener 50 caracteres como máximo";
+      } else if ((emptyStringValue || [])[1].length > 0) {
+        validText = "El nombre no puede tener espacios al inicio";
+      } else if (value.length === 0) {
+        validText = "No se puede ingresar un nombre vacío";
+      } else {
+        validText = "Nombre ingresado válido";
+      }
+    } else if (campo === "numero") {
+      if (referenceBk && value === referenceBk.numero) {
+        valid = undefined;
+      } else if (
+        !onlyNumbers(value) ||
+        value.length >= 25 ||
+        (emptyStringValue || [])[1].length > 0 ||
+        value.length === 0
+      ) {
+        valid = false;
+      }
+
+      if (!onlyNumbers(value)) {
+        validText = "El número solo debe contener números y paréntesis";
+      } else if (value.length >= 25) {
+        validText = "El número solo puede tener 25 caracteres como máximo";
+      } else if ((emptyStringValue || [])[1].length > 0) {
+        validText = "El número no puede tener espacios al inicio";
+      } else if (value.length === 0) {
+        validText = "No se puede ingresar un número vacío";
+      } else {
+        validText = "Número ingresado válido";
+      }
     }
 
     setFlagsReferencia((prev: any) => {
@@ -421,7 +448,7 @@ function EditarDatosGeneralesPage() {
       if (indexToUpdate !== -1) {
         updatedFlags[indexToUpdate] = {
           ...updatedFlags[indexToUpdate],
-          nombre: valid,
+          [campo]: valid,
         };
       }
 
@@ -436,7 +463,7 @@ function EditarDatosGeneralesPage() {
       if (indexToUpdate !== -1) {
         updatedFlags[indexToUpdate] = {
           ...updatedFlags[indexToUpdate],
-          nombre: validText.toString(),
+          [campo]: validText.toString(),
         };
       }
 
@@ -718,6 +745,7 @@ function EditarDatosGeneralesPage() {
     });
   };
   const editarReferencias = async (idMod: number) => {
+    var countVali = 0;
     var count = 0;
     referenciaData.data.forEach((req) => {
       var aux1: any;
@@ -730,63 +758,98 @@ function EditarDatosGeneralesPage() {
         aux2 = refereciaBkData.data[count].numero;
       }
       if (req.nombre !== aux1 || req.numero !== aux2) {
-        if (req.identificador <= 0) {
-          const postRef = {
-            nombre: req.nombre,
-            numerocel: req.numero,
-            id_modulo: idMod,
-            estado: true,
-          };
-          console.log(postRef);
-          fetch(
-            `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(postRef),
-            }
-          )
-            .then((response) => {
-              if (response.ok) {
-                successAlert("Éxito al editar los datos");
-                cargarDatosReferencia(idMod);
-              } else {
-                throw new Error("Error al cambiar los datos del servicio");
+        let send = true;
+        const check = checkValidationEdit(flagsReferencia[count]);
+
+        if (check === 2) {
+          warningAlert(
+            "Registro " +
+              (count + 1) +
+              ": Si desea editar, ingrese valores válidos"
+          );
+          send = false;
+        }
+
+        if (send) {
+          if (req.identificador <= 0) {
+            const postRef = {
+              nombre: req.nombre,
+              numerocel: req.numero,
+              id_modulo: idMod,
+              estado: true,
+            };
+            console.log(postRef);
+            fetch(
+              `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(postRef),
               }
-            })
-            .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-        } else {
-          const postRef = {
-            nombre: req.nombre,
-            numerocel: req.numero,
-          };
-          fetch(
-            `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(postRef),
-            }
-          )
-            .then((response) => {
-              if (response.ok) {
-                successAlert("Éxito al editar los datos");
-                cargarDatosReferencia(idMod);
-              } else {
-                throw new Error("Error al cambiar los datos del servicio");
+            )
+              .then((response) => {
+                if (response.ok) {
+                  successAlert(
+                    "Registro " + (count + 1) + ": Éxito al editar los datos"
+                  );
+                  cargarDatosReferencia(idMod);
+                } else {
+                  throw new Error("Error al cambiar los datos del servicio");
+                }
+              })
+              .catch(() =>
+                errorAlert(
+                  "Registro " +
+                    (count + 1) +
+                    ": Ocurrio un error al editar los datos"
+                )
+              );
+          } else {
+            const postRef = {
+              nombre: req.nombre,
+              numerocel: req.numero,
+            };
+
+            fetch(
+              `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(postRef),
               }
-            })
-            .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+            )
+              .then((response) => {
+                if (response.ok) {
+                  successAlert(
+                    "Registro " + (count + 1) + ": Éxito al editar los datos"
+                  );
+                  cargarDatosReferencia(idMod);
+                } else {
+                  throw new Error("Error al cambiar los datos del servicio");
+                }
+              })
+              .catch(() =>
+                errorAlert(
+                  "Registro " +
+                    (count + 1) +
+                    ": Ocurrio un error al editar los datos"
+                )
+              );
+          }
         }
       } else {
+        countVali++;
         //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
       }
       count++;
     });
+    if (countVali >= referenciaData.data.length) {
+      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+    }
   };
 
   const [inputsReq, setInputsReq]: any = useState([]);
