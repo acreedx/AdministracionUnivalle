@@ -2,8 +2,6 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
-
-import { FaRedo } from "react-icons/fa";
 import {
   Table,
   TableHeader,
@@ -21,7 +19,8 @@ import {
   CardBody,
   Card,
 } from "@roketid/windmill-react-ui";
-import { EditIcon, ModalsIcon, TrashIcon } from "icons";
+import { EditIcon, TrashIcon } from "icons";
+import { FaRedo } from "react-icons/fa";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 import { IListarServicios } from "utils/interfaces/servicios";
@@ -31,9 +30,8 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
-import Modal from "../../../components/modal";
-import RegistrarPage from "../registrar/index";
-import RegistrarServicioPageModal from "../registrar";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 
 function BienestarUniversitario() {
   const router = useRouter();
@@ -54,31 +52,6 @@ function BienestarUniversitario() {
   const [selectedObj, setSelectedObj] = useState<number>(0);
   const [activeInactive, setActiveInactive] = useState<string>();
 
-  function onPageChangeTable2(p: number) {
-    setPageTable2(p);
-  }
-
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-
-  // on page change, load new sliced data
-  // here you would make another server request for new data
-  useEffect(() => {
-    const getData = async () => {
-      const query = await fetch(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
-      );
-      const response: any = await query.json();
-      setTotal(response.data.length);
-      setUserInfo(
-        response.data.slice(
-          (pageTable2 - 1) * resultsPerPage,
-          pageTable2 * resultsPerPage
-        )
-      );
-    };
-    getData();
-  }, []);
   const getData = async (url: string) => {
     try {
       const query = await fetch(url);
@@ -111,7 +84,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -171,11 +144,11 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/1"
+        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/1"
+        "http://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/16"
       );
     }
   };
@@ -184,90 +157,12 @@ function BienestarUniversitario() {
     <Layout>
       {!isLoading ? (
         <>
-          <PageTitle>Listado de servicios - Bienestar Universitario</PageTitle>
+          <PageTitle>
+            Listado de servicios - Consultorio odontologico
+          </PageTitle>
 
-          <SectionTitle>Servicio</SectionTitle>
-
-          <div className=" flex flex-row-reverse  mb-5">
-            {/*<Modal
-              pageRender={<RegistrarServicioPageModal />}
-              buttonName="Registrar Nuevo Servicio"
-            />*/}
-          </div>
-
-          <TableContainer className="mb-8">
-            <Table>
-              <TableHeader>
-                <tr>
-                  <TableCell>Servicio</TableCell>
-                  <TableCell>Modulo</TableCell>
-                  <TableCell>Estado</TableCell>
-                  <TableCell>Acciones</TableCell>
-                </tr>
-              </TableHeader>
-              <TableBody>
-                {dataTable2.map((datos: any, i) => (
-                  <TableRow key={datos}>
-                    <TableCell>
-                      <div className="flex items-center text-sm">
-                        <Avatar
-                          className="hidden mr-3 md:block"
-                          src={datos.imagen}
-                        />
-                        <div>
-                          <p className="font-semibold">{datos.nombre}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{datos.modulo}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge></Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-4">
-                        <Link
-                          href={{
-                            pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                          }}
-                        >
-                          <Button layout="link" size="small" aria-label="Edit">
-                            <EditIcon className="w-5 h-5" aria-hidden="true" />
-                          </Button>
-                        </Link>
-                        <Link
-                          href={{
-                            pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
-                          }}
-                        >
-                          <Button
-                            layout="link"
-                            size="small"
-                            aria-label="Delete"
-                          >
-                            <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TableFooter>
-              <Pagination
-                totalResults={TotalResult}
-                resultsPerPage={resultsPerPage}
-                onChange={onPageChangeTable2}
-                label="Table navigation"
-              />
-            </TableFooter>
-          </TableContainer>
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/registrar">
-              <Button size="large">Registrar servicio</Button>
-            </Link>
+           <div className=" flex  mb-5">
+            <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
           </div>
           {dataTable2.length > 0 ? (
             <>
@@ -358,7 +253,7 @@ function BienestarUniversitario() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
+                                        pathname: `/consultorioOdontologico/editar/${datos.identificador}`,
                                       }}
                                     >
                                       <Button
