@@ -772,11 +772,13 @@ const editarUbicacion = async (idMod: number) => {
   const [inputsHor, setInputsHor]:any = useState([]);
 
   const handleAddRequisitos = () => {
-    
+    var newIdReq = requisitosData.data.length > 0 ? (requisitosData.data[requisitosData.data.length - 1].identificador) : -1;
+    newIdReq=newIdReq>0?(newIdReq+1)*-1:(newIdReq-1);
+
     const newRequisito:IEditarRequisitosArray = {
       data:[
         {
-        identificador:(requisitosData.data.length+1) * -1,
+        identificador:newIdReq,
           descripcion: "",
           pasosRequisito:
           [
@@ -802,13 +804,16 @@ const editarUbicacion = async (idMod: number) => {
     
   }
   const handleAddReferencias = () => {
+    var newIdRef = referenciaData.data.length > 0 ? (referenciaData.data[referenciaData.data.length - 1].identificador) : -1;
+    newIdRef=newIdRef>0?(newIdRef+1)*-1:(newIdRef-1);
     const newReference = {
-      identificador: (referenciaData.data.length+1) * -1,
+      identificador: newIdRef,
       nombre: "", 
       numero: "", 
     };
     referenciaData.data.push(newReference);
     setInputsRef([...inputsRef]);
+    console.log(referenciaData.data)
   }
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
@@ -819,11 +824,13 @@ const editarUbicacion = async (idMod: number) => {
     
   }
   const handleAddHorarios = () => {
+    var newIdHorarios = horariosData.data.length > 0 ? (horariosData.data[horariosData.data.length - 1].idHorarios) : -1;
+    newIdHorarios=newIdHorarios>0?(newIdHorarios+1)*-1:(newIdHorarios-1);
     const newHorario:IEditarHorarioArray = {
       data:
       [
         {
-           idHorarios: (horariosData.data.length+1) * -1,
+           idHorarios: newIdHorarios,
             horaInicio: "",
             horaFin: "",
             modulo: null,
@@ -842,6 +849,7 @@ const editarUbicacion = async (idMod: number) => {
     horariosData.data.push(newHorario.data[0]);
     countHor--;
     setInputsHor([...inputsHor]);
+    console.log(horariosData.data)
   }
   const handleDeleteHorarios = (id:number) => {
 
