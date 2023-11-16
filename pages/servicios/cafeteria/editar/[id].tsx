@@ -13,6 +13,7 @@ import {
 import {uploadFile} from "../../../../firebase/config"
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
+import URLS from "utils/demo/api";
 
 interface props {
   id: number;
@@ -69,7 +70,7 @@ function EditarProducto({ id }: props) {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`)
+      fetch(`${URLS.baseUrl}Publicaciones/GetPublicacionByID/${id}`)
         .then((res) => res.json())
         .then((res) => setService(convertJSONService(res.data)));
         
@@ -128,7 +129,7 @@ function EditarProducto({ id }: props) {
         ]
       }));
     
-    await fetch(`http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicacionesWithDescription/${id}`, {
+    await fetch(`${URLS.baseUrl}Publicaciones/UpdatePublicacionesWithDescription/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
