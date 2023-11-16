@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Input, Label } from "@roketid/windmill-react-ui";
@@ -13,11 +14,11 @@ import { IRequirementData } from "utils/demo/requirementData";
 import { uploadFile } from "../../../../firebase/config";
 import { ToastContainer } from "react-toastify";
 import { errorAlert } from "components/alerts";
-import { IUbicacionesData } from "utils/demo/ubicacionesData";
 import servicesProvider from "../../../../utils/providers/servicesProvider";
 import requirementsProvider from "../../../../utils/providers/requirementsProvider";
 import ubicacionesProvider from "../../../../utils/providers/ubicacionesProvider";
 import referencesProvider from "../../../../utils/providers/referencesProvider";
+import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
 interface props {
   id: number;
@@ -48,7 +49,6 @@ function EditarServicio({ id }: props) {
   const [validationMessage, setvalidationMessage] = useState<string>("");
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
   const [locations, setLocations] = useState<IUbicacionesData[]>([]);
-
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index].description = value;
@@ -100,8 +100,6 @@ function EditarServicio({ id }: props) {
 
   const handleSubmit = async () => {
     ValidateForm();
-    console.log(locations);
-    console.log(serviceImgArray);
     if (formIsValid) {
       try {
         if (serviceImg) {
@@ -119,7 +117,6 @@ function EditarServicio({ id }: props) {
           encharged,
           cellphone
         );
-        console.log(locations);
         locations.map(async (e, index) => {
           if (serviceImgArray[index] == null) {
             await ubicacionesProvider.UpdateSingleUbicacion(
@@ -208,7 +205,7 @@ function EditarServicio({ id }: props) {
         </Label>
 
         <Label className="mt-4">
-          <span className=" text-lg">Imagen de referencia del tramite</span>
+          <span className=" text-lg">Imagen de referencia de la ubicación</span>
           <div className="text-center">
             <div className="flex items-center justify-center space-x-4">
               <div className="flex flex-col items-center space-y-2">

@@ -212,6 +212,39 @@ function CrearServicio() {
                 </Button>
               </div>
             </div>
+            {/*<div>
+              <Label className="mt-4">
+                <div className="text-center">
+                  <div className="flex items-center justify-center space-x-4">
+                    <div className="flex flex-col items-center space-y-2">
+                      <span>Nueva Imagen</span>
+                      <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                        <img
+                          className="w-full h-full object-cover"
+                          src={
+                            serviceImgArray == null ||
+                            serviceImgArray.length == 0 ||
+                            serviceImgArray[index] == null
+                              ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                              : URL.createObjectURL(serviceImgArray[index])
+                          }
+                          alt="Imagen de Ubicación Nueva"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Label>
+              <Input
+                type="file"
+                accept=".jpg, .jpeg, .png"
+                className="mt-4"
+                placeholder="Imagen del servicio"
+                onChange={(e) =>
+                  handleSetLocation(index, e.target.files?.[0] || null)
+                }
+              />
+            </div>*/}
           </div>
         ))}
         <div className="flex flex-row-reverse ...">
