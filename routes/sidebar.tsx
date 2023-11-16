@@ -86,6 +86,10 @@ const routes: IRoute[] = [
         path: "/administracion/direccionDeCarrera/carrera",
         name: "Carreras",
       },
+      {
+        path: "/administracion/direccionDeCarrera/facultad",
+        name: "Facultades",
+      },
     ],
   },
   {
@@ -164,20 +168,19 @@ const routes: IRoute[] = [
       },
     ],
   },
-   {
+  {
     path: "/usuarios",
     icon: "PeopleIcon",
     name: "Usuarios",
     routes: [
-       {
+      {
         path: "/usuarios/listarUsuarios",
         name: "Listar Usuarios",
       },
       {
         path: "/usuarios/registrar",
         name: "Registrar",
-      }
-      
+      },
     ],
     exact: true,
   },
