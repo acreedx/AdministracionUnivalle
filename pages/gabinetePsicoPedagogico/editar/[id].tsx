@@ -44,6 +44,7 @@ function EditarServicioPage() {
   const [ubicaionVideo,setUVideo]:any = useState(null)
   const [serviceImg, setImg]: any = useState(null);
 
+  
   const [moduloData, setModuloData] = useState<IEditarServicio>({
     nombre: "",
     imagenUrl:null
