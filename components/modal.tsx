@@ -1,29 +1,23 @@
-import { FC,ChangeEvent } from "react";
+import { FC, ChangeEvent } from "react";
 import { useState } from "react";
 import { Button } from "@roketid/windmill-react-ui";
 
 interface ModalProps {
-  pageRender:any;
-  buttonName:string;
+  pageRender: any;
+  buttonName: any;
 }
-const ModalPage: FC<ModalProps> = ({
- pageRender,
- buttonName
-}) => {
-   const [showModal, setShowModal] = useState(false);
+const ModalPage: FC<ModalProps> = ({ pageRender, buttonName }) => {
+  const [showModal, setShowModal] = useState(false);
   return (
     <>
-      <Button
-        
-          type="button"
-          onClick={() => setShowModal(true)}
-        >
-          {buttonName}
-        </Button>
-       {showModal ? (
+      <Button type="button" onClick={() => setShowModal(true)}>
+        {buttonName}
+      </Button>
+
+      {showModal ? (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="w-fit bg-gray-900  rounded-lg shadow-xl p-3">
-            <h2 className="text-base text-gray-400 font-semibold text-center">
+            <h2 className="text-base text-gray-400 font-semibold ">
               {pageRender}
             </h2>
             <Button

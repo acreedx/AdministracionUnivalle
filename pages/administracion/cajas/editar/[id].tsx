@@ -49,6 +49,7 @@ function EditarServicio({ id }: props) {
   const [validationMessage, setvalidationMessage] = useState<string>("");
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
   const [locations, setLocations] = useState<IUbicacionesData[]>([]);
+
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index].description = value;
@@ -100,6 +101,8 @@ function EditarServicio({ id }: props) {
 
   const handleSubmit = async () => {
     ValidateForm();
+    console.log(locations);
+    console.log(serviceImgArray);
     if (formIsValid) {
       try {
         if (serviceImg) {

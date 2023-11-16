@@ -23,6 +23,10 @@ import RequisitoInputs from "../../../components/requisitosInput"
 import RequisitoPasosInputs from "../../../components/requisitoPasosInput"
 import Image from 'next/image'
 import VideoPlayer from "components/video_player";
+import Modal from '../../../components/modal';
+import EliminarReferencia from "../eliminarDatos/referenciaDel";
+import EliminarRequisitos from "../eliminarDatos/requisitosDel";
+
 export async function getServerSideProps(context: any) {
   return {
     props: {},
@@ -111,7 +115,7 @@ function EditarDatosGeneralesPage() {
   async function cargarDatosModulo(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
+        `https://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -131,7 +135,7 @@ function EditarDatosGeneralesPage() {
 async function cargarDatosUbicacion(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos de la ubicación.");
@@ -158,7 +162,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -180,7 +184,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
+        `https://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -203,7 +207,7 @@ async function cargarDatosUbicacion(id: number) {
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-  }, []);
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setModuloData({
@@ -291,7 +295,7 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
       }
       console.log(postModul)
       fetch(
-        `http://apisistemaunivalle.somee.com/api/Modulos/updateModulo/${id}`,
+        `https://apisistemaunivalle.somee.com/api/Modulos/updateModulo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -336,7 +340,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
         {
           method: "POST",
           headers: {
@@ -365,7 +369,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
+        `https://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -419,7 +423,7 @@ const editarUbicacion = async (idMod: number) => {
               
         };
           fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
+          `https://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
           {
             method: "POST",
             headers: {
@@ -449,7 +453,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postReq)
           fetch(
-          `http://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
+          `https://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
           {
             method: "PUT",
             headers: {
@@ -501,7 +505,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postRef)
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+        `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
         {
           method: "POST",
           headers: {
@@ -525,7 +529,7 @@ const editarUbicacion = async (idMod: number) => {
           numerocel:req.numero,
         };
         fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+        `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -579,9 +583,9 @@ const editarUbicacion = async (idMod: number) => {
   }
   const handleDeleteRequisitos = (id:number) => {
     if(id<0){
-      requisitosData.data.pop();
+      const indexAEliminar=requisitosData.data.findIndex((ex)=>ex.identificador===id);
+      requisitosData.data.splice(indexAEliminar, 1);
       setInputsReq([...inputsReq]);
-      console.log(requisitosData.data)
     }
     
   }
@@ -593,19 +597,18 @@ const editarUbicacion = async (idMod: number) => {
     };
     referenciaData.data.push(newReference);
     setInputsRef([...inputsRef]);
-    console.log(referenciaData.data)
   }
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
-      referenciaData.data.pop();
+      const indexAEliminar=referenciaData.data.findIndex((ex)=>ex.identificador===id);
+      referenciaData.data.splice(indexAEliminar,1);
       setInputsRef([...inputsRef]);
-      console.log(referenciaData.data)
     }
     
   }
   return (
     <Layout>
-      <PageTitle>Editar Pagina Principal - Gabinete Medico</PageTitle>
+      <PageTitle>Editar Pagina Principal - Gabinete Psico-Pedagogico</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -650,11 +653,20 @@ const editarUbicacion = async (idMod: number) => {
             </Button>
           </div>
         </div>
-        <div className="mt-4">
-         
+        
+        <div className="flex">
+         <div className="mx-2 mt-4">
           <Button size="large" onClick={()=>editarRequisitos(numId)}>
             Editar
-          </Button>
+          </Button> 
+        </div>
+          <div className="mx-2 mt-4">
+            <Modal pageRender={<EliminarRequisitos 
+            title="Gabinete Psico-Pedagogico"
+            pathEnable={`Requisitos/getRequisitosByModuloId/${numId}`}
+            pathDisable={`Requisitos/getDisabledRequisitosByModuloId/${numId}`}
+              />} buttonName="Gestionar Requisitos"/>
+          </div>
         </div>
       </div>
       <SectionTitle>Contactos de referencia</SectionTitle>
@@ -679,10 +691,19 @@ const editarUbicacion = async (idMod: number) => {
             </Button>
           </div>
         </div>
-        <div className=" mt-4">
+        <div className="flex">
+          <div className="mx-2 mt-4">
           <Button size="large" onClick={() => editarReferencias(numId)}>
             Editar
           </Button>
+          </div>
+          <div className="mx-2 mt-4">
+            <Modal pageRender={<EliminarReferencia 
+            title="Gabinete Psico-Pedagogico"
+            pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
+            pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+              />} buttonName="Gestionar Contactos"/>
+          </div>
         </div>
       </div>
       <SectionTitle>Ubicación</SectionTitle>

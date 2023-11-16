@@ -23,6 +23,10 @@ import RequisitoInputs from "../../../components/requisitosInput"
 import RequisitoPasosInputs from "../../../components/requisitoPasosInput"
 import Image from 'next/image'
 import VideoPlayer from "components/video_player";
+import Modal from '../../../components/modal';
+import EliminarReferencia from "../eliminarDatos/referenciaDel";
+import EliminarRequisitos from "../eliminarDatos/requisitosDel";
+
 export async function getServerSideProps(context: any) {
   return {
     props: {},
@@ -203,7 +207,7 @@ async function cargarDatosUbicacion(id: number) {
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
-  }, []);
+  }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setModuloData({
@@ -579,9 +583,9 @@ const editarUbicacion = async (idMod: number) => {
   }
   const handleDeleteRequisitos = (id:number) => {
     if(id<0){
-      requisitosData.data.pop();
+      const indexAEliminar=requisitosData.data.findIndex((ex)=>ex.identificador===id);
+      requisitosData.data.splice(indexAEliminar, 1);
       setInputsReq([...inputsReq]);
-      console.log(requisitosData.data)
     }
     
   }
@@ -597,15 +601,15 @@ const editarUbicacion = async (idMod: number) => {
   }
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
-      referenciaData.data.pop();
+      const indexAEliminar=referenciaData.data.findIndex((ex)=>ex.identificador===id);
+      referenciaData.data.splice(indexAEliminar,1);
       setInputsRef([...inputsRef]);
-      console.log(referenciaData.data)
     }
     
   }
   return (
     <Layout>
-      <PageTitle>Editar Pagina Principal - Bienestar Universitario</PageTitle>
+      <PageTitle>Editar Pagina Principal - Binestar Universitario</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -650,11 +654,20 @@ const editarUbicacion = async (idMod: number) => {
             </Button>
           </div>
         </div>
-        <div className="mt-4">
-         
+        
+        <div className="flex">
+         <div className="mx-2 mt-4">
           <Button size="large" onClick={()=>editarRequisitos(numId)}>
             Editar
-          </Button>
+          </Button> 
+        </div>
+          <div className="mx-2 mt-4">
+            <Modal pageRender={<EliminarRequisitos 
+            title="Bienestar Universitario"
+            pathEnable={`Requisitos/getRequisitosByModuloId/${numId}`}
+            pathDisable={`Requisitos/getDisabledRequisitosByModuloId/${numId}`}
+              />} buttonName="Gestionar Requisitos"/>
+          </div>
         </div>
       </div>
       <SectionTitle>Contactos de referencia</SectionTitle>
@@ -679,10 +692,19 @@ const editarUbicacion = async (idMod: number) => {
             </Button>
           </div>
         </div>
-        <div className=" mt-4">
+        <div className="flex">
+          <div className="mx-2 mt-4">
           <Button size="large" onClick={() => editarReferencias(numId)}>
             Editar
           </Button>
+          </div>
+          <div className="mx-2 mt-4">
+            <Modal pageRender={<EliminarReferencia 
+            title="Bienestar Universitario"
+            pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
+            pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+              />} buttonName="Gestionar Contactos"/>
+          </div>
         </div>
       </div>
       <SectionTitle>Ubicación</SectionTitle>
