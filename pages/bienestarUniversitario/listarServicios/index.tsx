@@ -31,6 +31,8 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
+import Modal from "../../../components/modal";
+import RegistrarPage from "../registrar/index";
 import RegistrarServicioPageModal from "../registrar";
 
 function BienestarUniversitario() {
@@ -356,7 +358,7 @@ function BienestarUniversitario() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
+                                        pathname: `/bienestarUniversitario/editar/${datos.identificador}`,
                                       }}
                                     >
                                       <Button

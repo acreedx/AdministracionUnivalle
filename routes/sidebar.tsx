@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-    ? pathname.indexOf(route.path) === 0
-    : false;
+      ? pathname.indexOf(route.path) === 0
+      : false;
 }
 
 const routes: IRoute[] = [
@@ -41,11 +41,7 @@ const routes: IRoute[] = [
         path: "/administracion/cajas",
         name: "Listar Servicios",
       },
-      {
-        path: "/administracion/cajas/crear",
-        name: "Crear Servicios",
-      },
-      {
+      /*{
         path: "/administracion/cajas/horariosubicacion",
         name: "Contactos",
       },
@@ -53,6 +49,10 @@ const routes: IRoute[] = [
         path: "/administracion/cajas/crearcontacto",
         name: "Crear Contacto",
       },
+      {
+        path: "/administracion/cajas/datosgenerales",
+        name: "Datos Generales",
+      },*/
     ],
   },
   {
@@ -63,14 +63,6 @@ const routes: IRoute[] = [
       {
         path: "/administracion/tramites",
         name: "Listar",
-      },
-      {
-        path: "/administracion/tramites/crear",
-        name: "Crear",
-      },
-      {
-        path: "/administracion/tramites/inactivos",
-        name: "Listar deshabilitados",
       },
     ],
   },
@@ -83,13 +75,16 @@ const routes: IRoute[] = [
         path: "/administracion/tramites/categorias",
         name: "Listar",
       },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Dirección de carrera",
+    routes: [
       {
-        path: "/administracion/tramites/categorias/crear",
-        name: "Crear",
-      },
-      {
-        path: "/administracion/tramites/categorias/inactivos",
-        name: "Listar deshabilitados",
+        path: "/administracion/direccionDeCarrera/carrera",
+        name: "Carreras",
       },
     ],
   },
@@ -170,6 +165,23 @@ const routes: IRoute[] = [
       },
     ],
   },
+   {
+    path: "/usuarios",
+    icon: "PeopleIcon",
+    name: "Usuarios",
+    routes: [
+       {
+        path: "/usuarios/listarUsuarios",
+        name: "Listar Usuarios",
+      },
+      {
+        path: "/usuarios/registrar",
+        name: "Registrar",
+      }
+      
+    ],
+    exact: true,
+  },
   {
     path: "/bienestarUniversitario",
     icon: "BienestarIcon",
@@ -181,15 +193,11 @@ const routes: IRoute[] = [
       },
       {
         path: "/bienestarUniversitario/listarObjPerdidos/",
-        name: "Listar Objetos Perdidos",
-      },
-      {
-        path: "/bienestarUniversitario/agregarObjPerdido",
-        name: "Agregar Objeto Perdido",
+        name: "Objetos Perdidos",
       },
       {
         path: "/bienestarUniversitario/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
@@ -204,7 +212,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabineteMedico/listarServicios/15",
+        path: "/gabineteMedico/listarServicios",
         name: "Listar Servicios",
       },
     ],
@@ -220,7 +228,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/gabinetePsicoPedagogico/listarServicios/14",
+        path: "/gabinetePsicoPedagogico/listarServicios",
         name: "Listar Servicios",
       },
     ],
@@ -236,7 +244,7 @@ const routes: IRoute[] = [
         name: "Datos Generales",
       },
       {
-        path: "/consultorioOdontologico/listarServicios/16",
+        path: "/consultorioOdontologico/listarServicios",
         name: "Listar Servicios",
       },
     ],

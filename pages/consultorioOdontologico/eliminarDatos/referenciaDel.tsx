@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, {FC, useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -30,8 +30,21 @@ import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
 import SearchBar from "components/searchBar";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 
-function BienestarUniversitario() {
+interface RefereciaProps {
+  pathEnable:string;
+  pathDisable:string;
+  title:string
+}
+
+const EliminarReferencia: FC<RefereciaProps> = ({
+
+ pathEnable,
+ pathDisable,
+ title
+}) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -82,7 +95,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+      `http://apisistemaunivalle.somee.com/api/${pathEnable}`
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -91,8 +104,8 @@ function BienestarUniversitario() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/${
-          action ? "deleteServicio" : "restoreServicio"
+        `http://apisistemaunivalle.somee.com/api/Referencia/${
+          action ? "DeleteReferences" : "RestoreReferences"
         }/${selectedObj}`,
         {
           method: "PUT",
@@ -142,28 +155,21 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+        `http://apisistemaunivalle.somee.com/api/${pathEnable}`
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/16"
+        `http://apisistemaunivalle.somee.com/api/${pathDisable}`
       );
     }
   };
 
   return (
-    <Layout>
+    <div>
       {!isLoading ? (
         <>
-          <PageTitle>
-            Listado de servicios - Gabinete Psico Pedagógico
-          </PageTitle>
+          <PageTitle>Lista de Contactos - {title}</PageTitle>
 
-          <div className="mb-8">
-            <Link href="/bienestarUniversitario/registrar">
-              <Button size="large">Registrar servicio</Button>
-            </Link>
-          </div>
           {dataTable2.length > 0 ? (
             <>
               <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
@@ -206,10 +212,8 @@ function BienestarUniversitario() {
                   <Table>
                     <TableHeader>
                       <tr>
-                        <TableCell>Imagen</TableCell>
                         <TableCell>Nombre</TableCell>
-                        <TableCell>Modulo</TableCell>
-                        <TableCell>Estado</TableCell>
+                        <TableCell>Número</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -222,51 +226,19 @@ function BienestarUniversitario() {
                         .map((datos: any, i) => (
                           <TableRow key={i}>
                             <TableCell>
-                              <div className="flex items-center text-sm">
-                                {isValidUrl(datos.archivo) ? (
-                                  <Avatar
-                                    className="hidden mr-3 md:block"
-                                    src={datos.archivo}
-                                    size="large"
-                                  />
-                                ) : (
-                                  <span className="text-center">-</span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
                               <div>
                                 <p>{datos.nombre}</p>
                               </div>
                             </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{datos.modulo}</span>
-                            </TableCell>
-                            <TableCell>
-                              <Badge type={datos.estado ? "success" : "danger"}>
-                                <p>{datos.estado ? "Activo" : "Inactivo"}</p>
-                              </Badge>
+                           <TableCell>
+                              <div>
+                                <p>{datos.numero}</p>
+                              </div>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <Link
-                                      href={{
-                                        pathname: `/bienestarUniversitario/editarObjPerdido/${datos.identificador}`,
-                                      }}
-                                    >
-                                      <Button
-                                        layout="link"
-                                        size="small"
-                                        aria-label="Edit"
-                                      >
-                                        <EditIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      </Button>
-                                    </Link>
                                   </>
                                 )}
                                 <Button
@@ -355,8 +327,8 @@ function BienestarUniversitario() {
         </div>
       )}
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
 
-export default BienestarUniversitario;
+export default EliminarReferencia;
