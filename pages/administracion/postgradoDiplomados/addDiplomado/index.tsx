@@ -3,14 +3,7 @@ import { Input, Label, Select, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
-import {
-  successAlert,
-  errorAlert,
-  warningAlert,
-} from "../../../../../components/alerts";
 import { ToastContainer } from "react-toastify";
-
-import { uploadFile } from "../../../../../firebase/config";
 
 import {
   IAddDiplomado,
@@ -21,7 +14,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import URL from "../../../../api/apiCarrer";
+import URL from "utils/demo/api";
+import { errorAlert, successAlert, warningAlert } from "components/alerts";
 
 function AgregarDiplomadoPage() {
   const router = useRouter();
@@ -51,13 +45,16 @@ function AgregarDiplomadoPage() {
       [campo]: e.target.value,
     }));
   };
-  const handleChangeDes = (e: ChangeEvent<HTMLTextAreaElement>, campo: string) => {
+  const handleChangeDes = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    campo: string
+  ) => {
     setDiplomado((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
   };
-  
+
   const addDoctorado = () => {
     if (
       diplomado.titulo != null &&
@@ -71,7 +68,7 @@ function AgregarDiplomadoPage() {
         },
         body: JSON.stringify({
           titulo: diplomado.titulo,
-          modalidad: diplomado.descripcion,
+          modalidad: diplomado.modalidad,
           imagen: diplomado.imagen,
         }),
       })
@@ -108,8 +105,6 @@ function AgregarDiplomadoPage() {
     setImg(null);
     clearImg();
   };
-
- 
 
   return (
     <Layout>
