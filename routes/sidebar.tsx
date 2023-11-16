@@ -108,7 +108,7 @@ const routes: IRoute[] = [
       },
     ],
   },
-  {
+  /*{
     path: "/example/forms",
     icon: "FormsIcon",
     name: "Forms",
@@ -164,7 +164,7 @@ const routes: IRoute[] = [
         name: "Blank",
       },
     ],
-  },
+  },*/
    {
     path: "/usuarios",
     icon: "PeopleIcon",
