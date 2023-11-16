@@ -9,7 +9,7 @@ import { PlusIcon, MinusIcon } from "icons";
 import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
 import { uploadFile } from "../../../firebase/config";
 import existingLocations from "../../../utils/dataTools/existingLocations";
-import { IconBase } from "react-icons/lib";
+
 
 
 function CrearTramite() {
@@ -25,13 +25,13 @@ function CrearTramite() {
   const [locationCroquisImg, setLocationCroquisImage] = useState<string[]>([]);
   const [valueNewLocation, setValueNewLocation] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>(['']);
-  const [fileLocationImg, setfileLocationImg]:any = useState<any[]>([]);
-  const [fileCroquisImg, setfileCroquisImg]:any = useState<any[]>([]);
+  const [fileLocationImg, setfileLocationImg]: any = useState<any[]>([]);
+  const [fileCroquisImg, setfileCroquisImg]: any = useState<any[]>([]);
 
   const handleCreateValueNewLocation = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocation = [...valueNewLocation, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setValueNewLocation(updatedValueLocation);
   };
@@ -53,7 +53,7 @@ function CrearTramite() {
   const handleCreateLocationImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationImg = [...locationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationImage(updatedValueLocationImg);
   };
@@ -75,7 +75,7 @@ function CrearTramite() {
   const handleCreateLocationCroquisImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationCroquisImg = [...locationCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationCroquisImage(updatedValueLocationCroquisImg);
   };
@@ -97,7 +97,7 @@ function CrearTramite() {
   const handleCreateFileLocationImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileLocationImg = [...fileLocationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileLocationImg(updatedFileLocationImg);
   };
@@ -119,7 +119,7 @@ function CrearTramite() {
   const handleCreateFileCroquisImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileCroquisImg = [...fileCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileCroquisImg(updatedFileCroquisImg);
   };
@@ -141,23 +141,22 @@ function CrearTramite() {
   const handleSetCommonLocationImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationImg(existingLocations[i].locationIMG, index)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
   };
   const handleSetCommonLocationCroquisImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationCroquisImg(existingLocations[i].croquis, index)
         //setLocationCroquisImage(existingLocations[i].croquis)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
+
   };
   const agregarLocation = () => {
     setLocations([...locations, '']);
@@ -185,20 +184,20 @@ function CrearTramite() {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
     }
   };
-  const handleChangeLocationCroquisImgByInput= (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleChangeLocationCroquisImgByInput = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const archivo = e.target.files?.[0];
     handleChangeFileCroquisImg(archivo, index)
     if (archivo) {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationCroquisImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
@@ -271,7 +270,7 @@ function CrearTramite() {
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Solicitudes");
 
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
@@ -308,8 +307,8 @@ function CrearTramite() {
         body: JSON.stringify({
           nombre: name,
           moduloId: moduleId,
-          imageUrl: "",
-          //      imagenUrl: await uploadFile(serviceImg, "servicios/"),
+          //imageUrl: "",
+          imagenUrl: await uploadFile(serviceImg, "servicios/"),
           idCategoria: selectedCategoryId
         }),
       });
@@ -380,12 +379,11 @@ function CrearTramite() {
 
   const createLocation = async (serviceId: number) => {
     //console.log(locationImg)
-    for (let i = 0; i < locationImg.length; i++){
+    for (let i = 0; i < locationImg.length; i++) {
       const location = locationImg[i];
       //console.log(location)
       var imgURL
-      if(location.includes("data:"))
-      {
+      if (location.includes("data:")) {
         //console.log(fileLocationImg[i])
         imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
       }
@@ -413,12 +411,11 @@ function CrearTramite() {
   };
   const createCroqui = async (serviceId: number) => {
     //console.log(locationCroquisImg)
-    for (let i = 0; i < locationCroquisImg.length; i++){
+    for (let i = 0; i < locationCroquisImg.length; i++) {
       const location = locationCroquisImg[i];
       var imgURL
       //console.log(location)
-      if(location.includes("data:"))
-      {
+      if (location.includes("data:")) {
         //console.log(fileLocationImg[i])
         imgURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
       }
@@ -431,7 +428,7 @@ function CrearTramite() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            descripcion: "CROQUIS"+valueNewLocation[i],
+            descripcion: "CROQUIS" + valueNewLocation[i],
             imagen: imgURL,
             video: "",
             serviciosId: serviceId,
@@ -494,7 +491,7 @@ function CrearTramite() {
             />
           </Label>
           {nameError && <span className="text-red-500">{nameError}</span>}
-          
+
 
           <Label className="mt-4">
             <span className=" text-lg">Imagen de referencia para el servicio</span>
@@ -636,9 +633,9 @@ function CrearTramite() {
                     type="button"
                     onClick={() => eliminarLocation(locationIndex)}
                   >
-                    <MinusIcon/>
+                    <MinusIcon />
                   </button>
-                  
+
                   <Input
                     className="mt-1 mb-1"
                     id={locationIndex.toString()}
@@ -648,9 +645,9 @@ function CrearTramite() {
                     value={valueNewLocation[locationIndex]}
                     onChange={(e) => {
                       handleChangeValueNewLocationByInput(e, locationIndex)
-                      if(!locationImg[locationIndex].includes("data:"))
+                      if (!locationImg[locationIndex].includes("data:"))
                         handleSetCommonLocationImg(e, locationIndex)
-                      if(!locationCroquisImg[locationIndex].includes("data:"))
+                      if (!locationCroquisImg[locationIndex].includes("data:"))
                         handleSetCommonLocationCroquisImg(e, locationIndex)
                       //console.log(locationImg)
                       //console.log(locationCroquisImg[locationIndex].includes("data:"))
@@ -659,19 +656,19 @@ function CrearTramite() {
                   />
                   <datalist id={"Locations" + locationIndex.toString()}>
                     {existingLocations.map((existingLocation, i) => (
-                      <option 
-                        key={existingLocation.id} 
+                      <option
+                        key={existingLocation.id}
                         value={existingLocation.name}
                         id={
-                          existingLocation.locationIMG 
-                          + ".-.-." + existingLocation.croquis 
+                          existingLocation.locationIMG
+                          + ".-.-." + existingLocation.croquis
                           + ".-.-." + existingLocation.name}
                       >
                         ubicacion común
                       </option>
                     ))}
                   </datalist>
-                  
+
                 </div>
 
                 <div className="flex justify-center space-x-10 mb-2">
@@ -682,9 +679,9 @@ function CrearTramite() {
                       className="mt-1"
                       placeholder="Imagen para ubicación"
                       onChange={(e) => handleChangeLocationImgByInput(e, locationIndex)}
-                      />
+                    />
                   </Label>
-                  
+
                   <Label className="mt-4">
                     <span>Croquis de la ubicación del lugar</span>
                     <Input
@@ -694,11 +691,11 @@ function CrearTramite() {
                       onChange={(e) => handleChangeLocationCroquisImgByInput(e, locationIndex)}
                     />
                   </Label>
-                  
+
                 </div>
                 <div className="flex justify-center space-x-10 mb-2 h-60 ">
-                  <img className = "" src={locationImg[locationIndex]} width="300rem"/>
-                  <img className = "" src={locationCroquisImg[locationIndex]} width="300rem"/>
+                  <img className="" src={locationImg[locationIndex]} width="300rem" />
+                  <img className="" src={locationCroquisImg[locationIndex]} width="300rem" />
                 </div>
               </div>
             ))}
