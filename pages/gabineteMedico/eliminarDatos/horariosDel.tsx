@@ -33,6 +33,7 @@ import SearchBar from "components/searchBar";
 import Modal from '../../../components/modal'
 import RegistrarPage from '../registrar/index'
 
+<<<<<<< HEAD:pages/gabineteMedico/eliminarDatos/horariosDel.tsx
 interface RefereciaProps {
   pathEnable:string;
   pathDisable:string;
@@ -40,6 +41,10 @@ interface RefereciaProps {
 }
 
 const EliminarHorario: FC<RefereciaProps> = ({
+=======
+import { IDiplomados } from "utils/interfaces/PostGrado/MDD";
+import URL from "pages/api/apiCareerDirection";
+>>>>>>> 46be6f7300240741cae930e923987436e13225dc:pages/administracion/postgradoDiplomados/index.tsx
 
  pathEnable,
  pathDisable,
@@ -168,7 +173,17 @@ const EliminarHorario: FC<RefereciaProps> = ({
     <div>
       {!isLoading ? (
         <>
+<<<<<<< HEAD:pages/gabineteMedico/eliminarDatos/horariosDel.tsx
           <PageTitle>Horarios de Atención - {title}</PageTitle>
+=======
+          <PageTitle>Maestrias, Doctorados y Diplomados - PostGrado</PageTitle>
+
+          <div className="mb-8">
+            <Link href="/administracion/postgradoDiplomados/addDiplomado/">
+              <Button size="large">Agregar Diplomado</Button>
+            </Link>
+          </div>
+>>>>>>> 46be6f7300240741cae930e923987436e13225dc:pages/administracion/postgradoDiplomados/index.tsx
 
           {dataTable2.length > 0 ? (
             <>
