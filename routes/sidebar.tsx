@@ -99,13 +99,14 @@ const routes: IRoute[] = [
     routes: [
       // submenu
       {
+        path: "/example/create-account",
+        name: "Crear Servicio",
+      },
+      {
         path: "/servicios/cafeteria",
         name: "Cafeteria",
       },
-      {
-        path: "/example/create-account",
-        name: "Create account",
-      },
+
       {
         path: "/example/forgot-password",
         name: "Forgot password",
@@ -238,7 +239,6 @@ const routes: IRoute[] = [
         path: "/consultorioOdontologico/listarServicios/16",
         name: "Listar Servicios",
       },
-     
     ],
     exact: true,
   },
