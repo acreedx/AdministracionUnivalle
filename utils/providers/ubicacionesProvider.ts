@@ -47,8 +47,10 @@ class UbicacionesProvider {
   public async UpdateSingleUbicacion(
     description: string,
     serviciosId: Number,
-    ubicacionId: Number
+    ubicacionId: Number,
+    imagen: string
   ) {
+    console.log(ubicacionId);
     fetch(`${URL.baseUrl}${this.UpdateUbicacionesRoute}${ubicacionId}`, {
       method: "PUT",
       headers: {
@@ -56,7 +58,7 @@ class UbicacionesProvider {
       },
       body: JSON.stringify({
         descripcion: description,
-        imagen: "",
+        imagen: imagen,
         video: "",
         serviciosId: serviciosId,
         id_modulo: this.id_modulo,
@@ -81,7 +83,12 @@ class UbicacionesProvider {
     ubicacionesList.forEach((elements) => {
       ubicaciones.forEach((element) => {
         if (elements.id == element.id) {
-          this.UpdateSingleUbicacion(elements.name, serviciosId, element.id);
+          this.UpdateSingleUbicacion(
+            elements.name,
+            serviciosId,
+            element.id,
+            element.imagen
+          );
         }
       });
     });
@@ -118,8 +125,9 @@ class UbicacionesProvider {
         if (res.data != null) {
           res.data.forEach((e: any) => {
             const ubicacionTemp: IUbicacionesData = {
-              id: e.id,
+              id: e.identificador,
               name: e.descripcion,
+              imagen: e.imagen,
             };
             this.ubicacionesList.push(ubicacionTemp);
           });
