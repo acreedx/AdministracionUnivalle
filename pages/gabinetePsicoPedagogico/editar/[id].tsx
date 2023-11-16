@@ -36,7 +36,7 @@ export async function getServerSideProps(context: any) {
   };
 }
 
-function EditarDatosGeneralesPage() {
+function EditarServicioPage() {
   const baseURL="https://apisistemaunivalle.somee.com/api";
   var countReq=-1;
   var countHor=-1;
@@ -1142,4 +1142,4 @@ const editarUbicacion = async (idMod: number) => {
   );
 }
 
-export default EditarDatosGeneralesPage;
+export default EditarServicioPage;
