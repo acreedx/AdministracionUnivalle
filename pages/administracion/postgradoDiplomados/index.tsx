@@ -30,9 +30,8 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 
-import URL from "../../../api/apiCarrer";
-
-import {IDiplomados} from "utils/interfaces/PostGrado/MDD";
+import { IDiplomados } from "utils/interfaces/PostGrado/MDD";
+import URL from "pages/api/apiCareerDirection";
 
 function Maestria() {
   const router = useRouter();
@@ -164,7 +163,6 @@ function Maestria() {
               <Button size="large">Agregar Diplomado</Button>
             </Link>
           </div>
-
 
           {dataTable2.length > 0 ? (
             <>
