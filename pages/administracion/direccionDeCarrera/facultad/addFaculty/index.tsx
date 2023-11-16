@@ -18,63 +18,36 @@ import { ToastContainer } from "react-toastify";
 
 import { uploadFile } from "../../../../../firebase/config";
 
-import {
-  IAddCarrer,
-  IFacultiesData,
-  convertJSONFaculty,
-  convertJSONListFaculty,
-} from "utils/interfaces/DireccionDeCarrera/Carreras";
+import { IAddFaculty } from "utils/interfaces/DireccionDeCarrera/Facultades";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import URL_API from "../../../../api/apiCareerDirection";
 
-function AddCarrerPage() {
+function AddFacultyPage() {
   const router = useRouter();
   const inputFileImg: any = useRef(null);
   const [img, setImg]: any = useState(null);
-  const [carrer, setCarrer] = useState<IAddCarrer>({
+  const [faculty, setFaculty] = useState<IAddFaculty>({
     titulo: "",
     descripcion: "",
-    tituloOtorgado: "",
-    duracion: 0,
-    planDeEstudios: "",
     imagen: "",
-    facultadId: 0,
   });
-  const [flags, setFlags] = useState({
-    titulo: undefined,
-    descripcion: undefined,
-    tituloOtorgado: undefined,
-    duracion: undefined,
-    planDeEstudios: undefined,
-    imagen: undefined,
-    facultadId: undefined,
-  });
-  const [textErrors, setTextErrors] = useState({
-    titulo: "",
-    descripcion: "",
-    tituloOtorgado: "",
-    duracion: 0,
-    planDeEstudios: "",
-    imagen: "",
-    facultadId: 0,
-  });
+const [flags, setFlags] = useState({
+  titulo: undefined,
+  descripcion: undefined,
+  imagen: undefined,
+});
+const [textErrors, setTextErrors] = useState({
+  titulo: "",
+  descripcion: "",
+  imagen: "",
+});
 
-  const [faculties, setFaculties] = useState<IFacultiesData[]>([]);
-  const [selectedFaculty, setSelectedFaculty] = useState("");
-
-  useEffect(() => {
-    async function doFetch() {
-      fetch(`${URL_API.baseUrl}Facultad/ListaActivos`)
-        .then((res) => res.json())
-        .then((res) => setFaculties(convertJSONListFaculty(res.response)));
-    }
-    doFetch();
-  }, []);
+  
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    setCarrer((prevData: any) => ({
+    setFaculty((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
@@ -83,7 +56,7 @@ function AddCarrerPage() {
     e: ChangeEvent<HTMLTextAreaElement>,
     campo: string
   ) => {
-    setCarrer((prevData: any) => ({
+    setFaculty((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
@@ -125,35 +98,29 @@ function AddCarrerPage() {
   };
 
   const uploadFiles = async () => {
-    carrer.imagen = "";
+    faculty.imagen = "";
     if (img != null) {
-      carrer.imagen = await uploadFile(img, "carreras/");
+      faculty.imagen = await uploadFile(img, "facultades/");
     }
-    addCarrer();
+    addFaculty();
   };
 
-  const addCarrer = () => {
+  const addFaculty = () => {
+    
     if (
-      carrer.titulo != null &&
-      carrer.descripcion != null &&
-      carrer.tituloOtorgado != null &&
-      carrer.duracion != null &&
-      carrer.planDeEstudios != null &&
-      carrer.imagen != null
+      faculty.titulo != null &&
+      faculty.descripcion != null &&
+      faculty.imagen != null
     ) {
-      fetch(`${URL_API.baseUrl}Carrera/Guardar`, {
+      fetch(`${URL_API.baseUrl}Facultad/Guardar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          titulo: carrer.titulo,
-          descripcion: carrer.descripcion,
-          tituloOtorgado: carrer.tituloOtorgado,
-          duracion: carrer.duracion,
-          planDeEstudios: carrer.planDeEstudios,
-          imagen: carrer.imagen,
-          facultadId: selectedFaculty,
+          titulo: faculty.titulo.toUpperCase(),
+          descripcion: faculty.descripcion,
+          imagen: faculty.imagen,
         }),
       })
         .then((response) => {
@@ -172,91 +139,64 @@ function AddCarrerPage() {
       warningAlert("Rellene todos los campos");
     }
   };
-  const clearValidations = () => {
-    setFlags(resetDefaultValFlags(flags, undefined));
-    setTextErrors(resetDefaultValFlags(textErrors, ""));
-  };
+
+  
 
   const clearImg = () => {
+    setImg(null);
     if (inputFileImg.current) {
       inputFileImg.current.value = null;
     }
   };
 
+  const clearValidations = () => {
+    setFlags(resetDefaultValFlags(flags, undefined));
+    setTextErrors(resetDefaultValFlags(textErrors, ""));
+  };
+
   const clearData = () => {
-    setCarrer({
-      ...carrer,
+    setFaculty({
+      ...faculty,
       titulo: "",
       descripcion: "",
-      tituloOtorgado: "",
-      duracion: 0,
-      planDeEstudios: "",
       imagen: "",
     });
-    setImg(null);
     clearImg();
     clearValidations();
   };
 
   return (
     <Layout>
-      <PageTitle>Agregar Carrera - Dirección de Carrera</PageTitle>
+      <PageTitle>Agregar Facultad - Dirección de Carrera</PageTitle>
       <SectionTitle>Ingrese todos los campos pedidos.</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Título</span>
           <Input
-            value={carrer.titulo}
+            value={faculty.titulo}
             className="mt-1"
             maxLength={50}
-            placeholder="Escriba título de la carrera"
+            placeholder="Escriba título de la facultad"
             onChange={(e) => handleChange(e, "titulo")}
           />
         </Label>
         <Label className="mt-3">
           <span>Descripción</span>
           <Textarea
-            value={carrer.descripcion}
+            value={faculty.descripcion}
             className="mt-1"
             rows={3}
-            placeholder="Escribe la descripción de la carrera."
+            placeholder="Escribe la descripción de la facultad."
             onChange={(e) => handleChangeDes(e, "descripcion")}
           />
         </Label>
-        <Label className="mt-3">
-          <span>Título Otorgado</span>
-          <Input
-            value={carrer.tituloOtorgado}
-            className="mt-1"
-            maxLength={50}
-            placeholder="Escriba título que otorga la carrera"
-            onChange={(e) => handleChange(e, "tituloOtorgado")}
-          />
-        </Label>
-        <Label className="mt-3">
-          <span>Duración</span>
-          <Input
-            type="number"
-            value={carrer.duracion}
-            maxLength={1}
-            className="mt-1"
-            placeholder="Escriba la duración de la carrera"
-            onChange={(e) => handleChange(e, "duracion")}
-          />
-        </Label>
-        <Label className="mt-3">
-          <span>Plan de Estudios</span>
-          <Input
-            value={carrer.planDeEstudios}
-            className="mt-1"
-            placeholder="Ingrese la URL del pdf con el plan de estudios."
-            onChange={(e) => handleChange(e, "planDeEstudios")}
-          />
-        </Label>
+        
+        
+
         <Label className="mt-4">
           <span className=" text-lg">
-            Imagen de referencia para la carrera
+            Imagen de referencia para la facultad
           </span>
           <div className="text-center mb-5">
             <div className="flex items-center justify-center space-x-4">
@@ -270,7 +210,7 @@ function AddCarrerPage() {
                         ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
                         : URL.createObjectURL(img)
                     }
-                    alt="Imagen nueva"
+                    alt="Imagen de Ubicación Nueva"
                   />
                 </div>
               </div>
@@ -281,7 +221,7 @@ function AddCarrerPage() {
             valid={flags.imagen}
             type="file"
             className="mt-1"
-            placeholder="Imagen para la carrera"
+            placeholder="Imagen para la facultad"
             accept="image/jpeg, image/png"
             onChange={(e) => handleImageChange(e)}
           />
@@ -289,24 +229,11 @@ function AddCarrerPage() {
             <HelperText valid={flags.imagen}>{textErrors.imagen}</HelperText>
           )}
         </Label>
-        <Label className="mt-4">
-          <span>Seleccione una Facultad</span>
-          <Select
-            className="mt-1"
-            onChange={(e) => setSelectedFaculty(e.target.value)}
-          >
-            {faculties.map((facultad, i) => (
-              <option key={facultad.id} value={facultad.id}>
-                {facultad.titulo}
-              </option>
-            ))}
-          </Select>
-        </Label>
       </div>
 
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
-          <Link href={"/administracion/direccionDeCarrera/carrera"}>
+          <Link href={"/administracion/direccionDeCarrera/facultad"}>
             <Button size="large">Volver</Button>
           </Link>
         </div>
@@ -328,4 +255,4 @@ function AddCarrerPage() {
   );
 }
 
-export default AddCarrerPage;
+export default AddFacultyPage;

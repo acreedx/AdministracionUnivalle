@@ -8,11 +8,10 @@ import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
 import URL_API from "../../../../api/apiCareerDirection";
 import {
-  ICarrersData,
+  IEditFaculty,
   IFacultiesData,
-  convertJSONCarrer,
-  convertJSONListFaculty,
-} from "utils/interfaces/DireccionDeCarrera/Carreras";
+  convertJSONFaculty,
+} from "utils/interfaces/DireccionDeCarrera/Facultades";
 import { GetServerSidePropsContext } from "next";
 import { uploadFile } from "../../../../../firebase/config";
 
@@ -28,43 +27,32 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-function EditCarrer({ id }: props) {
+function EditFaculty({ id }: props) {
   const router = useRouter();
   const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [carrer, setCarrer] = useState<ICarrersData>();
+  const [faculty, setFaculty] = useState<IFacultiesData>();
+
 
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [tituloOtorgado, setTituloOtorgado] = useState("");
-  const [duracion, setDuracion] = useState(0);
-  const [planDeEstudios, setPlanDeEstudios] = useState("");
   let [imagen, setImagen] = useState("");
-  const [facultadId, setFacultadId] = useState(0);
   const [img, setImg]: any = useState(null);
 
-  const [selectedFaculty, setSelectedFaculty] = useState("");
-  const [faculties, setFaculties] = useState<IFacultiesData[]>([]);
+  
   const [showAlertValidation, setShowAlertValidation] =
     useState<boolean>(false);
   const [validationMessage, setValidationMessage] = useState<string>("");
 
-  useEffect(() => {
-    async function doFetch() {
-      fetch(`${URL_API.baseUrl}Facultad/ListaActivos`)
-        .then((res) => res.json())
-        .then((res) => setFaculties(convertJSONListFaculty(res.response)));
-    }
-    doFetch();
-  }, []);
+  
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL_API.baseUrl}Carrera/Obtener/${id}`)
+      fetch(`${URL_API.baseUrl}Facultad/Obtener/${id}`)
         .then((res) => res.json())
         .then((res) => {
-          const carrerData = convertJSONCarrer(res.response);
-          console.log("Datos de la API:", carrerData); // Agregar este console.log
-          setCarrer(carrerData);
+          const facultyData = convertJSONFaculty(res.response);
+          console.log("Datos de la API:", facultyData); // Agregar este console.log
+          setFaculty(facultyData);
         })
         .catch((error) => {
           console.error("Error al obtener datos de la API:", error);
@@ -85,61 +73,36 @@ function EditCarrer({ id }: props) {
       setShowAlertValidation(true);
       return;
     }
-    if (tituloOtorgado === "" || tituloOtorgado === null) {
-      setValidationMessage("Debe rellenar el campo de Título Otorgado");
-      setShowAlertValidation(true);
-      return;
-    }
-    if (duracion === 0 || duracion === null) {
-      setValidationMessage("Debe rellenar el campo de Duración");
-      setShowAlertValidation(true);
-      return;
-    }
-    if (planDeEstudios === "" || planDeEstudios === null) {
-      setValidationMessage("Debe rellenar el campo de Plan de Estudios");
-      setShowAlertValidation(true);
-      return;
-    }
     
-    if (img != null) {
-      imagen = await uploadFile(img, "carreras/");
-    }
-    if (facultadId === 0 || facultadId === null) {
-      setValidationMessage("Debe rellenar el campo de Facultad ID");
-      setShowAlertValidation(true);
-      return;
-    }
 
-    await fetch(`${URL_API.baseUrl}Carrera/Editar`, {
+    if (img != null) {
+      imagen = await uploadFile(img, "facultades/");
+    }
+      
+    
+
+    await fetch(`${URL_API.baseUrl}Facultad/Editar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         id: id,
-        titulo: titulo,
+        titulo: titulo.toUpperCase(),
         descripcion: descripcion,
-        tituloOtorgado: tituloOtorgado,
-        duracion: duracion,
-        planDeEstudios: planDeEstudios,
         imagen: imagen,
-        facultadId: selectedFaculty,
       }),
     });
     router.back();
   };
 
   useEffect(() => {
-    if (carrer?.titulo) {
-      setTitulo(carrer!.titulo);
-      setDescripcion(carrer!.descripcion);
-      setTituloOtorgado(carrer!.tituloOtorgado);
-      setDuracion(carrer!.duracion);
-      setPlanDeEstudios(carrer!.planDeEstudios);
-      setImagen(carrer!.imagen);
-      setFacultadId(carrer!.facultadId);
+    if (faculty?.titulo) {
+      setTitulo(faculty!.titulo);
+      setDescripcion(faculty!.descripcion);
+      setImagen(faculty!.imagen);;
     }
-  }, [carrer]);
+  }, [faculty]);
 
   const handleAlertConfirm = () => {
     handleSubmit();
@@ -151,9 +114,9 @@ function EditCarrer({ id }: props) {
 
   return (
     <Layout>
-      <PageTitle>Editar Carrera</PageTitle>
+      <PageTitle>Editar Facultad</PageTitle>
       <div className="mb-4">
-        <Link href={`/administracion/direccionDeCarrera/carrera`}>
+        <Link href={`/administracion/direccionDeCarrera/facultad`}>
           <Button size="small">
             <span className="mr-2" aria-hidden="true">
               {"←"}
@@ -168,7 +131,7 @@ function EditCarrer({ id }: props) {
             <span>Titulo</span>
             <Input
               className="mt-1"
-              placeholder="Ingresa el titulo de la carrera."
+              placeholder="Ingresa el titulo de la facultad."
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
             />
@@ -179,38 +142,8 @@ function EditCarrer({ id }: props) {
               value={descripcion}
               className="mt-1"
               rows={5}
-              placeholder="Ingrese la descripción de la carrera."
+              placeholder="Ingrese la descripción de la facultad."
               onChange={(e) => setDescripcion(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-3">
-            <span>Título Otorgado</span>
-            <Input
-              value={tituloOtorgado}
-              className="mt-1"
-              maxLength={50}
-              placeholder="Ingrese el título que otorga la carrera"
-              onChange={(e) => setTituloOtorgado(e.target.value)}
-            />
-          </Label>
-          <Label className="mt-3">
-            <span>Duración</span>
-            <Input
-              value={duracion}
-              type="number"
-              maxLength={1}
-              className="mt-1"
-              placeholder="Escriba la duración de la carrera"
-              onChange={(e) => setDuracion(e.target.valueAsNumber)}
-            />
-          </Label>
-          <Label className="mt-3">
-            <span>Plan de Estudios</span>
-            <Input
-              value={planDeEstudios}
-              className="mt-1"
-              placeholder="Ingrese la URL del pdf con el plan de estudios."
-              onChange={(e) => setPlanDeEstudios(e.target.value)}
             />
           </Label>
           
@@ -257,23 +190,6 @@ function EditCarrer({ id }: props) {
               onChange={(e) => setImg(e.target.files?.[0] || null)}
             />
           </Label>
-          <Label className="mt-4">
-            <span>Seleccione una Facultad</span>
-            <Select
-              className="mt-1"
-              value={selectedFaculty}
-              onChange={(e) => setSelectedFaculty(e.target.value)}
-            >
-              <option value="" disabled>
-                Seleccione una facultad
-              </option>
-              {faculties.map((facultad) => (
-                <option key={facultad.id} value={facultad.id}>
-                  {facultad.titulo}
-                </option>
-              ))}
-            </Select>
-          </Label>
 
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
@@ -302,7 +218,7 @@ function EditCarrer({ id }: props) {
           onConfirm={handleAlertConfirm}
           onCancel={handleAlertCancel}
         >
-          Esta seguro que desea actualizar esta carrera?
+          Esta seguro que desea actualizar esta facultad?
         </SweetAlert>
       )}
       {showAlertValidation && (
@@ -322,4 +238,4 @@ function EditCarrer({ id }: props) {
   );
 }
 
-export default EditCarrer;
+export default EditFaculty;

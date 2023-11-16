@@ -32,17 +32,17 @@ import SearchBar from "components/searchBar";
 
 import URL from "../../../api/apiCareerDirection";
 
-import { ICarrers } from "utils/interfaces/DireccionDeCarrera/Carreras";
+import { IFaculties } from "utils/interfaces/DireccionDeCarrera/Facultades";
 
-function Carrera() {
+function Facultad() {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
   const [pageTable2, setPageTable2] = useState(1);
 
-  const [dataTable, setTotalData] = useState<ICarrers[]>([]);
-  const [dataTable2, setUserInfo] = useState<ICarrers[]>([]);
-  const [dataTableSearch, setSearch] = useState<ICarrers[]>([]);
+  const [dataTable, setTotalData] = useState<IFaculties[]>([]);
+  const [dataTable2, setUserInfo] = useState<IFaculties[]>([]);
+  const [dataTableSearch, setSearch] = useState<IFaculties[]>([]);
 
   const [TotalResult, setTotal] = useState(Number);
   const [searchPage, setSearchPage] = useState(1);
@@ -89,7 +89,7 @@ function Carrera() {
 
   useEffect(() => {
     setIsLoading(true);
-    getData(`${URL.baseUrl}Carrera/ListaActivos`);
+    getData(`${URL.baseUrl}Facultad/ListaActivos`);
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
   }, [pageTable2]);
@@ -97,7 +97,7 @@ function Carrera() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `${URL.baseUrl}Carrera/${
+        `${URL.baseUrl}Facultad/${
           action ? "Eliminar" : "Reestablecer"
         }/${selectedObj}`,
         {
@@ -147,9 +147,9 @@ function Carrera() {
   const handleActiveChange = (e: ChangeEvent<HTMLInputElement>) => {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
-      getData(`${URL.baseUrl}Carrera/ListaActivos`);
+      getData(`${URL.baseUrl}Facultad/ListaActivos`);
     } else if (e.target.value === "inactivos") {
-      getData(`${URL.baseUrl}Carrera/ListaInactivos`);
+      getData(`${URL.baseUrl}Facultad/ListaInactivos`);
     }
   };
 
@@ -157,11 +157,11 @@ function Carrera() {
     <Layout>
       {!isLoading ? (
         <>
-          <PageTitle>Carreras - Dirección de Carrera</PageTitle>
+          <PageTitle>Facultades - Dirección de Carrera</PageTitle>
 
           <div className="mb-8">
-            <Link href="/administracion/direccionDeCarrera/carrera/addCarrer/">
-              <Button size="large">Agregar Carrera</Button>
+            <Link href="/administracion/direccionDeCarrera/facultad/addFaculty/">
+              <Button size="large">Agregar Facultad</Button>
             </Link>
           </div>
 
@@ -171,7 +171,7 @@ function Carrera() {
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar carrera"
+                      placeHolder="Buscar facultad"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
@@ -209,9 +209,6 @@ function Carrera() {
                       <tr>
                         <TableCell>Imagen</TableCell>
                         <TableCell>Titulo</TableCell>
-                        <TableCell>Titulo Otorgado</TableCell>
-                        <TableCell>Duración</TableCell>
-                        <TableCell>Facultad</TableCell>
                         <TableCell>Estado</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
@@ -244,23 +241,6 @@ function Carrera() {
                               </div>
                             </TableCell>
 
-                            <TableCell>
-                              <div>
-                                <p>{datos.tituloOtorgado}</p>
-                              </div>
-                            </TableCell>
-
-                            <TableCell>
-                              <div>
-                                <p>{datos.duracion}</p>
-                              </div>
-                            </TableCell>
-
-                            <TableCell>
-                              <div>
-                                <p>{datos.oFacultad.titulo}</p>
-                              </div>
-                            </TableCell>
 
                             <TableCell>
                               <Badge type={datos.estado ? "success" : "danger"}>
@@ -274,7 +254,7 @@ function Carrera() {
                                   <>
                                     <Link
                                       href={{
-                                        pathname: `/administracion/direccionDeCarrera/carrera/editCarrer/${datos.id}`,
+                                        pathname: `/administracion/direccionDeCarrera/facultad/editFaculty/${datos.id}`,
                                       }}
                                     >
                                       <Button
@@ -342,7 +322,7 @@ function Carrera() {
                                   >
                                     {datos.estado
                                       ? "¿Está seguro de eliminar este registro?"
-                                      : "¿Está seguro de recuperar este registro?"}
+                                      : "¿Está seguro de recuperar este registro este registro?"}
                                   </SweetAlert>
                                 )}
                               </div>
@@ -381,4 +361,4 @@ function Carrera() {
   );
 }
 
-export default Carrera;
+export default Facultad;
