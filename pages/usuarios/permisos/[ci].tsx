@@ -207,9 +207,8 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
   return (
     <Layout>
       <PageTitle>Editar Permisos del Usuario</PageTitle>
+      <SectionTitle>Datos Generales del usuario</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        
-        <SectionTitle>Datos Generales del usuario</SectionTitle>
         <div>
          <div className="flex">
             <Label className="mb-2 flex-1 mr-4">
@@ -283,8 +282,8 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
           </div>
         </div>
       </div>
+      <SectionTitle>Permisos Otorgados</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
-        <SectionTitle>Permisos Otorgados</SectionTitle>
         <div>
           <TableContainer className="mb-8">
             <Table>

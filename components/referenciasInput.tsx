@@ -24,23 +24,25 @@ const ReferenciaInputs: FC<ReferenciaInputsProps> = ({
       <div className="text-lg">
         {isNuevoContacto ? "Nuevo Contacto" : `Contacto ${isNuevoContacto ? "" : index + 1}`}
       </div>
-      <span>Nombre del Contacto</span>
-      <div className="flex">
-        <Input
-          value={valueNombre === null ? "" : valueNombre}
-          placeholder="Escriba el nombre del contacto."
-          onChange={(e) => handle(e, identificador, "nombre")}
-        />
-        <div className=" mx-1" ></div>
-        <Input
-          value={valueContacto === null ? "" : valueContacto}
-          placeholder="Escriba el número del contacto."
-          onChange={(e) => handle(e, identificador, "numero")}
-        />
-        <div className=" mx-1" ></div>
-        {isNuevoContacto? <Button size="small" onClick={()=>hadleDelete(identificador)}>-</Button>:null}
+      <div className="flex items-center">
+        <div className="w-1/2 pr-2"> {/* Dividir la fila en dos, ajustar el espacio a la derecha */}
+          <span>Nombre del Contacto</span>
+          <Input
+            value={valueNombre === null ? "" : valueNombre}
+            placeholder="Escriba el nombre del contacto."
+            onChange={(e) => handle(e, identificador, "nombre")}
+          />
+        </div>
+        <div className="w-1/2 pl-2"> {/* Dividir la fila en dos, ajustar el espacio a la izquierda */}
+          <span>Número del contacto</span>
+          <Input
+            value={valueContacto === null ? "" : valueContacto}
+            placeholder="Escriba el número del contacto."
+            onChange={(e) => handle(e, identificador, "numero")}
+          />
+        </div>
+        {isNuevoContacto ? <Button className="mt-4 ml-2" size="small" onClick={() => hadleDelete(identificador)}>-</Button> : null}
       </div>
-
       <hr className="mt-3" />
     </>
   );

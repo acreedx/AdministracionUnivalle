@@ -45,6 +45,13 @@ export interface IEditarUbicacion {
 export interface IEditarRequisitos {
   descripcion: string | null;
 }
+export interface IEditarCarrera {
+  nombre: string | null;
+}
+export interface IEditarReferencia {
+  nombre: string | null;
+  numeroCel: string | null;
+}
 
 export interface IEditarRequisitosArray {
   data:[
@@ -61,10 +68,27 @@ export interface IEditarRequisitosArray {
     }  
   ]
 }
-
-export interface IEditarCarrera {
-  nombre: string | null;
+export interface IEditarHorarioArray{
+  data:
+  [
+    {
+      idHorarios: number;
+      horaInicio: string;
+      horaFin: string;
+      modulo: string | null;
+      servicio: string | null;
+      estado: boolean;
+      diasAtencion:
+      [
+        {
+          idAtencion:number;
+          nombreDia:string|null;
+        }
+      ] 
+    }
+  ]
 }
+
 export interface IEditarReferenciaArray {
   data:
   [
@@ -76,10 +100,7 @@ export interface IEditarReferenciaArray {
   ]
  
 }
-export interface IEditarReferencia {
-  nombre: string | null;
-  numeroCel: string | null;
-}
+
 
 export interface IListarServicios {
   data: [
