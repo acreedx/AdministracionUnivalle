@@ -1,12 +1,13 @@
-import React, { useState, ChangeEvent, useEffect, TextareaHTMLAttributes } from "react";
+import React, { useState, ChangeEvent, useEffect, TextareaHTMLAttributes, useRef } from "react";
 import { 
   IEditarServicio,
   IEditarUbicacion,
   IEditarReferenciaArray,
   IEditarRequisitosArray, 
-  IEditarHorarioArray
+  IEditarHorarioArray,
+  IListarModulos
 } from "../../../utils/interfaces/servicios";
-import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
+import { HelperText, Input, Label, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -30,6 +31,7 @@ import EliminarRequisitos from "../eliminarDatos/requisitosServDel";
 import Link from "next/link";
 import EliminarHorario from "../eliminarDatos/horariosDel";
 import HorariosInputs from "components/horariosInput";
+import { checkValidationEdit, onlyLetters, onlyLettersAndNumbers, onlyNumbers, resetDefaultValFlags, validateImg, validateUbicationString, validateVideo } from "utils/functions/validations";
 export async function getServerSideProps(context: any) {
   return {
     props: {},
@@ -156,9 +158,65 @@ function EditarServicioPage() {
       }
     ]
   });
+
+  const [modules, setModules] = useState<IListarModulos[]>([]);
+
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
+   //Errors variables
+
+  
+
+  const [flagsRequisitos, setFlagsRequisitos] = useState([
+    {
+      nombreModulo: undefined,
+      imagen: undefined,
+    },
+  ]);
+  const [textErrorsRequisitos, setTextErrorsRequisitos] = useState([
+    {
+      nombreModulo: "",
+      imagen: "",
+    },
+  ]);
+
+  const [flagsReferencia, setFlagsReferencia] = useState<Array<any>>([]);
+  const [textErrorsReferencia, setTextErrorsReferencia] = useState<any>([]);
+
+  const [flagsUbicacion, setFlagsUbicacion] = useState({
+    descripcion: undefined,
+    imagen: undefined,
+    video: undefined,
+  });
+  const [textErrorsUbicacion, setTextErrorsUbicacion] = useState({
+    descripcion: "",
+    imagen: "",
+    video: "",
+  });
+  const [flagsServicioGral, setFlagsServicioGral] = useState({
+    nombre: undefined,
+    imagen: undefined,
+  });
+  const [textErrorsServicioGral, setTextErrorsServicioGral] = useState({
+    nombre: "",
+    imagen: "",
+  });
+  const inputFileImgUbi: any = useRef(null);
+  const inputFileVideoUbi: any = useRef(null);
+  const inputFileImgServicio: any = useRef(null);
+  async function cargarModulos() {
+    try {
+      const res = await fetch(`${baseURL}/Servicios/getActiveServicios`);
+      if (!res.ok) {
+        throw new Error("Error al obtener los datos del modulo.");
+      }
+      const resData = await res.json();
+      setModules(resData.data);
+    } catch (error) {
+      //errorAlert("Ocurrió un error al traer los datos");
+    }
+  }
   
   async function cargarDatosModulo(id: number) {
     try {
@@ -277,43 +335,199 @@ async function cargarDatosUbicacion(id: number) {
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
     cargarDatosHorario(numId);
+    cargarModulos();
   }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+    let valid: any = true;
+    let validText = "";
+    if (value === moduloBkData.nombre) {
+      valid = undefined;
+    } else if (
+      !onlyLettersAndNumbers(value) ||
+      value.length >= 50 ||
+      (emptyStringValue || [])[1].length > 0 ||
+      value.length === 0
+    ) {
+      valid = false;
+    }
+
+    if (!onlyLettersAndNumbers(value)) {
+      validText = "El nombre solo debe contener números y letras";
+    } else if (value.length >= 50) {
+      validText = "El nombre solo puede tener 50 caracteres como máximo";
+    } else if ((emptyStringValue || [])[1].length > 0) {
+      validText = "El nombre no puede tener espacios al inicio";
+    } else if (value.length === 0) {
+      validText = "No se puede ingresar un nombre vacío";
+    } else {
+      validText = "Nombre ingresado válido";
+    }
+
+    setFlagsServicioGral((prev) => ({ ...prev, nombre: valid }));
+    setTextErrorsServicioGral((prev) => ({ ...prev, nombre: validText }));
+
     setModuloData({
       ...moduloData,
       [campo]: e.target.value,
     });
   };
-const handleChange1 = (e: ChangeEvent<HTMLTextAreaElement>, id: number, pasoId: number, campo: string) => {
-  setRequisitosData((prevData: any) => {
-    const newData = prevData.data.map((requisito: any) => {
-      if (requisito.identificador === id) {
-        const updatedPasos = requisito.pasosRequisito.map((paso: any) => {
-          if (paso.identificador === pasoId) {
-            return {
-              ...paso,
-              [campo]: e.target.value,
-            };
-          }
-          return paso;
-        });
 
-        return {
-          ...requisito,
-          pasosRequisito: updatedPasos,
+  const handleChange1 = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    id: number,
+    pasoId: number,
+    campo: string
+  ) => {
+    setRequisitosData((prevData: any) => {
+      const newData = prevData.data.map((requisito: any) => {
+        if (requisito.identificador === id) {
+          const updatedPasos = requisito.pasosRequisito.map((paso: any) => {
+            if (paso.identificador === pasoId) {
+              return {
+                ...paso,
+                [campo]: e.target.value,
+              };
+            }
+            return paso;
+          });
+
+          return {
+            ...requisito,
+            pasosRequisito: updatedPasos,
+          };
+        }
+        return requisito;
+      });
+
+      return { data: newData };
+    });
+    console.log(requisitosData.data);
+  };
+
+  const handleChange2 = (
+    e: ChangeEvent<HTMLInputElement>,
+    id: number,
+    campo: string
+  ) => {
+    setRequisitosData((prevData: any) => {
+      const newData = prevData.data.map((item: any) => {
+        if (item.identificador === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          return {
+            ...item,
+            [campo]: e.target.value,
+          };
+        }
+        return item;
+      });
+
+      return { data: newData };
+    });
+    console.log(requisitosData.data);
+  };
+
+  const handleChange3 = (
+    e: ChangeEvent<HTMLInputElement>,
+    id: number,
+    campo: string
+  ) => {
+    const reference = referenciaData.data.find(
+      (r: any) => r.identificador === id
+    );
+
+    const referenceBk = refereciaBkData.data.find(
+      (r: any) => r.identificador === id
+    );
+
+    const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+    let valid: any = true;
+    let validText = "";
+
+    if (campo === "nombre") {
+      if (referenceBk && value === referenceBk.nombre) {
+        valid = undefined;
+      } else if (
+        !onlyLetters(value) ||
+        value.length >= 50 ||
+        (emptyStringValue || [])[1].length > 0 ||
+        value.length === 0
+      ) {
+        valid = false;
+      }
+
+      if (!onlyLetters(value)) {
+        validText = "El nombre solo debe contener números y letras";
+      } else if (value.length >= 50) {
+        validText = "El nombre solo puede tener 50 caracteres como máximo";
+      } else if ((emptyStringValue || [])[1].length > 0) {
+        validText = "El nombre no puede tener espacios al inicio";
+      } else if (value.length === 0) {
+        validText = "No se puede ingresar un nombre vacío";
+      } else {
+        validText = "Nombre ingresado válido";
+      }
+    } else if (campo === "numero") {
+      if (referenceBk && value === referenceBk.numero) {
+        valid = undefined;
+      } else if (
+        !onlyNumbers(value) ||
+        value.length >= 25 ||
+        (emptyStringValue || [])[1].length > 0 ||
+        value.length === 0
+      ) {
+        valid = false;
+      }
+
+      if (!onlyNumbers(value)) {
+        validText = "El número solo debe contener números y paréntesis";
+      } else if (value.length >= 25) {
+        validText = "El número solo puede tener 25 caracteres como máximo";
+      } else if ((emptyStringValue || [])[1].length > 0) {
+        validText = "El número no puede tener espacios al inicio";
+      } else if (value.length === 0) {
+        validText = "No se puede ingresar un número vacío";
+      } else {
+        validText = "Número ingresado válido";
+      }
+    }
+
+    setFlagsReferencia((prev: any) => {
+      const updatedFlags = [...prev];
+      const indexToUpdate = referenciaData.data.findIndex(
+        (ref) => ref.identificador === id
+      );
+
+      if (indexToUpdate !== -1) {
+        updatedFlags[indexToUpdate] = {
+          ...updatedFlags[indexToUpdate],
+          [campo]: valid,
         };
       }
-      return requisito;
+
+      return updatedFlags;
+    });
+    setTextErrorsReferencia((prev: any) => {
+      const updatedFlags = [...prev];
+      const indexToUpdate = referenciaData.data.findIndex(
+        (ref) => ref.identificador === id
+      );
+
+      if (indexToUpdate !== -1) {
+        updatedFlags[indexToUpdate] = {
+          ...updatedFlags[indexToUpdate],
+          [campo]: validText.toString(),
+        };
+      }
+
+      return updatedFlags;
     });
 
-    return { data: newData };
-  });
-  console.log(requisitosData.data);
-};
-const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
-      setRequisitosData((prevData:any) => {
-      const newData = prevData.data.map((item:any) => {
+    setReferenciaData((prevData: any) => {
+      const newData = prevData.data.map((item: any) => {
         if (item.identificador === id) {
           // Clona el objeto original y actualiza la propiedad especificada
           return {
@@ -322,35 +536,50 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
           };
         }
         return item;
-        });
-
-        return { data: newData };
       });
-      console.log(requisitosData.data);
-  };
-  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
-      setReferenciaData((prevData:any) => {
-      const newData = prevData.data.map((item:any) => {
-        if (item.identificador === id) {
-          // Clona el objeto original y actualiza la propiedad especificada
-          return {
-            ...item,
-            [campo]: e.target.value,
-          };
-        }
-        return item;
-        });
 
-        return { data: newData };
-      });
-      console.log(referenciaData.data);
+      return { data: newData };
+    });
+    console.log(referenciaData.data);
   };
   const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+    let valid: any = true;
+    let validText = "";
+    if (value === ubicacionBkData.descripcion) {
+      valid = undefined;
+    } else if (
+      !validateUbicationString(value) ||
+      value.length >= 250 ||
+      (emptyStringValue || [])[1].length > 0 ||
+      value.length === 0
+    ) {
+      valid = false;
+    }
+
+    if (!validateUbicationString(value)) {
+      validText =
+        'La descripción solo debe contener números, letras y el caracter "-"';
+    } else if (value.length >= 250) {
+      validText = "La descripción solo puede tener 250 caracteres como máximo";
+    } else if ((emptyStringValue || [])[1].length > 0) {
+      validText = "La descripción no puede tener espacios al inicio";
+    } else if (value.length === 0) {
+      validText = "No se puede ingresar una descripción vacía";
+    } else {
+      validText = "Descripción ingresada válida";
+    }
+
+    setFlagsUbicacion((prev) => ({ ...prev, descripcion: valid }));
+    setTextErrorsUbicacion((prev) => ({ ...prev, descripcion: validText }));
+
     setUbicacionData({
       ...ubicacionData,
       [campo]: e.target.value,
     });
   };
+
   const handleChange5 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
       setHorariosData((prevData:any) => {
       const newData = prevData.data.map((item:any) => {
@@ -396,73 +625,123 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
  
   const clearData = () => {
     setModuloData(moduloBkData);
+    setReferenciaData(refereciaBkData);
+    setRequisitosData(requisitosBkData);
+    setHorariosData(horariosBkData);
+    setUbicacionData(ubicacionBkData);
+    clearValidations();
+  };
+ const clearValidations = () => {
+    clearValidationsMod();
+    clearValidationsUbi();
   };
 
-  const editarModulo= async (id: number) => {
-    if (
-      moduloData.nombre !== moduloBkData.nombre ||
-      serviceImg!=null
+  const clearValidationsMod = () => {
+    setFlagsServicioGral(resetDefaultValFlags(flagsServicioGral, undefined));
+    setTextErrorsServicioGral(resetDefaultValFlags(textErrorsServicioGral, ""));
+  };
 
-    ) {
-      if (serviceImg != null) {
+  const clearValidationsUbi = () => {
+    setFlagsUbicacion(resetDefaultValFlags(flagsUbicacion, undefined));
+    setTextErrorsUbicacion(resetDefaultValFlags(textErrorsUbicacion, ""));
+  };
+ const editarModulo = async (id: number) => {
+    const check = checkValidationEdit(flagsServicioGral);
+    const repetitiveModule = modules.find(
+      (m: any) =>
+        m.nombre === moduloData.nombre &&
+        m.nombre != moduloBkData.nombre
+    );
+    const validation = check === 0 || check === 2 || repetitiveModule;
+    let send = validation ? false : true;
+
+    if (validation) {
+      warningAlert(
+        check === 0
+          ? "No cambio ningún dato, por lo que no se hizo la edición"
+          : check === 2
+          ? "Si desea editar, ingrese valores válidos"
+          : repetitiveModule
+          ? "Nombre del módulo ya existe"
+          : "Valor no válido ingresado"
+      );
+    }
+     if (send) {
+      if (serviceImg != null && flagsServicioGral.imagen) {
         moduloData.imagenUrl = await uploadFile(serviceImg, "servicios/");
       }
-
-      const postModul={
-        nombre:moduloData.nombre,
-        imagenUrl:moduloData.imagenUrl
-      }
-      
-
-      fetch(
-        `${baseURL}/Servicios/updateServicio/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postModul),
-        }
-      )
+      const postModul = {
+        nombre: moduloData.nombre,
+        imagenUrl:moduloData.imagenUrl,
+      };
+      fetch(`${baseURL}/Servicios/updateServicio/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postModul),
+      })
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
             cargarDatosModulo(id);
-            setImg(null);
+            cargarModulos();
+            clearImgServ();
+            clearValidationsMod();
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
         })
         .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      } else {
+    } else {
       //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
+
 const editarUbicacion = async (idMod: number) => {
-    if (
-      
-      ubicacionData.descripcion !== ubicacionBkData.descripcion ||
-      ubicacionImg!=null||
-      ubicaionVideo!=null
-    ) {
-      if(ubicacionImg!=null){
-        ubicacionData.imagen = await uploadFile(ubicacionImg,"ubicaciones/imagenes/");
+    let send = true;
+    const check = checkValidationEdit(flagsUbicacion);
+    if (check === 0) {
+      send = false;
+      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+    }
+    if (check === 2) {
+      send = false;
+      warningAlert("Si desea editar, ingrese valores válidos");
+    }
+
+    if (send) {
+      if (ubicacionImg != null && flagsUbicacion.imagen) {
+        ubicacionData.imagen = await uploadFile(
+          ubicacionImg,
+          "ubicaciones/imagenes/"
+        );
       }
-      if(ubicaionVideo!=null){
-        ubicacionData.video = await uploadFile(ubicaionVideo,"ubicaciones/videos/");
+      if (ubicaionVideo != null && flagsUbicacion.video) {
+        ubicacionData.video = await uploadFile(
+          ubicaionVideo,
+          "ubicaciones/videos/"
+        );
       }
-      if(ubicacionBkData.descripcion==null && ubicacionBkData.imagen==null && ubicacionBkData.video==null){
-        const postUbi={
+      const postUbi={
           descripcion:ubicacionData.descripcion,
           imagen:ubicacionData.imagen,
           video:ubicacionData.video,
           serviciosId:idMod,
           estado:true,
         }
-        fetch(
-        `${baseURL}/Ubicaciones/addUbicaciones`,
+
+      const postOrPut =
+        ubicacionBkData.descripcion == null &&
+        ubicacionBkData.imagen == null &&
+        ubicacionBkData.video == null;
+
+      fetch(
+        postOrPut
+          ? `${baseURL}/Ubicaciones/addUbicaciones`
+          : `${baseURL}/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
-          method: "POST",
+          method: postOrPut ? "POST" : "PUT",
           headers: {
             "Content-Type": "application/json",
           },
@@ -473,44 +752,20 @@ const editarUbicacion = async (idMod: number) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
             cargarDatosUbicacion(idMod);
-            setUImg(null);
+            clearImg();
+            clearVideo();
+            clearValidationsUbi();
           } else {
             throw new Error("Error al cambiar los datos del servicio");
           }
         })
-        .catch(() => errorAlert("Ocurrio un error al agregar nuevos datos"));
-      }else{
-        const postUbi={
-          descripcion:ubicacionData.descripcion,
-          imagen:ubicacionData.imagen,
-          video:ubicacionData.video,
-          serviciosId:idMod,
-          estado:true,
-        }
-        fetch(
-        `${baseURL}/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postUbi),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-            cargarDatosUbicacion(idMod);
-            setUImg(null);
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }
-      
-    } else {
-      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+        .catch(() =>
+          errorAlert(
+            postOrPut
+              ? "Ocurrio un error al agregar nuevos datos"
+              : "Ocurrio un error al editar los datos"
+          )
+        );
     }
   };
   const editarRequisitos = async (idMod: number) => {
@@ -599,78 +854,108 @@ const editarUbicacion = async (idMod: number) => {
     
   };
   const editarReferencias = async (idMod: number) => {
-    var count =0;
-    referenciaData.data.forEach(req => {
-    var aux1:any;
-    var aux2:any;
-    if(count>=refereciaBkData.data.length){
-      aux1=null;
-      aux2=null;
-    }else{
-      aux1=refereciaBkData.data[count].nombre
-      aux2=refereciaBkData.data[count].numero
-    }
-    if (
-      req.nombre !== aux1 ||
-      req.numero !== aux2
-    ) {
-      if(req.identificador<=0){
-        const postRef = {
-          nombre:req.nombre,
-          numerocel:req.numero,
-          serviciosId:idMod,
-          estado: true
-        };
-        console.log(postRef)
-        fetch(
-        `${baseURL}/Referencia/addReferences`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postRef),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-            cargarDatosReferencia(idMod);
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
-         const postRef = {
-          nombre:req.nombre,
-          numerocel:req.numero,
-        };
-        fetch(
-        `${baseURL}/Referencia/updateReferences/${req.identificador}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postRef),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-            cargarDatosReferencia(idMod);
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+    var countVali = 0;
+    var count = 0;
+    referenciaData.data.forEach((req) => {
+      var aux1: any;
+      var aux2: any;
+      if (count >= refereciaBkData.data.length) {
+        aux1 = null;
+        aux2 = null;
+      } else {
+        aux1 = refereciaBkData.data[count].nombre;
+        aux2 = refereciaBkData.data[count].numero;
       }
-    } else {
-      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      if (req.nombre !== aux1 || req.numero !== aux2) {
+        let send = true;
+        const check = checkValidationEdit(flagsReferencia[count]);
+
+        if (check === 2) {
+          warningAlert(
+            "Registro " +
+              (count + 1) +
+              ": Si desea editar, ingrese valores válidos"
+          );
+          send = false;
+        }
+
+        if (send) {
+          if (req.identificador <= 0) {
+            const postRef = {
+              nombre:req.nombre,
+              numerocel:req.numero,
+              serviciosId:idMod,
+              estado: true
+            };
+            console.log(postRef);
+            fetch(`${baseURL}/Referencia/addReferences`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(postRef),
+            })
+              .then((response) => {
+                if (response.ok) {
+                  successAlert(
+                    "Registro " + (count + 1) + ": Éxito al editar los datos"
+                  );
+                  cargarDatosReferencia(idMod);
+                } else {
+                  throw new Error("Error al cambiar los datos del servicio");
+                }
+              })
+              .catch(() =>
+                errorAlert(
+                  "Registro " +
+                    (count + 1) +
+                    ": Ocurrio un error al editar los datos"
+                )
+              );
+          } else {
+            const postRef = {
+              nombre: req.nombre,
+              numerocel: req.numero,
+            };
+
+            fetch(
+              `${baseURL}/Referencia/updateReferences/${req.identificador}`,
+              {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(postRef),
+              }
+            )
+              .then((response) => {
+                if (response.ok) {
+                  successAlert(
+                    "Registro " + (count + 1) + ": Éxito al editar los datos"
+                  );
+                  cargarDatosReferencia(idMod);
+                } else {
+                  throw new Error("Error al cambiar los datos del servicio");
+                }
+              })
+              .catch(() =>
+                errorAlert(
+                  "Registro " +
+                    (count + 1) +
+                    ": Ocurrio un error al editar los datos"
+                )
+              );
+          }
+        }
+      } else {
+        countVali++;
+        //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      }
+      count++;
+    });
+    if (countVali >= referenciaData.data.length) {
+      warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
-    count++;
-  });
   };
    const editarHorarios = async (idMod: number) => {
     var count =0;
@@ -869,9 +1154,135 @@ const editarUbicacion = async (idMod: number) => {
     }
     
   }
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let imgRes = validateImg(value);
+
+    if (imgRes == 0) {
+      valid = undefined;
+    } else if (imgRes === 2 || imgRes === 3) {
+      valid = false;
+    }
+
+    if (imgRes == 1) {
+      setUImg(value);
+    } else {
+      clearImg();
+    }
+
+    validText =
+      imgRes === 1
+        ? "Imagen válida"
+        : imgRes === 2
+        ? "Solo se permite imágenes con tamaño menor a 10MB"
+        : imgRes === 3
+        ? "Solo se permiten imágenes jpg y png"
+        : "";
+
+    setFlagsUbicacion((prev) => ({ ...prev, imagen: valid }));
+    setTextErrorsUbicacion((prev) => ({
+      ...prev,
+      imagen: validText,
+    }));
+  };
+  
+const handleImageServChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let imgRes = validateImg(value);
+
+    if (imgRes == 0) {
+      valid = undefined;
+    } else if (imgRes === 2 || imgRes === 3) {
+      valid = false;
+    }
+
+    if (imgRes == 1) {
+      setImg(value);
+    } else {
+      clearImgServ();
+    }
+
+    validText =
+      imgRes === 1
+        ? "Imagen válida"
+        : imgRes === 2
+        ? "Solo se permite imágenes con tamaño menor a 10MB"
+        : imgRes === 3
+        ? "Solo se permiten imágenes jpg y png"
+        : "";
+
+    setFlagsServicioGral((prev) => ({ ...prev, imagen: valid }));
+    setTextErrorsServicioGral((prev) => ({
+      ...prev,
+      imagen: validText,
+    }));
+  };
+
+  const handleVideoChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let videoRes = validateVideo(value);
+
+    if (videoRes == 0) {
+      valid = undefined;
+    } else if (videoRes === 2 || videoRes === 3) {
+      valid = false;
+    }
+
+    if (videoRes == 1) {
+      setUVideo(value);
+    } else {
+      clearVideo();
+    }
+
+    validText =
+      videoRes === 1
+        ? "Video válido"
+        : videoRes === 2
+        ? "Solo se permite video con un tamaño menor o igual 200MB"
+        : videoRes === 3
+        ? "Solo se permiten videos mp4, m4v y webm"
+        : "";
+
+    setFlagsUbicacion((prev) => ({ ...prev, video: valid }));
+    setTextErrorsUbicacion((prev) => ({
+      ...prev,
+      video: validText,
+    }));
+  };
+
+  const clearImg = () => {
+    setUImg(null);
+    if (inputFileImgUbi.current) {
+      inputFileImgUbi.current.value = null;
+    }
+  };
+  const clearImgServ = () => {
+    setImg(null);
+    if (inputFileImgServicio.current) {
+      inputFileImgServicio.current.value = null;
+    }
+  };
+  const clearVideo = () => {
+    setUVideo(null);
+    if (inputFileVideoUbi.current) {
+      inputFileVideoUbi.current.value = null;
+    }
+  };
   return (
     <Layout>
-      <PageTitle>Editar Servicio - Clínica Odontologica</PageTitle>
+      <PageTitle>Editar Servicio - Clínica Odontológica</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
@@ -879,10 +1290,16 @@ const editarUbicacion = async (idMod: number) => {
           <span>Nombre del servicio</span>
           <Input
             value={moduloData.nombre}
+            valid={flagsServicioGral.nombre}
             className="mt-1"
             placeholder="Escriba aquí el nombre del servicio"
             onChange={(e) => handleChange(e, "nombre")}
           />
+          {flagsServicioGral.nombre != null && (
+            <HelperText valid={flagsServicioGral.nombre}>
+              {textErrorsServicioGral.nombre}
+            </HelperText>
+          )}
         </Label>
         <hr className="my-4"/>
         <Label>
@@ -912,11 +1329,19 @@ const editarUbicacion = async (idMod: number) => {
           </div>
         </div>
          <Input
-          type="file"
-          className="mt-1"
-          placeholder="Imagen del servicio"
-          onChange={e => setImg(e.target.files?.[0] || null)}
-        />
+            ref={inputFileImgServicio}
+            valid={flagsServicioGral.imagen}
+            type="file"
+            className="mt-1"
+            accept="image/jpeg, image/png"
+            placeholder="Imagen del servicio"
+            onChange={(e) => handleImageServChange(e)}
+          />
+          {flagsServicioGral.imagen != null && (
+            <HelperText valid={flagsServicioGral.imagen}>
+              {textErrorsServicioGral.imagen}
+            </HelperText>
+          )}
         </Label>
         <div className=" mt-4">
           <Button size="large" onClick={() => editarModulo(numId)}>
@@ -973,8 +1398,16 @@ const editarUbicacion = async (idMod: number) => {
           {
             referenciaData.data.map((ref,index)=>(
                <div className="my-3" key={ref.identificador}>
-                <ReferenciaInputs index={index} identificador={ref.identificador} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
-               </div>
+                <ReferenciaInputs
+                index={index}
+                identificador={ref.identificador}
+                valueNombre={ref.nombre}
+                valueContacto={ref.numero}
+                handle={handleChange3}
+                hadleDelete={handleDeleteReferencias}
+                flag={flagsReferencia[index]}
+                textFlag={textErrorsReferencia[index]}
+              />               </div>
             ))
           }
       
@@ -1051,6 +1484,11 @@ const editarUbicacion = async (idMod: number) => {
           placeholder="Ingrese la ubicación del servicio"
           onChange={(e) => handleChange4(e, "descripcion")}
         />
+        {flagsUbicacion.descripcion != null && (
+            <HelperText valid={flagsUbicacion.descripcion}>
+              {textErrorsUbicacion.descripcion}
+            </HelperText>
+          )}
       </Label>
       <hr className="mt-4"/>
       <Label className="mt-4">
@@ -1062,8 +1500,11 @@ const editarUbicacion = async (idMod: number) => {
               <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
                 <img
                   className="w-full h-full object-cover"
-                  src={ubicacionBkData.imagen === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : ubicacionBkData.imagen}
-                  alt="Imagen de Ubicación actual"
+                    src={
+                      ubicacionBkData.imagen === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : ubicacionBkData.imagen
+                    }                  alt="Imagen de Ubicación actual"
                 />
               </div>
             </div>
@@ -1072,19 +1513,29 @@ const editarUbicacion = async (idMod: number) => {
               <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
                 <img
                   className="w-full h-full object-cover"
-                  src={ubicacionImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : URL.createObjectURL(ubicacionImg)}
-                  alt="Imagen de Ubicación Nueva"
+                    src={
+                      ubicacionImg === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : URL.createObjectURL(ubicacionImg)
+                    }                  alt="Imagen de Ubicación Nueva"
                 />
               </div>
             </div>
           </div>
         </div>
         <Input
-          type="file"
-          className="mt-1"
-          placeholder="Imagen para ubicación"
-          onChange={e => setUImg(e.target.files?.[0] || null)}
-        />
+            ref={inputFileImgUbi}
+            type="file"
+            className="mt-1"
+            placeholder="Imagen para ubicación"
+            accept="image/jpeg, image/png"
+            onChange={(e) => handleImageChange(e)}
+          />
+          {flagsUbicacion.imagen != null && (
+            <HelperText valid={flagsUbicacion.imagen}>
+              {textErrorsUbicacion.imagen}
+            </HelperText>
+          )}
       </Label>
       <hr className="mt-4"/>
       <Label className="mt-4">
@@ -1113,12 +1564,20 @@ const editarUbicacion = async (idMod: number) => {
             </div>
           </div>
         </div>
-        <Input
-          type="file"
-          className="mt-1"
-          placeholder="Video para ubicación"
-          onChange={e => setUVideo(e.target.files?.[0] || null)}
-        />
+         <Input
+            ref={inputFileVideoUbi}
+            type="file"
+            className="mt-1"
+            placeholder="Video para ubicación"
+            accept="video/mp4,video/x-m4v,video/webm"
+            valid={flagsUbicacion.video}
+            onChange={(e) => handleVideoChange(e)}
+          />
+          {flagsUbicacion.video != null && (
+            <HelperText valid={flagsUbicacion.video}>
+              {textErrorsUbicacion.video}
+            </HelperText>
+          )}
       </Label>
 
       <div className="mt-4">
