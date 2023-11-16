@@ -1,5 +1,3 @@
-
-
 import ButtonsIcon from "./buttons.svg";
 import CardsIcon from "./cards.svg";
 import ChartsIcon from "./charts.svg";
