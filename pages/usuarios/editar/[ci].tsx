@@ -66,7 +66,7 @@ function EditarUsuarioPageModal() {
     apellidos: "",
   });
   const [nuevaClaveData, setNuevaClaveData] = useState<IEditarClave>({
-    clave: "",
+    newPassword: "",
   });
   const [cargosData, setCargosData] = useState<IListarCargos[]>([]);
   const [usuariosData, setUsuariosData] = useState<IListarUsuario[]>([]);
@@ -113,7 +113,7 @@ function EditarUsuarioPageModal() {
   
   };
   const handleChange3 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    if(campo=="clave"){
+    if(campo=="newPassword"){
       if(e.target.value.length>50){
         setClaveValid(false)
         setClaveText("La contraseña no puede superar los 50 caracteres")
@@ -142,7 +142,7 @@ function EditarUsuarioPageModal() {
     
   };
   const handleChange4 = (e: ChangeEvent<HTMLInputElement>) => {
-   if(e.target.value==nuevaClaveData.clave){
+   if(e.target.value==nuevaClaveData.newPassword){
       setClaveConfValid(true);
       setClaveConfText("La contraseña coincide");
     }else{
@@ -153,7 +153,7 @@ function EditarUsuarioPageModal() {
       setClaveConfValid(undefined);
       setClaveConfText("");
     }
-    
+    console.log(nuevaClaveData.newPassword)
   };
   function onlyNumbers(str: string) {
     return /^[0-9]*$/.test(str);
@@ -224,10 +224,7 @@ function EditarUsuarioPageModal() {
       errorAlert("Error al registrar Apellidos no validos");
       return;
     }
-    if(claveValid==false || !claveConfValid==false){
-      errorAlert("Error al registrar contraseña no valida");
-      return;
-    }
+
     nuevoUsuarioData.nombres=usuarioData.nombres;
     nuevoUsuarioData.apellidos=usuarioData.apellidos;
     fetch(`https://apisistemaunivalle.somee.com/api/Usuarios/updateUser/${strCi}`, {
@@ -250,16 +247,37 @@ function EditarUsuarioPageModal() {
       .catch(() => errorAlert("Error al registrar los datos"));
   };
 
-  function editarClave(): void {
-    throw new Error("Function not implemented.");
-  }
+  const editarClave = () => {
+    if(claveValid==false || claveConfValid==false){
+      errorAlert("Error al editar contraseña no valida");
+      return;
+    }
+    
+    fetch(`https://apisistemaunivalle.somee.com/api/Usuarios/changePassword/${strCi}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(nuevaClaveData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          successAlert("Éxito al cambiar la contraseña");
+          setTimeout(() => {
+            window.location.reload();
+          }, 2000);
+        } else {
+          throw new Error("Error al cambiar los datos del servicio");
+        }
+      })
+      .catch(() => errorAlert("Error al registrar los datos"));
+  };
 
   return (
     <Layout>
+      <PageTitle>Editar Datos Usuario</PageTitle>
+      <SectionTitle>Datos Generales del usuario</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Editar Datos Usuario</PageTitle>
-        <SectionTitle>Datos Generales del usuario</SectionTitle>
-
         <div>
           <Label className=" mb-2">
             <span className="text-lg">CI del usuario</span>
@@ -327,17 +345,17 @@ function EditarUsuarioPageModal() {
         </div>
         </div>
         </div>
+        <SectionTitle>Cambiar contraseña del Usuario</SectionTitle>
         <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-          <SectionTitle>Cambiar contraseña del Usuario</SectionTitle>
           <div>
             <Label className=" mb-2">
             <span className="text-lg">Contraseña</span>
             <Input
               type="password"
-              value={nuevaClaveData.clave}
+              value={nuevaClaveData.newPassword}
               className="mt-1"
               placeholder="Escriba aquí la contraseña del usuario"
-              onChange={(e) => handleChange3(e, "clave")}
+              onChange={(e) => handleChange3(e, "newPassword")}
               valid={claveValid}
             />
             {claveValid != null && (

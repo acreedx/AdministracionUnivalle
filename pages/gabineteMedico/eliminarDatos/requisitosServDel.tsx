@@ -94,7 +94,7 @@ const EliminarRequisitos: FC<RequisitosProps> = ({
   useEffect(() => {
     setIsLoading(true);
     getData(
-      `http://apisistemaunivalle.somee.com/api/${pathEnable}`
+      `https://apisistemaunivalle.somee.com/api/${pathEnable}`
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -103,7 +103,7 @@ const EliminarRequisitos: FC<RequisitosProps> = ({
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Requisitos/${
+        `https://apisistemaunivalle.somee.com/api/Requisitos/${
           action ? "deleteRequisito" : "restoreRequisito"
         }/${selectedObj}`,
         {
@@ -154,11 +154,11 @@ const EliminarRequisitos: FC<RequisitosProps> = ({
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        `http://apisistemaunivalle.somee.com/api/${pathEnable}`
+        `https://apisistemaunivalle.somee.com/api/${pathEnable}`
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        `http://apisistemaunivalle.somee.com/api/${pathDisable}`
+        `https://apisistemaunivalle.somee.com/api/${pathDisable}`
       );
     }
   };

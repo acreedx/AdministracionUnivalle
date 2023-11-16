@@ -39,7 +39,7 @@ interface RefereciaProps {
   title:string
 }
 
-const EliminarReferencia: FC<RefereciaProps> = ({
+const EliminarHorario: FC<RefereciaProps> = ({
 
  pathEnable,
  pathDisable,
@@ -104,8 +104,8 @@ const EliminarReferencia: FC<RefereciaProps> = ({
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Referencia/${
-          action ? "DeleteReferences" : "RestoreReferences"
+        `https://apisistemaunivalle.somee.com/api/Horarios/${
+          action ? "deleteHorarios" : "restoreHorarios"
         }/${selectedObj}`,
         {
           method: "PUT",
@@ -168,7 +168,7 @@ const EliminarReferencia: FC<RefereciaProps> = ({
     <div>
       {!isLoading ? (
         <>
-          <PageTitle>Lista de Contactos - {title}</PageTitle>
+          <PageTitle>Horarios de Atención - {title}</PageTitle>
 
           {dataTable2.length > 0 ? (
             <>
@@ -212,8 +212,9 @@ const EliminarReferencia: FC<RefereciaProps> = ({
                   <Table>
                     <TableHeader>
                       <tr>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Número</TableCell>
+                        <TableCell>Día</TableCell>
+                        <TableCell>Hora Apertura</TableCell>
+                        <TableCell>Hora Cierre</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -227,12 +228,17 @@ const EliminarReferencia: FC<RefereciaProps> = ({
                           <TableRow key={i}>
                             <TableCell>
                               <div>
-                                <p>{datos.nombre}</p>
+                                <p>{datos.diasAtencion[0].nombreDia}</p>
                               </div>
                             </TableCell>
                            <TableCell>
                               <div>
-                                <p>{datos.numero}</p>
+                                <p>{datos.horaInicio}</p>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div>
+                                <p>{datos.horaFin}</p>
                               </div>
                             </TableCell>
                             <TableCell>
@@ -248,7 +254,7 @@ const EliminarReferencia: FC<RefereciaProps> = ({
                                   type={"button"}
                                   onClick={() => {
                                     setShowAlert(true);
-                                    setSelectedObj(datos.identificador);
+                                    setSelectedObj(datos.idHorarios);
                                   }}
                                 >
                                   {datos.estado ? (
@@ -331,4 +337,4 @@ const EliminarReferencia: FC<RefereciaProps> = ({
   );
 }
 
-export default EliminarReferencia;
+export default EliminarHorario;

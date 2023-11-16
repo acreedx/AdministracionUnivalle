@@ -26,7 +26,11 @@ class UbicacionesProvider {
       });
     });
   }
-  public async CreateSingleUbicacion(description: string, serviceId: Number) {
+  public async CreateSingleUbicacion(
+    description: string,
+    imagen: string,
+    serviceId: Number
+  ) {
     fetch(`${URL.baseUrl}${this.createUbicacionRoute}`, {
       method: "POST",
       headers: {
@@ -34,7 +38,7 @@ class UbicacionesProvider {
       },
       body: JSON.stringify({
         descripcion: description,
-        imagen: "",
+        imagen: imagen,
         video: "",
         serviciosId: serviceId,
         id_modulo: this.id_modulo,
@@ -47,8 +51,10 @@ class UbicacionesProvider {
   public async UpdateSingleUbicacion(
     description: string,
     serviciosId: Number,
-    ubicacionId: Number
+    ubicacionId: Number,
+    imagen: string
   ) {
+    console.log(ubicacionId);
     fetch(`${URL.baseUrl}${this.UpdateUbicacionesRoute}${ubicacionId}`, {
       method: "PUT",
       headers: {
@@ -56,7 +62,7 @@ class UbicacionesProvider {
       },
       body: JSON.stringify({
         descripcion: description,
-        imagen: "",
+        imagen: imagen,
         video: "",
         serviciosId: serviciosId,
         id_modulo: this.id_modulo,
@@ -75,13 +81,18 @@ class UbicacionesProvider {
     );
     ubicaciones.forEach((e) => {
       if (e.id == 0) {
-        this.CreateSingleUbicacion(e.name, serviciosId);
+        this.CreateSingleUbicacion(e.name, e.imagen, serviciosId);
       }
     });
     ubicacionesList.forEach((elements) => {
       ubicaciones.forEach((element) => {
         if (elements.id == element.id) {
-          this.UpdateSingleUbicacion(elements.name, serviciosId, element.id);
+          this.UpdateSingleUbicacion(
+            elements.name,
+            serviciosId,
+            element.id,
+            element.imagen
+          );
         }
       });
     });
@@ -118,8 +129,9 @@ class UbicacionesProvider {
         if (res.data != null) {
           res.data.forEach((e: any) => {
             const ubicacionTemp: IUbicacionesData = {
-              id: e.id,
+              id: e.identificador,
               name: e.descripcion,
+              imagen: e.imagen,
             };
             this.ubicacionesList.push(ubicacionTemp);
           });

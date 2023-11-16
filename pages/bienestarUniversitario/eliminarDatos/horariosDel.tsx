@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, {FC, useState, useEffect, ChangeEvent } from "react";
+import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import {
@@ -21,29 +22,38 @@ import {
 import { EditIcon, TrashIcon } from "icons";
 import { FaRedo } from "react-icons/fa";
 
+import SweetAlert from "react-bootstrap-sweetalert";
+import { IListarServicios } from "utils/interfaces/servicios";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
+import { isValidUrl } from "utils/functions/url";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 import { ToastContainer } from "react-toastify";
-import { isValidUrl } from "utils/functions/url";
-import SweetAlert from "react-bootstrap-sweetalert";
-import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
+import Modal from '../../../components/modal'
+import RegistrarPage from '../registrar/index'
 
-import URL from "../../../api/apiCarrer";
+interface RefereciaProps {
+  pathEnable:string;
+  pathDisable:string;
+  title:string
+}
 
-import {IDiplomados} from "utils/interfaces/PostGrado/MDD";
+const EliminarHorario: FC<RefereciaProps> = ({
 
-function Maestria() {
+ pathEnable,
+ pathDisable,
+ title
+}) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState<number>(0);
   const [pageTable2, setPageTable2] = useState(1);
 
-  const [dataTable, setTotalData] = useState<IDiplomados[]>([]);
-  const [dataTable2, setUserInfo] = useState<IDiplomados[]>([]);
-  const [dataTableSearch, setSearch] = useState<IDiplomados[]>([]);
-
+  const [dataTable, setTotalData] = useState<IListarServicios[]>([]);
+  const [dataTable2, setUserInfo] = useState<IListarServicios[]>([]);
+  const [dataTableSearch, setSearch] = useState<IListarServicios[]>([]);
   const [TotalResult, setTotal] = useState(Number);
   const [searchPage, setSearchPage] = useState(1);
 
@@ -53,27 +63,22 @@ function Maestria() {
   const [selectedObj, setSelectedObj] = useState<number>(0);
   const [activeInactive, setActiveInactive] = useState<string>();
 
-  function onPageChangeTable2(p: number) {
-    setPageTable2(p);
-  }
-
   const getData = async (url: string) => {
     try {
       const query = await fetch(url);
       if (query.ok) {
-        const res: any = await query.json();
-        if (res.response != null) {
-          setTotalData(res.response);
-          setTotal(res.response.length);
+        const response: any = await query.json();
+        if (response.data != null) {
+          setTotalData(response.data);
+          setTotal(response.data.length);
           setUserInfo(
-            res.response.slice(
+            response.data.slice(
               (pageTable2 - 1) * resultsPerPage,
               pageTable2 * resultsPerPage
             )
           );
-          setSearch(res.response);
+          setSearch(response.data);
         } else {
-          console.log(url);
           warningAlert("No se encontrarón datos");
         }
       } else {
@@ -89,7 +94,9 @@ function Maestria() {
 
   useEffect(() => {
     setIsLoading(true);
-    getData(`${URL.baseUrl}/api/Carrera/ListaActivos`);
+    getData(
+      `https://apisistemaunivalle.somee.com/api/${pathEnable}`
+    );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
   }, [pageTable2]);
@@ -97,8 +104,8 @@ function Maestria() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `${URL.baseUrl}/api/Carrera/${
-          action ? "Eliminar" : "Reestablecer"
+        `https://apisistemaunivalle.somee.com/api/Horarios/${
+          action ? "deleteHorarios" : "restoreHorarios"
         }/${selectedObj}`,
         {
           method: "PUT",
@@ -128,8 +135,8 @@ function Maestria() {
   };
 
   const searchObjs = (parameter: string) => {
-    const filteredData = dataTable.filter((obj) =>
-      obj.titulo.toLowerCase().includes(parameter.toLowerCase())
+    const filteredData: any = dataTable.filter((obj: any) =>
+      obj.nombre.toLowerCase().includes(parameter.toLowerCase())
     );
     setSearch(filteredData);
     setTotal(filteredData.length);
@@ -147,24 +154,21 @@ function Maestria() {
   const handleActiveChange = (e: ChangeEvent<HTMLInputElement>) => {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
-      getData(`${URL.baseUrl}/api/Carrera/ListaActivos`);
+      getData(
+        `https://apisistemaunivalle.somee.com/api/${pathEnable}`
+      );
     } else if (e.target.value === "inactivos") {
-      getData(`${URL.baseUrl}/api/Carrera/ListaInactivos`);
+      getData(
+        `https://apisistemaunivalle.somee.com/api/${pathDisable}`
+      );
     }
   };
 
   return (
-    <Layout>
+    <div>
       {!isLoading ? (
         <>
-          <PageTitle>Maestrias, Doctorados y Diplomados - PostGrado</PageTitle>
-
-          <div className="mb-8">
-            <Link href="/administracion/postgradoDiplomados/addDiplomado/">
-              <Button size="large">Agregar Diplomado</Button>
-            </Link>
-          </div>
-
+          <PageTitle>Horarios de Atención - {title}</PageTitle>
 
           {dataTable2.length > 0 ? (
             <>
@@ -172,7 +176,7 @@ function Maestria() {
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar Diplomado"
+                      placeHolder="Buscar objeto perdido"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
@@ -208,10 +212,9 @@ function Maestria() {
                   <Table>
                     <TableHeader>
                       <tr>
-                        <TableCell>Imagen</TableCell>
-                        <TableCell>Titulo</TableCell>
-                        <TableCell>Modalidad</TableCell>
-                        <TableCell>Estado</TableCell>
+                        <TableCell>Día</TableCell>
+                        <TableCell>Hora Apertura</TableCell>
+                        <TableCell>Hora Cierre</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -224,57 +227,24 @@ function Maestria() {
                         .map((datos: any, i) => (
                           <TableRow key={i}>
                             <TableCell>
-                              <div className="flex items-center text-sm">
-                                {isValidUrl(datos.imagen) ? (
-                                  <Avatar
-                                    className="hidden mr-3 md:block"
-                                    src={datos.imagen}
-                                    size="large"
-                                  />
-                                ) : (
-                                  <span className="text-center">-</span>
-                                )}
+                              <div>
+                                <p>{datos.diasAtencion[0].nombreDia}</p>
                               </div>
                             </TableCell>
-
+                           <TableCell>
+                              <div>
+                                <p>{datos.horaInicio}</p>
+                              </div>
+                            </TableCell>
                             <TableCell>
                               <div>
-                                <p>{datos.titulo}</p>
+                                <p>{datos.horaFin}</p>
                               </div>
                             </TableCell>
-
-                            <TableCell>
-                              <div>
-                                <p>{datos.modalidad}</p>
-                              </div>
-                            </TableCell>
-
-                            <TableCell>
-                              <Badge type={datos.estado ? "success" : "danger"}>
-                                <p>{datos.estado ? "Activo" : "Inactivo"}</p>
-                              </Badge>
-                            </TableCell>
-
                             <TableCell>
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <Link
-                                      href={{
-                                        pathname: `/administracion/postgradoDiplomados/editDiplomado/${datos.id}`,
-                                      }}
-                                    >
-                                      <Button
-                                        layout="link"
-                                        size="small"
-                                        aria-label="Edit"
-                                      >
-                                        <EditIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      </Button>
-                                    </Link>
                                   </>
                                 )}
                                 <Button
@@ -284,7 +254,7 @@ function Maestria() {
                                   type={"button"}
                                   onClick={() => {
                                     setShowAlert(true);
-                                    setSelectedObj(datos.id);
+                                    setSelectedObj(datos.idHorarios);
                                   }}
                                 >
                                   {datos.estado ? (
@@ -350,7 +320,7 @@ function Maestria() {
                   </TableFooter>
                 </TableContainer>
               ) : (
-                <SectionTitle>No se encontró inactivos</SectionTitle>
+                <SectionTitle>No se encontró registros</SectionTitle>
               )}
             </>
           ) : (
@@ -362,10 +332,9 @@ function Maestria() {
           <PageTitle>Cargando datos...</PageTitle>
         </div>
       )}
-
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
 
-export default Maestria;
+export default EliminarHorario;

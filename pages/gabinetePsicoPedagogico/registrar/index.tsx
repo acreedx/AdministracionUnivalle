@@ -125,7 +125,7 @@ function RegistrarServicioPageModal() {
       warningAlert("El servicio ingresado ya existe");
     } else {
       if (checkValidation(flags) && servicioData.imagenUrl != null) {
-        fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+        fetch("https://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -203,7 +203,7 @@ function RegistrarServicioPageModal() {
 
   useEffect(() => {
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/14"
+      "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/14"
     );
   }, []);
 

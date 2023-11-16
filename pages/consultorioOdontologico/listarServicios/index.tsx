@@ -84,7 +84,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+      "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -93,7 +93,7 @@ function BienestarUniversitario() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Servicios/${
+        `https://apisistemaunivalle.somee.com/api/Servicios/${
           action ? "deleteServicio" : "restoreServicio"
         }/${selectedObj}`,
         {
@@ -144,11 +144,11 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+        "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "http://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/16"
+        "https://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/16"
       );
     }
   };
@@ -158,7 +158,7 @@ function BienestarUniversitario() {
       {!isLoading ? (
         <>
           <PageTitle>
-            Listado de servicios - Consultorio odontologico
+            Listado de servicios - Clínica Odontológica
           </PageTitle>
 
            <div className=" flex  mb-5">

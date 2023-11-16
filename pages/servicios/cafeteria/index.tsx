@@ -19,11 +19,10 @@ import {
   Pagination,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
-
-
 import Layout from "example/containers/Layout";
 import { route } from "next/dist/server/router";
 import response, { ICafeteriaData } from "utils/demo/cafeteriaData";
+import URLS from "utils/demo/api";
 
 const response2 = response.concat([]);
 
@@ -50,7 +49,7 @@ function Cafeteria() {
 
   useEffect(() => {
     const getData = async () => {
-      const query = await fetch('http://apisistemaunivalle.somee.com/api/Publicaciones/getPublicacionesbyModuloId/4');
+      const query = await fetch(`${URLS.baseUrl}Publicaciones/getPublicacionesbyModuloId/4`);
       const response:any= await query.json();
       //console.log(response)
       setTotal(response.data.length);
@@ -94,7 +93,7 @@ function Cafeteria() {
     deleteProduct(index)
   }
   const deleteProduct = async(index:number) =>{
-    await fetch(`https://apisistemaunivalle.somee.com/api/Publicaciones/DeletePublicaciones?id=${index}`, {
+    await fetch(`${URLS.baseUrl}Publicaciones/DeletePublicaciones?id=${index}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

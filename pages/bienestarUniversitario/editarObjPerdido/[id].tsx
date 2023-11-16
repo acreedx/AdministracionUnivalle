@@ -42,7 +42,7 @@ function AgregarObjPerdidoPage() {
     try {
       console.log(id);
       const res = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
+        `https://apisistemaunivalle.somee.com/api/Publicaciones/GetPublicacionByID/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -75,7 +75,7 @@ function AgregarObjPerdidoPage() {
       if (objPerData.archivo != null) {
         objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
         fetch(
-          `http://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
+          `https://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
           {
             method: "PUT",
             headers: {

@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-      ? pathname.indexOf(route.path) === 0
-      : false;
+    ? pathname.indexOf(route.path) === 0
+    : false;
 }
 
 const routes: IRoute[] = [
@@ -41,18 +41,6 @@ const routes: IRoute[] = [
         path: "/administracion/cajas",
         name: "Listar Servicios",
       },
-      /*{
-        path: "/administracion/cajas/horariosubicacion",
-        name: "Contactos",
-      },
-      {
-        path: "/administracion/cajas/crearcontacto",
-        name: "Crear Contacto",
-      },
-      {
-        path: "/administracion/cajas/datosgenerales",
-        name: "Datos Generales",
-      },*/
     ],
   },
   {
@@ -215,7 +203,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/gabineteMedico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
@@ -231,7 +219,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/gabinetePsicoPedagogico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
@@ -239,7 +227,7 @@ const routes: IRoute[] = [
   {
     path: "/consultorioOdontologico",
     icon: "DentistIcon",
-    name: "Consultorio Odontologico",
+    name: "Clínica Odontologica",
     routes: [
       {
         path: "/consultorioOdontologico/datosGenerales/16",
@@ -247,7 +235,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/consultorioOdontologico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,

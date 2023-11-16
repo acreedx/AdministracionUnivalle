@@ -126,7 +126,7 @@ function RegistrarServicioPageModal() {
       warningAlert("El servicio ingresado ya existe");
     } else {
       if (checkValidation(flags) && servicioData.imagenUrl != null) {
-        fetch("http://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
+        fetch("https://apisistemaunivalle.somee.com/api/Servicios/addServicio", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -204,13 +204,13 @@ function RegistrarServicioPageModal() {
 
   useEffect(() => {
     getData(
-      "http://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+      "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
     );
   }, []);
 
   return (
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <PageTitle>Registrar servicio - Consultorio Odontologico</PageTitle>
+      <PageTitle>Registrar servicio - Clínica Odontológica</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div>
