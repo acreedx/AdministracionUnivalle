@@ -31,9 +31,8 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 
-import URL from "../../../api/apiCarrer";
-
-import {IDiplomados} from "utils/interfaces/PostGrado/MDD";
+import { IDiplomados } from "utils/interfaces/PostGrado/MDD";
+import URL from "pages/api/apiCarrer";
 
 function Maestria() {
   //Autentificacion
