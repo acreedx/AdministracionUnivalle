@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import { isAuthenticated } from "utils/auth/auth";
 import {
   Table,
   TableHeader,
@@ -28,6 +29,14 @@ import SearchBar from "components/searchBar";
 import servicesProvider from "../../../utils/providers/servicesProvider";
 
 function Cajas() {
+  //Autentificacion
+  useEffect(() => {
+    const usuarioAutenticado = isAuthenticated();
+    if (!usuarioAutenticado) {
+      router.push("/login");
+    }
+  }, []);
+
   const router = useRouter();
   const [state, setState] = useState("");
   const resultsPerPage = 10;

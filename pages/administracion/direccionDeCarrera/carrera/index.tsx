@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import { isAuthenticated } from "utils/auth/auth";
 import {
   Table,
   TableHeader,
@@ -36,6 +37,13 @@ import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
 import {ICarrers} from "utils/interfaces/DireccionDeCarrera/Carreras";
 
 function Carrera() {
+  //Autentificacion
+  useEffect(() => {
+    const usuarioAutenticado = isAuthenticated();
+    if (!usuarioAutenticado) {
+      router.push("/login");
+    }
+  }, []);
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -165,7 +173,6 @@ function Carrera() {
               <Button size="large">Agregar Carrera</Button>
             </Link>
           </div>
-
 
           {dataTable2.length > 0 ? (
             <>

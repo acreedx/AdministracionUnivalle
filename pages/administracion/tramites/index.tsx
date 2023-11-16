@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import { isAuthenticated } from "utils/auth/auth";
 import {
   Table,
   TableHeader,
@@ -28,6 +29,13 @@ import Layout from "example/containers/Layout";
 
 import SweetAlert from "react-bootstrap-sweetalert";
 function Tramites() {
+  //Autentificacion
+  useEffect(() => {
+    const usuarioAutenticado = isAuthenticated();
+    if (!usuarioAutenticado) {
+      router.push("/login");
+    }
+  }, []);
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -40,7 +48,11 @@ function Tramites() {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}${moduleName}`)
+      fetch(
+        `${URL.baseUrl}${
+          state == "activos" ? route : routeInactives
+        }${moduleName}`
+      )
         .then((res) => res.json())
         .then((res) => setServices(convertJSONListService(res.data)));
     }
@@ -74,14 +86,12 @@ function Tramites() {
       },
     });
     if (state != "activos") {
-
       await fetch(`${URL.baseUrl}${restoreServiceRoute}${selectedService}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
       });
-
     }
     router.reload();
   };
@@ -120,7 +130,7 @@ function Tramites() {
                 type="radio"
                 value="activos"
                 name="activeInactive"
-                checked={state === 'activos'}
+                checked={state === "activos"}
                 onChange={(e) => handleActiveChange(e)}
               />
               <span className="ml-2">Activos</span>
@@ -130,7 +140,7 @@ function Tramites() {
                 type="radio"
                 value="inactivos"
                 name="activeInactive"
-                checked={state === 'inactivos'}
+                checked={state === "inactivos"}
                 onChange={(e) => handleActiveChange(e)}
               />
               <span className="ml-2">Inactivos</span>
@@ -140,12 +150,10 @@ function Tramites() {
       </div>
       <div className="mb-1">
         <Link href={`/administracion/tramites/crear`}>
-          <Button size="small">
-            Registrar un nuevo tramite
-          </Button>
+          <Button size="small">Registrar un nuevo tramite</Button>
         </Link>
-      </div> 
-      
+      </div>
+
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
@@ -166,133 +174,142 @@ function Tramites() {
                 if (searchTerm === "") {
                   return servicio;
                 } else if (
-                  servicio.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  servicio.encharged?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  servicio.cellphone?.toLowerCase().includes(searchTerm.toLowerCase())
+                  servicio.name
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  servicio.encharged
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase()) ||
+                  servicio.cellphone
+                    ?.toLowerCase()
+                    .includes(searchTerm.toLowerCase())
                 ) {
                   return servicio;
                 }
               })
-            .map((servicio, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      < Avatar
-                        className="hidden mr-3 md:block"
-                        src={servicio.image}
-                        size="large"
-                      />
+              .map((servicio, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <Avatar
+                          className="hidden mr-3 md:block"
+                          src={servicio.image}
+                          size="large"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.name}</p>
+                      </div>
+                    </div>
+                  </TableCell>
 
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.encharged}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.encharged}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.cellphone}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.cellphone}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.duration}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.duration}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.categoryId}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.categoryId}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    type={servicio.status == "success" ? "success" : "danger"}
-                  >
-                    {servicio.status == "success" ? "Activo" : "Inactivo"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-
-                  <div className="flex items-center space-x-4">
-                    {state === "activos" ? (
-                      <>
-                        <Link
-                          href={`/administracion/tramites/editar/[id]`}
-                          as={`/administracion/tramites/editar/${servicio.id}`}
-                        >
-                          <Button layout="link" size="small" aria-label="Edit">
-                            <EditIcon className="w-5 h-5" aria-hidden="true" />
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      type={servicio.status == "success" ? "success" : "danger"}
+                    >
+                      {servicio.status == "success" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-4">
+                      {state === "activos" ? (
+                        <>
+                          <Link
+                            href={`/administracion/tramites/editar/[id]`}
+                            as={`/administracion/tramites/editar/${servicio.id}`}
+                          >
+                            <Button
+                              layout="link"
+                              size="small"
+                              aria-label="Edit"
+                            >
+                              <EditIcon
+                                className="w-5 h-5"
+                                aria-hidden="true"
+                              />
+                            </Button>
+                          </Link>
+                          <Button
+                            layout="link"
+                            size="small"
+                            aria-label="Delete"
+                            type="button"
+                            onClick={() => {
+                              setShowAlert(true);
+                              setSelectedService(servicio.id);
+                            }}
+                          >
+                            <TrashIcon className="w-5 h-5" aria-hidden="true" />
                           </Button>
-                        </Link>
+                        </>
+                      ) : (
                         <Button
                           layout="link"
                           size="small"
                           aria-label="Delete"
-                          type="button"
+                          type={"button"}
                           onClick={() => {
                             setShowAlert(true);
                             setSelectedService(servicio.id);
                           }}
                         >
-                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                          <Badge className="w-5 h-5" aria-hidden="true" />
                         </Button>
-                      </>
-                    ) : (
+                      )}
 
-                      <Button
-                        layout="link"
-                        size="small"
-                        aria-label="Delete"
-                        type={"button"}
-                        onClick={() => {
-                          setShowAlert(true);
-                          setSelectedService(servicio.id);
-                        }}
-                      >
-                        <Badge className="w-5 h-5" aria-hidden="true" />
-
-                      </Button>
-                    )}
-
-
-                    {showAlert && (
-                      <SweetAlert
-                        warning
-                        title="Atención"
-                        confirmBtnText="Confirmar"
-                        cancelBtnText="Cancelar"
-                        showCancel
-                        onConfirm={handleAlertConfirm}
-                        onCancel={handleAlertCancel}
-                      >
-                        {state == "activos" ? "¿Estás seguro de eliminar este Trámite?" : "¿Estás seguro de restaurar este Trámite?"}
-                      </SweetAlert>
-                    )}
-                  </div>
-
-                </TableCell>
-              </TableRow>
-            ))}
+                      {showAlert && (
+                        <SweetAlert
+                          warning
+                          title="Atención"
+                          confirmBtnText="Confirmar"
+                          cancelBtnText="Cancelar"
+                          showCancel
+                          onConfirm={handleAlertConfirm}
+                          onCancel={handleAlertCancel}
+                        >
+                          {state == "activos"
+                            ? "¿Estás seguro de eliminar este Trámite?"
+                            : "¿Estás seguro de restaurar este Trámite?"}
+                        </SweetAlert>
+                      )}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
         <TableFooter>

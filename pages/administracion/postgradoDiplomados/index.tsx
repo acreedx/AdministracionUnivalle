@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import { isAuthenticated } from "utils/auth/auth";
 import {
   Table,
   TableHeader,
@@ -35,6 +36,13 @@ import URL from "../../../api/apiCarrer";
 import {IDiplomados} from "utils/interfaces/PostGrado/MDD";
 
 function Maestria() {
+  //Autentificacion
+  useEffect(() => {
+    const usuarioAutenticado = isAuthenticated();
+    if (!usuarioAutenticado) {
+      router.push("/login");
+    }
+  }, []);
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -164,7 +172,6 @@ function Maestria() {
               <Button size="large">Agregar Diplomado</Button>
             </Link>
           </div>
-
 
           {dataTable2.length > 0 ? (
             <>
