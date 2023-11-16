@@ -31,7 +31,7 @@ function CrearCategoria() {
         descripcion: description,
       }),
     });
-    router.back();
+    router.push("/administracion/tramites/categorias/");
   };
 
   const handleAlertConfirm = () => {

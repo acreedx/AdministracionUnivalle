@@ -1,15 +1,15 @@
 const locations=[
     {
         id: 0,
-        name: "cafeteria",
-        locationIMG: "https://firebasestorage.googleapis.com/v0/b/univalle-files.appspot.com/o/menuCafeteria%2Fcfe9dbdb-b57b-493f-a592-786be544e2ac?alt=media&token=dc369060-0b37-4e1e-8adf-ac18191e17d3",
-        croquis: "https://media.newyorker.com/photos/64bc4330ef09d4a0e04cb249/master/pass/Rosen-Messi-Miami.jpg"
+        name: "Tramites",
+        locationIMG: "https://i.ibb.co/6YCcPk0/Microsoft-Teams-image-3.jpg",
+        croquis: "https://i.ibb.co/WsCNyGB/Croquis-Tramites.png"
     },
     {
         id: 1,
-        name: "cajas",
-        locationIMG: "https://media.officedepot.com/images/f_auto,q_auto,e_sharpen,h_450/products/208206/208206_p/208206",
-        croquis: "https://firebasestorage.googleapis.com/v0/b/univalle-files.appspot.com/o/menuCafeteria%2Fcfe9dbdb-b57b-493f-a592-786be544e2ac?alt=media&token=dc369060-0b37-4e1e-8adf-ac18191e17d3"
+        name: "Cajas",
+        locationIMG: "https://i.ibb.co/gw6b89z/Microsoft-Teams-image.jpg",
+        croquis: "https://i.ibb.co/G30Td00/croquis-Cajas.png"
     },
     {
         id: 2,

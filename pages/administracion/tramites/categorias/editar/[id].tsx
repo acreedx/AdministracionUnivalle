@@ -68,7 +68,7 @@ function EditarCategoria({ id }: props) {
       }),
     });
 
-    router.back();
+    router.push("/administracion/tramites/categorias/");
   };
 
   useEffect(() => {
