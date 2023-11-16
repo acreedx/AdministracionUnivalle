@@ -41,7 +41,7 @@ const routes: IRoute[] = [
         path: "/administracion/cajas",
         name: "Listar Servicios",
       },
-      {
+      /*{
         path: "/administracion/cajas/horariosubicacion",
         name: "Contactos",
       },
@@ -52,7 +52,7 @@ const routes: IRoute[] = [
       {
         path: "/administracion/cajas/datosgenerales",
         name: "Datos Generales",
-      },
+      },*/
     ],
   },
   {
