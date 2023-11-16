@@ -7,7 +7,8 @@ import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
 import { GetServerSidePropsContext } from "next";
-import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
+//import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
+import { ITramitesDataEdit, convertJSONService } from "utils/demo/tramitesDataEdit";
 import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
 import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
@@ -132,13 +133,16 @@ function ModificarTramite({ id }: props) {
 
 
   const router = useRouter();
-  const [service, setService] = useState<ITramitesData>();
+  const [service, setService] = useState<ITramitesDataEdit>();
 
   useEffect(() => {
     async function doFetch() {
       fetch(`${URLS.baseUrl}${route}${id}`)
         .then((res) => res.json())
-        .then((res) => setService(convertJSONService(res.data[0])));
+        .then((res) => {
+          setService(convertJSONService(res.data[0]))
+          console.log(res)
+        });
     }
     doFetch();
 
@@ -191,8 +195,8 @@ function ModificarTramite({ id }: props) {
         },
         body: JSON.stringify({
           nombre: name,
-          //     imagenUrl: await uploadFile(serviceImg, "servicios/"),
-          imageUrl: "",
+          imagenUrl: await uploadFile(serviceImg, "servicios/"),
+          //   imageUrl: "",
           idCategoria: selectedCategoryId,
 
         }),
@@ -333,7 +337,7 @@ function ModificarTramite({ id }: props) {
         },
       });
 
-      //   router.reload();
+      router.push("/administracion/tramites")
     } catch (error) {
       console.error("Error al hacer el fetch:", error);
     }
@@ -439,7 +443,7 @@ function ModificarTramite({ id }: props) {
                   <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
                     <img
                       className="w-full h-full object-cover"
-                      src={serviceImg === null ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png" : service?.image}
+                      src={service?.image}
                       alt="Imagen de Ubicación actual"
                     />
                   </div>
@@ -478,12 +482,12 @@ function ModificarTramite({ id }: props) {
           <Label className="mt-4">
             <span>Encargado</span>
             <Input
-            className={`mt-1 ${enchargedError ? 'border-red-500' : ''}`}
-            placeholder="Ingresa el nombre completo del encargado"
-            value={encharged}
-            onChange={handleEnchargedChange}
-          />
-          {enchargedError && <span className="text-red-500">{enchargedError}</span>}
+              className={`mt-1 ${enchargedError ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el nombre completo del encargado"
+              value={encharged}
+              onChange={handleEnchargedChange}
+            />
+            {enchargedError && <span className="text-red-500">{enchargedError}</span>}
 
           </Label>
           <Label className="mt-4">
@@ -644,7 +648,7 @@ function ModificarTramite({ id }: props) {
             </button>
             {showAlert && (
               <SweetAlert
-                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                warning
                 title="Atención"
                 confirmBtnText="Confirmar"
                 cancelBtnText="Cancelar"
