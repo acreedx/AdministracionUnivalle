@@ -1,4 +1,4 @@
-interface ITramitesData {
+interface ITramitesDataEdit {
   id: number;
   name: string;
   image: string;
@@ -15,11 +15,10 @@ interface ITramitesData {
   status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
 }
 function convertJSONService(data: any) {
-  const convertedData: ITramitesData = {
+  const convertedData: ITramitesDataEdit = {
     id: data.id,
     name: data.nombre,
-    image: data.imagen,
-
+    image: data.imagenUrl,
     enchargedId:
       data.referencia && data.referencia[0] ? data.referencia[0].id : null,
     encharged:
@@ -44,12 +43,12 @@ function convertJSONService(data: any) {
   };
   return convertedData;
 }
-function convertJSONListService(data: any) {
-  const convertedListData: ITramitesData[] = [];
+function convertJSONListServiceEdit(data: any) {
+  const convertedListDataEdit: ITramitesDataEdit[] = [];
   data.forEach((e: any) => {
-    convertedListData.push(convertJSONService(e));
+    convertedListDataEdit.push(convertJSONService(e));
   });
-  return convertedListData;
+  return convertedListDataEdit;
 }
-export type { ITramitesData };
-export { convertJSONService, convertJSONListService };
+export type { ITramitesDataEdit };
+export { convertJSONService, convertJSONListServiceEdit };
