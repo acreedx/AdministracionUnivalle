@@ -739,6 +739,7 @@ const editarUbicacion = async (idMod: number) => {
             listAtencion:
             [
               {
+                id:req.diasAtencion[0].idAtencion,
                 idDia:req.diasAtencion[0].nombreDia==="Lunes"?1
                 :req.diasAtencion[0].nombreDia==="Martes"?2
                 :req.diasAtencion[0].nombreDia==="Miercoles"?3

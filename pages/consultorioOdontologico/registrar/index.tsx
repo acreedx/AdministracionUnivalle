@@ -210,7 +210,7 @@ function RegistrarServicioPageModal() {
 
   return (
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <PageTitle>Registrar servicio - Consultorio Odontologico</PageTitle>
+      <PageTitle>Registrar servicio - Clínica Odontológica</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
 
       <div>

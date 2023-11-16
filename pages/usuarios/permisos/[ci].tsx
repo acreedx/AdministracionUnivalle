@@ -132,9 +132,9 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `https://apisistemaunivalle.somee.com/api/`,
+        `https://apisistemaunivalle.somee.com/api/Permisos/deletePermiso/${selectedObj}`,
         {
-          method: "PUT",
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
@@ -290,7 +290,7 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
               <TableHeader>
                 <tr>
                   <TableCell className=" font-extrabold text-sm">Nombre del modulo</TableCell>
-                  {/* <TableCell>Quitar</TableCell> */}
+                  <TableCell>Quitar</TableCell>
                 </tr>
               </TableHeader>
               <TableBody>
@@ -301,7 +301,7 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
                         <p>{datos.modulo}</p>
                       </div>
                     </TableCell>
-                    {/* <TableCell>
+                    <TableCell>
                       <div>
                        <Button
                           layout="link"
@@ -350,7 +350,7 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
                           </SweetAlert>
                         )}
                       </div>
-                    </TableCell> */}
+                    </TableCell>
                   </TableRow>
                 ))
                 }

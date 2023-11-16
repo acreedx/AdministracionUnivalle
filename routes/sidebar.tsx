@@ -217,7 +217,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/gabineteMedico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
@@ -233,7 +233,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/gabinetePsicoPedagogico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
@@ -241,7 +241,7 @@ const routes: IRoute[] = [
   {
     path: "/consultorioOdontologico",
     icon: "DentistIcon",
-    name: "Consultorio Odontologico",
+    name: "Clínica Odontologica",
     routes: [
       {
         path: "/consultorioOdontologico/datosGenerales/16",
@@ -249,7 +249,7 @@ const routes: IRoute[] = [
       },
       {
         path: "/consultorioOdontologico/listarServicios",
-        name: "Listar Servicios",
+        name: "Servicios",
       },
     ],
     exact: true,
