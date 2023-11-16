@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import URL from "utils/demo/api";
+import URL from "pages/api/apiCarrer";
 import { errorAlert, successAlert, warningAlert } from "components/alerts";
 
 function AgregarDiplomadoPage() {
