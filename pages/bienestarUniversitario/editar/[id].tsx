@@ -1131,7 +1131,7 @@ const editarUbicacion = async (idMod: number) => {
       <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
         <div>
           <Link href={{
-            pathname: `/consultorioOdontologico/listarServicios`,
+            pathname: `/bienestarUniversitario/listarServicios`,
           }}>
           <Button size="large">Volver</Button>
           </Link>

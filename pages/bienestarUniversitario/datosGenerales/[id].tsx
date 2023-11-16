@@ -49,6 +49,7 @@ export async function getServerSideProps(context: any) {
 }
 
 function EditarDatosGeneralesPage() {
+
   const baseURL="https://apisistemaunivalle.somee.com/api";
   var countReq=-1;
   var countHor=-1;
@@ -216,7 +217,7 @@ function EditarDatosGeneralesPage() {
   async function cargarModulos() {
     try {
       const res = await fetch(
-        "https://apisistemaunivalle.somee.com/api/Modulos/getActiveModulos"
+        `${baseURL}/Modulos/getActiveModulos`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -274,6 +275,7 @@ function EditarDatosGeneralesPage() {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
+
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
@@ -294,6 +296,7 @@ function EditarDatosGeneralesPage() {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
+
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
@@ -327,6 +330,7 @@ function EditarDatosGeneralesPage() {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
+
   async function cargarDatosHorario(id: number) {
     try {
       const res = await fetch(
@@ -393,6 +397,7 @@ function EditarDatosGeneralesPage() {
       [campo]: e.target.value,
     });
   };
+
   const handleChange1 = (
     e: ChangeEvent<HTMLTextAreaElement>,
     id: number,
@@ -424,6 +429,7 @@ function EditarDatosGeneralesPage() {
     });
     console.log(requisitosData.data);
   };
+
   const handleChange2 = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
@@ -445,6 +451,7 @@ function EditarDatosGeneralesPage() {
     });
     console.log(requisitosData.data);
   };
+
   const handleChange3 = (
     e: ChangeEvent<HTMLInputElement>,
     id: number,
@@ -554,23 +561,49 @@ function EditarDatosGeneralesPage() {
         return item;
       });
 
-  const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
-      setReferenciaData((prevData:any) => {
-      const newData = prevData.data.map((item:any) => {
-        if (item.identificador === id) {
-          // Clona el objeto original y actualiza la propiedad especificada
-          return {
-            ...item,
-            [campo]: e.target.value,
-          };
-        }
-        return item;
-        });
-
-        return { data: newData };
-      });
-
+      return { data: newData };
+    });
+    console.log(referenciaData.data);
   };
+  const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
+    const value = e.target.value;
+    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
+    let valid: any = true;
+    let validText = "";
+    if (value === ubicacionBkData.descripcion) {
+      valid = undefined;
+    } else if (
+      !validateUbicationString(value) ||
+      value.length >= 250 ||
+      (emptyStringValue || [])[1].length > 0 ||
+      value.length === 0
+    ) {
+      valid = false;
+    }
+
+    if (!validateUbicationString(value)) {
+      validText =
+        'La descripción solo debe contener números, letras y el caracter "-"';
+    } else if (value.length >= 250) {
+      validText = "La descripción solo puede tener 250 caracteres como máximo";
+    } else if ((emptyStringValue || [])[1].length > 0) {
+      validText = "La descripción no puede tener espacios al inicio";
+    } else if (value.length === 0) {
+      validText = "No se puede ingresar una descripción vacía";
+    } else {
+      validText = "Descripción ingresada válida";
+    }
+
+    setFlagsUbicacion((prev) => ({ ...prev, descripcion: valid }));
+    setTextErrorsUbicacion((prev) => ({ ...prev, descripcion: validText }));
+
+    setUbicacionData({
+      ...ubicacionData,
+      [campo]: e.target.value,
+    });
+  };
+      
+      
   const handleChange5 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
       setHorariosData((prevData:any) => {
       const newData = prevData.data.map((item:any) => {
@@ -615,47 +648,14 @@ function EditarDatosGeneralesPage() {
     });
   };
 
-  const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
-    const value = e.target.value;
-    const emptyStringValue = value.match(/^(\s*)(.*)(\s*)$/);
-    let valid: any = true;
-    let validText = "";
-    if (value === ubicacionBkData.descripcion) {
-      valid = undefined;
-    } else if (
-      !validateUbicationString(value) ||
-      value.length >= 250 ||
-      (emptyStringValue || [])[1].length > 0 ||
-      value.length === 0
-    ) {
-      valid = false;
-    }
-
-    if (!validateUbicationString(value)) {
-      validText =
-        'La descripción solo debe contener números, letras y el caracter "-"';
-    } else if (value.length >= 250) {
-      validText = "La descripción solo puede tener 250 caracteres como máximo";
-    } else if ((emptyStringValue || [])[1].length > 0) {
-      validText = "La descripción no puede tener espacios al inicio";
-    } else if (value.length === 0) {
-      validText = "No se puede ingresar una descripción vacía";
-    } else {
-      validText = "Descripción ingresada válida";
-    }
-
-    setFlagsUbicacion((prev) => ({ ...prev, descripcion: valid }));
-    setTextErrorsUbicacion((prev) => ({ ...prev, descripcion: validText }));
-
-    setUbicacionData({
-      ...ubicacionData,
-      [campo]: e.target.value,
-    });
-  };
-
   const clearData = () => {
     setModuloData(moduloBkData);
+    setReferenciaData(refereciaBkData);
+    setRequisitosData(requisitosBkData);
+    setHorariosData(horariosBkData);
+    setUbicacionData(ubicacionBkData);
     clearValidations();
+    
   };
 
   const clearValidations = () => {
@@ -673,7 +673,7 @@ function EditarDatosGeneralesPage() {
     setTextErrorsUbicacion(resetDefaultValFlags(textErrorsUbicacion, ""));
   };
 
-  const editarModulo = async (id: number) => {
+ const editarModulo = async (id: number) => {
     const check = checkValidationEdit(flagsNombreModulo);
     const repetitiveModule = modules.find(
       (m: any) =>
@@ -756,6 +756,7 @@ function EditarDatosGeneralesPage() {
         id_modulo: idMod,
         estado: true,
       };
+
       const postOrPut =
         ubicacionBkData.descripcion == null &&
         ubicacionBkData.imagen == null &&
@@ -763,9 +764,8 @@ function EditarDatosGeneralesPage() {
 
       fetch(
         postOrPut
-          ? `https://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`
-          : `https://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
-
+          ? `${baseURL}/Ubicaciones/addUbicaciones`
+          : `${baseURL}/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
           method: postOrPut ? "POST" : "PUT",
           headers: {
@@ -819,7 +819,7 @@ function EditarDatosGeneralesPage() {
             ],
           };
           fetch(
-            `https://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
+            `${baseURL}/Requisitos/addRequisito`,
             {
               method: "POST",
               headers: {
@@ -849,7 +849,7 @@ function EditarDatosGeneralesPage() {
           };
           console.log(postReq);
           fetch(
-            `https://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
+            `${baseURL}/Requisitos/updateRequisito/${req.identificador}`,
             {
               method: "PUT",
               headers: {
@@ -910,7 +910,7 @@ function EditarDatosGeneralesPage() {
             };
             console.log(postRef);
             fetch(
-              `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+              `${baseURL}/Referencia/addReferences`,
               {
                 method: "POST",
                 headers: {
@@ -943,7 +943,7 @@ function EditarDatosGeneralesPage() {
             };
 
             fetch(
-              `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+              `${baseURL}/Referencia/updateReferences/${req.identificador}`,
               {
                 method: "PUT",
                 headers: {
@@ -1175,6 +1175,7 @@ function EditarDatosGeneralesPage() {
     setInputsHor([...inputsHor]);
     console.log(horariosData.data)
   }
+
   const handleDeleteHorarios = (id:number) => {
 
     if(id<0){
@@ -1184,7 +1185,6 @@ function EditarDatosGeneralesPage() {
     }
     
   }
-  };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.files?.[0];
@@ -1276,6 +1276,7 @@ function EditarDatosGeneralesPage() {
     <Layout>
       <PageTitle>Editar Pagina Principal - Bienestar Universitario</PageTitle>
       <SectionTitle>Datos Generales*</SectionTitle>
+
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Nombre del modulo</span>
@@ -1354,69 +1355,53 @@ function EditarDatosGeneralesPage() {
           </div>
         </div>
       </div>
-      <SectionTitle>Contactos de referencia</SectionTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <Label className="mt-4">
-          {referenciaData.data.map((ref, index) => (
-            <div className="my-3" key={ref.identificador}>
-              <ReferenciaInputs
-                index={index}
-                identificador={ref.identificador}
-                valueNombre={ref.nombre}
-                valueContacto={ref.numero}
-                handle={handleChange3}
-                hadleDelete={handleDeleteReferencias}
-                flag={flagsReferencia[index]}
-                textFlag={textErrorsReferencia[index]}
-              />
-            </div>
-          ))}
-
-          {inputsRef}
-        </Label>
-        <div className="flex flex-row-reverse ...">
-          <div>
-            <Button size="small" onClick={handleAddReferencias}>
-              +
-            </Button>
-          </div>
-        </div>
-        <div className="flex">
-          <div className="mx-2 mt-4">
-            <Button size="large" onClick={() => editarReferencias(numId)}>
-              Editar
-            </Button>
-          </div>
-          <div className="mx-2 mt-4">
-            <Modal
-              pageRender={
-                <EliminarReferencia
-                  title="Bienestar Universitario"
-                  pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
-                  pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
-                />
-              }
-              buttonName="Gestionar Contactos"
+    <SectionTitle>Contactos de referencia</SectionTitle>
+    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <Label className="mt-4">
+        {referenciaData.data.map((ref, index) => (
+          <div className="my-3" key={ref.identificador}>
+            <ReferenciaInputs
+              index={index}
+              identificador={ref.identificador}
+              valueNombre={ref.nombre}
+              valueContacto={ref.numero}
+              handle={handleChange3}
+              hadleDelete={handleDeleteReferencias}
+              flag={flagsReferencia[index]}
+              textFlag={textErrorsReferencia[index]}
             />
           </div>
+        ))}
+
+        {inputsRef}
+      </Label>
+      <div className="flex flex-row-reverse ...">
+        <div>
+          <Button size="small" onClick={handleAddReferencias}>
+            +
+          </Button>
         </div>
       </div>
       <div className="flex">
         <div className="mx-2 mt-4">
-        <Button size="large" onClick={() => editarReferencias(numId)}>
-          Editar
-        </Button>
+          <Button size="large" onClick={() => editarReferencias(numId)}>
+            Editar
+          </Button>
         </div>
         <div className="mx-2 mt-4">
-          <Modal pageRender={<EliminarReferencia 
-          title="Bienestar Universitario"
-          pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
-          pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
-            />} buttonName="Gestionar Contactos"/>
+          <Modal
+            pageRender={
+              <EliminarReferencia
+                title="Bienestar Universitario"
+                pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
+                pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+              />
+            }
+            buttonName="Gestionar Contactos"
+          />
         </div>
       </div>
-    </div>
-
+    </div>  
     <SectionTitle>Horarios de Atención</SectionTitle>
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <SectionTitle>Asignar un nuevo Horario</SectionTitle>
@@ -1475,6 +1460,7 @@ function EditarDatosGeneralesPage() {
             </HelperText>
           )}
         </Label>
+
         <hr className="mt-4" />
         <Label className="mt-4">
           <span className=" text-lg">Imagen de la ubicación del servicio</span>
@@ -1581,7 +1567,6 @@ function EditarDatosGeneralesPage() {
         <div>
           <Button size="large">Volver</Button>
         </div>
-
         <div>
           <Button size="large" onClick={clearData}>
             Limpiar campos

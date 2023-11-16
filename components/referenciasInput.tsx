@@ -33,11 +33,14 @@ const ReferenciaInputs: FC<ReferenciaInputsProps> = ({
       <div className="flex items-center">
         <div className="w-1/2 pr-2"> {/* Dividir la fila en dos, ajustar el espacio a la derecha */}
           <span>Nombre del Contacto</span>
-          <Input
+         <Input
             value={valueNombre === null ? "" : valueNombre}
             placeholder="Escriba el nombre del contacto."
             onChange={(e) => handle(e, identificador, "nombre")}
           />
+          {flag && flag.nombre != null && (
+            <HelperText valid={flag.nombre}>{textFlag.nombre}</HelperText>
+          )}
         </div>
         <div className="w-1/2 pl-2"> {/* Dividir la fila en dos, ajustar el espacio a la izquierda */}
           <span>Número del contacto</span>
