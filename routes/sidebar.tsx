@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-    ? pathname.indexOf(route.path) === 0
-    : false;
+      ? pathname.indexOf(route.path) === 0
+      : false;
 }
 
 const routes: IRoute[] = [
@@ -41,11 +41,7 @@ const routes: IRoute[] = [
         path: "/administracion/cajas",
         name: "Listar Servicios",
       },
-      {
-        path: "/administracion/cajas/crear",
-        name: "Crear Servicios",
-      },
-      {
+      /*{
         path: "/administracion/cajas/horariosubicacion",
         name: "Contactos",
       },
@@ -53,6 +49,10 @@ const routes: IRoute[] = [
         path: "/administracion/cajas/crearcontacto",
         name: "Crear Contacto",
       },
+      {
+        path: "/administracion/cajas/datosgenerales",
+        name: "Datos Generales",
+      },*/
     ],
   },
   {
@@ -63,14 +63,6 @@ const routes: IRoute[] = [
       {
         path: "/administracion/tramites",
         name: "Listar",
-      },
-      {
-        path: "/administracion/tramites/crear",
-        name: "Crear",
-      },
-      {
-        path: "/administracion/tramites/inactivos",
-        name: "Listar deshabilitados",
       },
     ],
   },
@@ -83,13 +75,16 @@ const routes: IRoute[] = [
         path: "/administracion/tramites/categorias",
         name: "Listar",
       },
+    ],
+  },
+  {
+    path: "/example/forms",
+    icon: "FormsIcon",
+    name: "Dirección de carrera",
+    routes: [
       {
-        path: "/administracion/tramites/categorias/crear",
-        name: "Crear",
-      },
-      {
-        path: "/administracion/tramites/categorias/inactivos",
-        name: "Listar deshabilitados",
+        path: "/administracion/direccionDeCarrera/carrera",
+        name: "Carreras",
       },
     ],
   },

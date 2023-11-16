@@ -90,6 +90,28 @@ function Cafeteria() {
     })
     return price
   }
+  const handleDeleteProduct = (index:number) =>{
+    deleteProduct(index)
+  }
+  const deleteProduct = async(index:number) =>{
+    await fetch(`https://apisistemaunivalle.somee.com/api/Publicaciones/DeletePublicaciones?id=${index}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    /*if (state != "activos") {
+
+      await fetch(`${URL.baseUrl}${restoreServiceRoute}${selectedService}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+    }*/
+    router.reload();
+  }
 
   return (
     <Layout>
@@ -154,8 +176,7 @@ function Cafeteria() {
                         <EditIcon className="w-5 h-5" aria-hidden="true" />
                       </Button>
                     </Link>
-
-                    <Button layout="link" size="small" aria-label="Delete">
+                    <Button layout="link" size="small" aria-label="Delete" onClick={() => handleDeleteProduct(menu.identificador)}>
                       <TrashIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                   </div>

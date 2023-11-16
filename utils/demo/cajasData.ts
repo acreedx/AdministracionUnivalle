@@ -7,7 +7,7 @@ interface ICajasData {
   encharged: string;
   imagenUrl: string;
   cellphone: string;
-  status: "success" | "danger" | "warning" | "neutral" | "primary" | undefined;
+  status: "success" | "danger";
 }
 function convertJSONService(data: any) {
   const convertedData: ICajasData = {
@@ -31,43 +31,5 @@ function convertJSONListService(data: any) {
   return convertedListData;
 }
 
-const tableData: ICajasData[] = [
-  {
-    id: 6,
-    name: "Cobro de Colegiatura",
-    ubicacionId: 1,
-    ubicacion: "Torre innovación, Planta Baja",
-    enchargedId: 1,
-    imagenUrl: "",
-    encharged: "Daniel",
-    cellphone: "1234567",
-    status: "neutral",
-  },
-
-  {
-    id: 7,
-    name: "Cobro de Trámites",
-    ubicacionId: 1,
-    ubicacion: "Torre innovación, Planta Baja",
-    enchargedId: 1,
-    imagenUrl: "",
-    encharged: "Daniel",
-    cellphone: "1234567",
-    status: "neutral",
-  },
-  {
-    id: 8,
-    name: "Cobro de Cheques",
-    ubicacionId: 1,
-    imagenUrl: "",
-    ubicacion: "Torre innovación, Planta Baja",
-    enchargedId: 1,
-    encharged: "Daniel",
-    cellphone: "1234567",
-    status: "neutral",
-  },
-];
-
-export default tableData;
 export type { ICajasData };
 export { convertJSONService, convertJSONListService };
