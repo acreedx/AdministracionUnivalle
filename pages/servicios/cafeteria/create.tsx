@@ -14,6 +14,7 @@ import {
 import { ToastContainer } from "react-toastify";
 import {uploadFile} from "../../../firebase/config"
 import { useRouter } from "next/router";
+import URLS from "utils/demo/api";
 
 function Forms() {
   const router = useRouter();
@@ -135,7 +136,7 @@ function Forms() {
   };
   
   const registrarProducto = () => {
-    fetch("http://apisistemaunivalle.somee.com/api/Publicaciones/addPublicacionWithDescription", {
+    fetch(`${URLS.baseUrl}Publicaciones/addPublicacionWithDescription`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

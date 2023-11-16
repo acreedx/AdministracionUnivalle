@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Input, Label } from "@roketid/windmill-react-ui";
@@ -13,11 +14,11 @@ import { IRequirementData } from "utils/demo/requirementData";
 import { uploadFile } from "../../../../firebase/config";
 import { ToastContainer } from "react-toastify";
 import { errorAlert } from "components/alerts";
-import { IUbicacionesData } from "utils/demo/ubicacionesData";
 import servicesProvider from "../../../../utils/providers/servicesProvider";
 import requirementsProvider from "../../../../utils/providers/requirementsProvider";
 import ubicacionesProvider from "../../../../utils/providers/ubicacionesProvider";
 import referencesProvider from "../../../../utils/providers/referencesProvider";
+import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
 interface props {
   id: number;
@@ -39,6 +40,7 @@ function EditarServicio({ id }: props) {
   const [name, setname] = useState("");
   const [imgUrl, setimgUrl] = useState("");
   const [serviceImg, setImg]: any = useState(null);
+  const [serviceImgArray, setImgArray]: any = useState([]);
   const [encharged, setencharged] = useState("");
   const [cellphone, setcellphone] = useState("");
 
@@ -47,6 +49,7 @@ function EditarServicio({ id }: props) {
   const [validationMessage, setvalidationMessage] = useState<string>("");
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
   const [locations, setLocations] = useState<IUbicacionesData[]>([]);
+
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index].description = value;
@@ -56,6 +59,16 @@ function EditarServicio({ id }: props) {
     const newLocations = [...locations];
     newLocations[index].name = value;
     setLocations(newLocations);
+  };
+  const handleSetLocation = (index: number, img: any) => {
+    const newImages = [...serviceImgArray];
+    newImages[index] = img;
+    setImgArray(newImages);
+  };
+  const handleRemoveLocationImg = (index: number) => {
+    const newImages = [...serviceImgArray];
+    newImages.splice(index, 1);
+    setImgArray(newImages);
   };
   const handleRemoveRequirement = (index: number) => {
     const newRequirements = [...requirements];
@@ -73,6 +86,10 @@ function EditarServicio({ id }: props) {
         setService(await servicesProvider.GetOneService(id));
         setRequirements(await requirementsProvider.GetRequirementsList(id));
         setLocations(await ubicacionesProvider.GetUbicacionesList(id));
+        const arrayLength = await ubicacionesProvider.GetUbicacionesList(id);
+        arrayLength.map((e, index) => {
+          setImgArray([...serviceImgArray, null]);
+        });
       } catch {
         (e: any) => {
           errorAlert(e);
@@ -84,6 +101,8 @@ function EditarServicio({ id }: props) {
 
   const handleSubmit = async () => {
     ValidateForm();
+    console.log(locations);
+    console.log(serviceImgArray);
     if (formIsValid) {
       try {
         if (serviceImg) {
@@ -101,6 +120,27 @@ function EditarServicio({ id }: props) {
           encharged,
           cellphone
         );
+        locations.map(async (e, index) => {
+          if (serviceImgArray[index] == null) {
+            await ubicacionesProvider.UpdateSingleUbicacion(
+              e.name,
+              id,
+              e.id,
+              e.imagen
+            );
+          } else {
+            const imgUrlNew: string = await uploadFile(
+              serviceImgArray[index],
+              "ubicaciones/imagenes/"
+            );
+            await ubicacionesProvider.UpdateSingleUbicacion(
+              e.name,
+              id,
+              e.id,
+              imgUrlNew
+            );
+          }
+        });
         await ubicacionesProvider.UpdateUbicaciones(id, locations);
         setShowAlert(false);
         setShowAlertValidation(false);
@@ -168,7 +208,7 @@ function EditarServicio({ id }: props) {
         </Label>
 
         <Label className="mt-4">
-          <span className=" text-lg">Imagen de referencia del tramite</span>
+          <span className=" text-lg">Imagen de referencia de la ubicación</span>
           <div className="text-center">
             <div className="flex items-center justify-center space-x-4">
               <div className="flex flex-col items-center space-y-2">
@@ -273,7 +313,7 @@ function EditarServicio({ id }: props) {
         <SectionTitle>Ubicaciones</SectionTitle>
         {locations.map((location, index) => (
           <div key={index}>
-            <div className="flex flex-row items-center">
+            <div className="flex flex-col items-center">
               <Input
                 type="text"
                 className="mt-1 mb-4"
@@ -283,11 +323,58 @@ function EditarServicio({ id }: props) {
                   handleLocationChange(index, e.target.value);
                 }}
               />
-
-              <div className="ml-4">
+              <div>
+                <Label className="mt-4">
+                  <div className="text-center">
+                    <div className="flex items-center justify-center space-x-4">
+                      <div className="flex flex-col items-center space-y-2">
+                        <span>Imagen Actual</span>
+                        <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                          <img
+                            className="w-full h-full object-cover"
+                            src={
+                              location?.imagen === null
+                                ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                                : location.imagen
+                            }
+                            alt="Imagen de Ubicación actual"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-center space-y-2">
+                        <span>Nueva Imagen</span>
+                        <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                          <img
+                            className="w-full h-full object-cover"
+                            src={
+                              serviceImgArray == null ||
+                              serviceImgArray.length == 0 ||
+                              serviceImgArray[index] == null
+                                ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                                : URL.createObjectURL(serviceImgArray[index])
+                            }
+                            alt="Imagen de Ubicación Nueva"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Label>
+                <Input
+                  type="file"
+                  accept=".jpg, .jpeg, .png"
+                  className="mt-4"
+                  placeholder="Imagen del servicio"
+                  onChange={(e) =>
+                    handleSetLocation(index, e.target.files?.[0] || null)
+                  }
+                />
+              </div>
+              <div className="self-end mb-4">
                 <Button
                   size="small"
                   onClick={() => {
+                    handleRemoveLocationImg(index);
                     handleRemoveLocation(index);
                   }}
                 >
@@ -302,7 +389,8 @@ function EditarServicio({ id }: props) {
             <Button
               size="small"
               onClick={() => {
-                setLocations([...locations, { id: 0, name: "" }]);
+                setLocations([...locations, { id: 0, name: "", imagen: "" }]);
+                setImgArray([...serviceImgArray, null]);
               }}
             >
               +
