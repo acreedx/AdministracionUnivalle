@@ -26,7 +26,11 @@ class UbicacionesProvider {
       });
     });
   }
-  public async CreateSingleUbicacion(description: string, serviceId: Number) {
+  public async CreateSingleUbicacion(
+    description: string,
+    imagen: string,
+    serviceId: Number
+  ) {
     fetch(`${URL.baseUrl}${this.createUbicacionRoute}`, {
       method: "POST",
       headers: {
@@ -34,7 +38,7 @@ class UbicacionesProvider {
       },
       body: JSON.stringify({
         descripcion: description,
-        imagen: "",
+        imagen: imagen,
         video: "",
         serviciosId: serviceId,
         id_modulo: this.id_modulo,
@@ -77,7 +81,7 @@ class UbicacionesProvider {
     );
     ubicaciones.forEach((e) => {
       if (e.id == 0) {
-        this.CreateSingleUbicacion(e.name, serviciosId);
+        this.CreateSingleUbicacion(e.name, e.imagen, serviciosId);
       }
     });
     ubicacionesList.forEach((elements) => {
