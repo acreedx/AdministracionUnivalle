@@ -275,10 +275,9 @@ function EditarUsuarioPageModal() {
 
   return (
     <Layout>
+      <PageTitle>Editar Datos Usuario</PageTitle>
+      <SectionTitle>Datos Generales del usuario</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Editar Datos Usuario</PageTitle>
-        <SectionTitle>Datos Generales del usuario</SectionTitle>
-
         <div>
           <Label className=" mb-2">
             <span className="text-lg">CI del usuario</span>
@@ -346,8 +345,8 @@ function EditarUsuarioPageModal() {
         </div>
         </div>
         </div>
+        <SectionTitle>Cambiar contraseña del Usuario</SectionTitle>
         <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-          <SectionTitle>Cambiar contraseña del Usuario</SectionTitle>
           <div>
             <Label className=" mb-2">
             <span className="text-lg">Contraseña</span>

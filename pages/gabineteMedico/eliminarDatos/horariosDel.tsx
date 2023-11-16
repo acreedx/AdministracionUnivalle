@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, {FC, useState, useEffect, ChangeEvent } from "react";
 import { useRouter } from "next/router";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -33,7 +33,18 @@ import SearchBar from "components/searchBar";
 import Modal from '../../../components/modal'
 import RegistrarPage from '../registrar/index'
 
-function BienestarUniversitario() {
+interface RefereciaProps {
+  pathEnable:string;
+  pathDisable:string;
+  title:string
+}
+
+const EliminarHorario: FC<RefereciaProps> = ({
+
+ pathEnable,
+ pathDisable,
+ title
+}) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
@@ -84,7 +95,7 @@ function BienestarUniversitario() {
   useEffect(() => {
     setIsLoading(true);
     getData(
-      "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+      `https://apisistemaunivalle.somee.com/api/${pathEnable}`
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -93,8 +104,8 @@ function BienestarUniversitario() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Servicios/${
-          action ? "deleteServicio" : "restoreServicio"
+        `https://apisistemaunivalle.somee.com/api/Horarios/${
+          action ? "deleteHorarios" : "restoreHorarios"
         }/${selectedObj}`,
         {
           method: "PUT",
@@ -144,26 +155,21 @@ function BienestarUniversitario() {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        "https://apisistemaunivalle.somee.com/api/Servicios/getServicioByModuloId/16"
+        `https://apisistemaunivalle.somee.com/api/${pathEnable}`
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        "https://apisistemaunivalle.somee.com/api/Servicios/getDisabledServicioByModuloId/16"
+        `https://apisistemaunivalle.somee.com/api/${pathDisable}`
       );
     }
   };
 
   return (
-    <Layout>
+    <div>
       {!isLoading ? (
         <>
-          <PageTitle>
-            Listado de servicios - Clínica Odontológica
-          </PageTitle>
+          <PageTitle>Horarios de Atención - {title}</PageTitle>
 
-           <div className=" flex  mb-5">
-            <Modal pageRender={<RegistrarPage/>} buttonName="Registrar Nuevo Servicio"/>
-          </div>
           {dataTable2.length > 0 ? (
             <>
               <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
@@ -206,10 +212,9 @@ function BienestarUniversitario() {
                   <Table>
                     <TableHeader>
                       <tr>
-                        <TableCell>Imagen</TableCell>
-                        <TableCell>Nombre</TableCell>
-                        <TableCell>Modulo</TableCell>
-                        <TableCell>Estado</TableCell>
+                        <TableCell>Día</TableCell>
+                        <TableCell>Hora Apertura</TableCell>
+                        <TableCell>Hora Cierre</TableCell>
                         <TableCell>Acciones</TableCell>
                       </tr>
                     </TableHeader>
@@ -222,51 +227,24 @@ function BienestarUniversitario() {
                         .map((datos: any, i) => (
                           <TableRow key={i}>
                             <TableCell>
-                              <div className="flex items-center text-sm">
-                                {isValidUrl(datos.archivo) ? (
-                                  <Avatar
-                                    className="hidden mr-3 md:block"
-                                    src={datos.archivo}
-                                    size="large"
-                                  />
-                                ) : (
-                                  <span className="text-center">-</span>
-                                )}
+                              <div>
+                                <p>{datos.diasAtencion[0].nombreDia}</p>
+                              </div>
+                            </TableCell>
+                           <TableCell>
+                              <div>
+                                <p>{datos.horaInicio}</p>
                               </div>
                             </TableCell>
                             <TableCell>
                               <div>
-                                <p>{datos.nombre}</p>
+                                <p>{datos.horaFin}</p>
                               </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm">{datos.modulo}</span>
-                            </TableCell>
-                            <TableCell>
-                              <Badge type={datos.estado ? "success" : "danger"}>
-                                <p>{datos.estado ? "Activo" : "Inactivo"}</p>
-                              </Badge>
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center space-x-4">
                                 {datos.estado && (
                                   <>
-                                    <Link
-                                      href={{
-                                        pathname: `/consultorioOdontologico/editar/${datos.identificador}`,
-                                      }}
-                                    >
-                                      <Button
-                                        layout="link"
-                                        size="small"
-                                        aria-label="Edit"
-                                      >
-                                        <EditIcon
-                                          className="w-5 h-5"
-                                          aria-hidden="true"
-                                        />
-                                      </Button>
-                                    </Link>
                                   </>
                                 )}
                                 <Button
@@ -276,7 +254,7 @@ function BienestarUniversitario() {
                                   type={"button"}
                                   onClick={() => {
                                     setShowAlert(true);
-                                    setSelectedObj(datos.identificador);
+                                    setSelectedObj(datos.idHorarios);
                                   }}
                                 >
                                   {datos.estado ? (
@@ -355,8 +333,8 @@ function BienestarUniversitario() {
         </div>
       )}
       <ToastContainer />
-    </Layout>
+    </div>
   );
 }
 
-export default BienestarUniversitario;
+export default EliminarHorario;

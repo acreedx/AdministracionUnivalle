@@ -3,9 +3,10 @@ import {
   IEditarModulo,
   IEditarUbicacion,
   IEditarReferenciaArray,
-  IEditarRequisitosArray 
+  IEditarRequisitosArray ,
+  IEditarHorarioArray,
 } from "../../../utils/interfaces/servicios";
-import { Input, Label, Textarea } from "@roketid/windmill-react-ui";
+import { Input, Label, TableContainer, Textarea, Table, TableBody, TableCell, TableHeader, TableRow } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -26,6 +27,8 @@ import VideoPlayer from "components/video_player";
 import Modal from '../../../components/modal';
 import EliminarReferencia from "../eliminarDatos/referenciaDel";
 import EliminarRequisitos from "../eliminarDatos/requisitosDel";
+import HorariosInputs from "components/horariosInput";
+import EliminarHorario from "../eliminarDatos/horariosDel";
 
 export async function getServerSideProps(context: any) {
   return {
@@ -35,7 +38,9 @@ export async function getServerSideProps(context: any) {
 
 function EditarDatosGeneralesPage() {
 
+  const baseURL="https://apisistemaunivalle.somee.com/api";
   var countReq=-1;
+  var countHor=-1;
   const [ubicacionImg,setUImg]:any = useState(null)
   const [ubicaionVideo,setUVideo]:any = useState(null)
 
@@ -108,6 +113,46 @@ function EditarDatosGeneralesPage() {
       } 
     ]
   });
+  const [horariosData,setHorariosData]= useState<IEditarHorarioArray>({
+    data:
+    [
+      {
+        idHorarios: 0,
+        horaInicio: "",
+        horaFin: "",
+        modulo: null,
+        servicio: null,
+        estado: true,
+        diasAtencion:
+        [
+          {
+            idAtencion:0,
+            nombreDia:null
+          }
+        ]
+      }
+    ]
+  });
+   const [horariosBkData,setHorariosBkData]= useState<IEditarHorarioArray>({
+    data:
+    [
+      {
+        idHorarios: 0,
+        horaInicio: "",
+        horaFin: "",
+        modulo: null,
+        servicio: null,
+        estado: true,
+        diasAtencion:
+        [
+          {
+            idAtencion:0,
+            nombreDia:""
+          }
+        ]
+      }
+    ]
+  });
   const router = useRouter();
   const { id } = router.query;
   const numId = parseInt(id as string, 10);
@@ -115,7 +160,7 @@ function EditarDatosGeneralesPage() {
   async function cargarDatosModulo(id: number) {
     try {
       const res = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Modulos/getModuloById/${id}`
+        `${baseURL}/Modulos/getModuloById/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
@@ -135,7 +180,7 @@ function EditarDatosGeneralesPage() {
 async function cargarDatosUbicacion(id: number) {
     try {
       const res = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Ubicaciones/getUbicacionesbyModuloId/${id}`
+        `${baseURL}/Ubicaciones/getUbicacionesbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos de la ubicación.");
@@ -162,7 +207,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosRequisitos(id: number) {
     try {
       const res = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Requisitos/getRequisitosByModuloId/${id}`
+        `${baseURL}/Requisitos/getRequisitosByModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -184,7 +229,7 @@ async function cargarDatosUbicacion(id: number) {
   async function cargarDatosReferencia(id: number) {
     try {
       const res = await fetch(
-        `https://apisistemaunivalle.somee.com/api/Referencia/getReferenciasbyModuloId/${id}`
+        `${baseURL}/Referencia/getReferenciasbyModuloId/${id}`
       );
       if (!res.ok) {
         throw new Error("Error al obtener los datos del servicio.");
@@ -201,12 +246,33 @@ async function cargarDatosUbicacion(id: number) {
       //errorAlert("Ocurrió un error al traer los datos");
     }
   }
+  async function cargarDatosHorario(id: number) {
+    try {
+      const res = await fetch(
+        `${baseURL}/Horarios/getHorarioByModuloIdActive/${id}`
+      );
+      if (!res.ok) {
+        throw new Error("Error al obtener los datos del servicio.");
+      }
+      const resData = await res.json();
+
+      setHorariosBkData({
+        data:resData.data,
+      });
+      setHorariosData({
+        data:resData.data,
+      });
+    } catch (error) {
+      //errorAlert("Ocurrió un error al traer los datos");
+    }
+  }
 
   useEffect(() => {
     cargarDatosModulo(numId);
     cargarDatosUbicacion(numId);
     cargarDatosRequisitos(numId);
     cargarDatosReferencia(numId);
+    cargarDatosHorario(numId);
   }, [id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
@@ -256,7 +322,6 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
 
         return { data: newData };
       });
-      console.log(requisitosData.data);
   };
   const handleChange3 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
       setReferenciaData((prevData:any) => {
@@ -273,7 +338,49 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
 
         return { data: newData };
       });
-      console.log(referenciaData.data);
+
+  };
+  const handleChange5 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
+      setHorariosData((prevData:any) => {
+      const newData = prevData.data.map((item:any) => {
+        if (item.idHorarios === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          return {
+            ...item,
+            [campo]: e.target.value,
+          };
+        }
+        return item;
+        });
+
+        return { data: newData };
+      });
+  };
+  const handleChange6 = (e: ChangeEvent<HTMLSelectElement>, id: number, campo: string, diaId: number) => {
+    setHorariosData((prevData: any) => {
+      const newData = prevData.data.map((item:any) => {
+        if (item.idHorarios === id) {
+          // Clona el objeto original y actualiza la propiedad especificada
+          const updatedDiasAtencion = item.diasAtencion?.map((dia:any) => {
+            if (dia.idAtencion === diaId) {
+              return {
+                ...dia,
+                [campo]: e.target.value,
+              };
+            }
+            return dia;
+          });
+
+          return {
+            ...item,
+            diasAtencion: updatedDiasAtencion,
+          };
+        }
+        return item;
+      });
+
+      return { data: newData };
+    });
   };
   const handleChange4 = (e: ChangeEvent<HTMLInputElement>, campo: string) => {
     setUbicacionData({
@@ -295,7 +402,7 @@ const handleChange2 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: strin
       }
       console.log(postModul)
       fetch(
-        `https://apisistemaunivalle.somee.com/api/Modulos/updateModulo/${id}`,
+        `${baseURL}/Modulos/updateModulo/${id}`,
         {
           method: "PUT",
           headers: {
@@ -340,7 +447,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `https://apisistemaunivalle.somee.com/api/Ubicaciones/addUbicaciones`,
+        `${baseURL}/Ubicaciones/addUbicaciones`,
         {
           method: "POST",
           headers: {
@@ -369,7 +476,7 @@ const editarUbicacion = async (idMod: number) => {
         }
         console.log(postUbi)
         fetch(
-        `https://apisistemaunivalle.somee.com/api/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
+        `${baseURL}/Ubicaciones/updateUbicaciones/${ubicacionData.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -423,7 +530,7 @@ const editarUbicacion = async (idMod: number) => {
               
         };
           fetch(
-          `https://apisistemaunivalle.somee.com/api/Requisitos/addRequisito`,
+          `${baseURL}/Requisitos/addRequisito`,
           {
             method: "POST",
             headers: {
@@ -453,7 +560,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postReq)
           fetch(
-          `https://apisistemaunivalle.somee.com/api/Requisitos/updateRequisito/${req.identificador}`,
+          `${baseURL}/Requisitos/updateRequisito/${req.identificador}`,
           {
             method: "PUT",
             headers: {
@@ -505,7 +612,7 @@ const editarUbicacion = async (idMod: number) => {
         };
         console.log(postRef)
         fetch(
-        `https://apisistemaunivalle.somee.com/api/Referencia/addReferences`,
+        `${baseURL}/Referencia/addReferences`,
         {
           method: "POST",
           headers: {
@@ -529,7 +636,7 @@ const editarUbicacion = async (idMod: number) => {
           numerocel:req.numero,
         };
         fetch(
-        `https://apisistemaunivalle.somee.com/api/Referencia/updateReferences/${req.identificador}`,
+        `${baseURL}/Referencia/updateReferences/${req.identificador}`,
         {
           method: "PUT",
           headers: {
@@ -554,17 +661,125 @@ const editarUbicacion = async (idMod: number) => {
     count++;
   });
   };
+  const editarHorarios = async (idMod: number) => {
+    var count =0;
+    horariosData.data.forEach(req => {
+    var aux1:any;
+    var aux2:any;
+    var aux3:any;
+    if(count>=horariosBkData.data.length){
+      aux1=null;
+      aux2=null;
+    }else{
+      aux1=horariosBkData.data[count].horaInicio
+      aux2=horariosBkData.data[count].horaFin
+      aux3=horariosBkData.data[count].diasAtencion[0].nombreDia
+    }
+    if (
+      req.horaInicio !== aux1 ||
+      req.horaFin !== aux2 ||
+      req.diasAtencion[0].nombreDia!==aux3
+    ) {
+      if(req.idHorarios<=0){
+
+        const postHor = {
+            horaInicio: req.horaInicio,
+            horaFin: req.horaFin,
+            idModulo: numId,
+            listAtencion:
+            [
+              {
+                idDia:req.diasAtencion[0].nombreDia==="Lunes"?1
+                :req.diasAtencion[0].nombreDia==="Martes"?2
+                :req.diasAtencion[0].nombreDia==="Miercoles"?3
+                :req.diasAtencion[0].nombreDia==="Jueves"?4
+                :req.diasAtencion[0].nombreDia==="Viernes"?5
+                :req.diasAtencion[0].nombreDia==="Sabado"?6
+                :req.diasAtencion[0].nombreDia==="Domingo"?7
+                :1
+              }
+            ]
+        };
+        console.log(postHor)
+        fetch(
+        `${baseURL}/Horarios/addHorario`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postHor),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosHorario(idMod);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }else{
+         const postHor = {
+            horaInicio: req.horaInicio,
+            horaFin: req.horaFin,
+            idModulo: numId,
+            listAtencion:
+            [
+              {
+                id:req.diasAtencion[0].idAtencion,
+                idDia:req.diasAtencion[0].nombreDia==="Lunes"?1
+                :req.diasAtencion[0].nombreDia==="Martes"?2
+                :req.diasAtencion[0].nombreDia==="Miercoles"?3
+                :req.diasAtencion[0].nombreDia==="Jueves"?4
+                :req.diasAtencion[0].nombreDia==="Viernes"?5
+                :req.diasAtencion[0].nombreDia==="Sabado"?6
+                :req.diasAtencion[0].nombreDia==="Domingo"?7
+                :1
+              }
+            ]
+        };
+        fetch(
+        `${baseURL}/Horarios/updateHorarios/${req.idHorarios}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postHor),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            successAlert("Éxito al editar los datos");
+            cargarDatosHorario(idMod);
+          } else {
+            throw new Error("Error al cambiar los datos del servicio");
+          }
+        })
+        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+      }
+    } else {
+      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+    }
+    count++;
+  });
+  };
 
   const [inputsReq, setInputsReq]:any = useState([]);
   const [inputPaso, setInputsPaso]:any = useState([]);
   const [inputsRef, setInputsRef]:any = useState([]);
+  const [inputsHor, setInputsHor]:any = useState([]);
 
   const handleAddRequisitos = () => {
-    
+    var newIdReq = requisitosData.data.length > 0 ? (requisitosData.data[requisitosData.data.length - 1].identificador) : -1;
+    newIdReq=newIdReq>0?(newIdReq+1)*-1:(newIdReq-1);
+
     const newRequisito:IEditarRequisitosArray = {
       data:[
         {
-        identificador:(requisitosData.data.length+1) * -1,
+        identificador:newIdReq,
           descripcion: "",
           pasosRequisito:
           [
@@ -590,19 +805,59 @@ const editarUbicacion = async (idMod: number) => {
     
   }
   const handleAddReferencias = () => {
+    var newIdRef = referenciaData.data.length > 0 ? (referenciaData.data[referenciaData.data.length - 1].identificador) : -1;
+    newIdRef=newIdRef>0?(newIdRef+1)*-1:(newIdRef-1);
     const newReference = {
-      identificador: (referenciaData.data.length+1) * -1,
+      identificador: newIdRef,
       nombre: "", 
       numero: "", 
     };
     referenciaData.data.push(newReference);
     setInputsRef([...inputsRef]);
+    console.log(referenciaData.data)
   }
   const handleDeleteReferencias = (id:number) => {
     if(id<0){
       const indexAEliminar=referenciaData.data.findIndex((ex)=>ex.identificador===id);
       referenciaData.data.splice(indexAEliminar,1);
       setInputsRef([...inputsRef]);
+    }
+    
+  }
+  const handleAddHorarios = () => {
+    var newIdHorarios = horariosData.data.length > 0 ? (horariosData.data[horariosData.data.length - 1].idHorarios) : -1;
+    newIdHorarios=newIdHorarios>0?(newIdHorarios+1)*-1:(newIdHorarios-1);
+    const newHorario:IEditarHorarioArray = {
+      data:
+      [
+        {
+           idHorarios: newIdHorarios,
+            horaInicio: "",
+            horaFin: "",
+            modulo: null,
+            servicio: null,
+            estado: true,
+            diasAtencion:
+            [
+              {
+                idAtencion:countHor,
+                nombreDia:null
+              }
+            ]
+        }
+      ]   
+    };
+    horariosData.data.push(newHorario.data[0]);
+    countHor--;
+    setInputsHor([...inputsHor]);
+    console.log(horariosData.data)
+  }
+  const handleDeleteHorarios = (id:number) => {
+
+    if(id<0){
+      const indexAEliminar=horariosData.data.findIndex((ex)=>ex.idHorarios===id);
+      horariosData.data.splice(indexAEliminar,1);
+      setInputsHor([...inputsHor]);
     }
     
   }
@@ -669,45 +924,81 @@ const editarUbicacion = async (idMod: number) => {
           </div>
         </div>
       </div>
-      <SectionTitle>Contactos de referencia</SectionTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <Label className="mt-4">
-          
-          {
-            referenciaData.data.map((ref,index)=>(
-               <div className="my-3" key={ref.identificador}>
-                <ReferenciaInputs index={index} identificador={ref.identificador} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
-               </div>
-            ))
-          }
-      
-          {inputsRef}
+    <SectionTitle>Contactos de referencia</SectionTitle>
+    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <Label className="mt-4">
+        
+        {
+          referenciaData.data.map((ref,index)=>(
+              <div className="my-3" key={ref.identificador}>
+              <ReferenciaInputs index={index} identificador={ref.identificador} valueNombre={ref.nombre} valueContacto={ref.numero} handle={handleChange3} hadleDelete={handleDeleteReferencias}/>
+              </div>
+          ))
+        }
+      {inputsRef}
 
-        </Label>
-        <div className="flex flex-row-reverse ...">
-          <div >
-            <Button  size="small" onClick={handleAddReferencias}>
-                +
-            </Button>
-          </div>
-        </div>
-        <div className="flex">
-          <div className="mx-2 mt-4">
-          <Button size="large" onClick={() => editarReferencias(numId)}>
-            Editar
+      </Label>
+      <div className="flex flex-row-reverse ...">
+        <div >
+          <Button  size="small" onClick={handleAddReferencias}>
+              +
           </Button>
-          </div>
-          <div className="mx-2 mt-4">
-            <Modal pageRender={<EliminarReferencia 
-            title="Gabinete Psico-Pedagogico"
-            pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
-            pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
-              />} buttonName="Gestionar Contactos"/>
-          </div>
         </div>
       </div>
-      <SectionTitle>Ubicación</SectionTitle>
+      <div className="flex">
+        <div className="mx-2 mt-4">
+        <Button size="large" onClick={() => editarReferencias(numId)}>
+          Editar
+        </Button>
+        </div>
+        <div className="mx-2 mt-4">
+          <Modal pageRender={<EliminarReferencia 
+          title="Gabinete Psico-Pedagogico"
+          pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
+          pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+            />} buttonName="Gestionar Contactos"/>
+        </div>
+      </div>
+    </div>
 
+    <SectionTitle>Horarios de Atención</SectionTitle>
+    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <SectionTitle>Asignar un nuevo Horario</SectionTitle>
+      <Label className="mt-4">
+        {
+          horariosData.data.map((ref,index)=>(
+              <div className="my-3" key={index}>
+              <HorariosInputs index={index} identificador={ref.idHorarios} valueDia={ref.diasAtencion[0].nombreDia} idAtencion={ref.diasAtencion[0].idAtencion}
+               valueHorarioinicio={ref.horaInicio} valueHorarioFin={ref.horaFin} handle={handleChange5} handleSelect={handleChange6} hadleDelete={handleDeleteHorarios}/>
+              </div>
+          ))
+        }
+      {inputsHor}
+
+      </Label>
+      <div className="flex flex-row-reverse ...">
+        <div >
+          <Button  size="small" onClick={handleAddHorarios}>
+              +
+          </Button>
+        </div>
+      </div>
+      <div className="flex">
+        <div className="mx-2 mt-4">
+        <Button size="large" onClick={() => editarHorarios(numId)}>
+          Editar
+        </Button>
+        </div>
+        <div className="mx-2 mt-4">
+          <Modal pageRender={<EliminarHorario 
+          title="Gabinete Psico-Pedagogico"
+          pathEnable={`Horarios/getHorarioByModuloIdActive/${numId}`}
+          pathDisable={`Horarios/getHorarioByModuloIdInActive/${numId}`}
+            />} buttonName="Gestionar Horarios"/>
+        </div>
+      </div>
+    </div>
+    <SectionTitle>Ubicación</SectionTitle>
     <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
       <Label>
         <span >Descripción</span>
