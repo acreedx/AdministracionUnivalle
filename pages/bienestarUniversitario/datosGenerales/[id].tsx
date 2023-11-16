@@ -3,7 +3,7 @@ import {
   IEditarModulo,
   IEditarUbicacion,
   IEditarReferenciaArray,
-  IEditarRequisitosArray ,
+  IEditarRequisitosArray,
   IEditarHorarioArray,
 } from "../../../utils/interfaces/servicios";
 import { HelperText, Input, Label } from "@roketid/windmill-react-ui";
@@ -49,13 +49,11 @@ export async function getServerSideProps(context: any) {
 }
 
 function EditarDatosGeneralesPage() {
-
-  const baseURL="https://apisistemaunivalle.somee.com/api";
-  var countReq=-1;
-  var countHor=-1;
-  const [ubicacionImg,setUImg]:any = useState(null)
-  const [ubicaionVideo,setUVideo]:any = useState(null)
-
+  const baseURL = "https://apisistemaunivalle.somee.com/api";
+  var countReq = -1;
+  var countHor = -1;
+  const [ubicacionImg, setUImg]: any = useState(null);
+  const [ubicaionVideo, setUVideo]: any = useState(null);
 
   const [moduloData, setModuloData] = useState<IEditarModulo>({
     nombremodulo: "",
@@ -125,9 +123,8 @@ function EditarDatosGeneralesPage() {
       ],
     });
 
-  const [horariosData,setHorariosData]= useState<IEditarHorarioArray>({
-    data:
-    [
+  const [horariosData, setHorariosData] = useState<IEditarHorarioArray>({
+    data: [
       {
         idHorarios: 0,
         horaInicio: "",
@@ -135,20 +132,18 @@ function EditarDatosGeneralesPage() {
         modulo: null,
         servicio: null,
         estado: true,
-        diasAtencion:
-        [
+        diasAtencion: [
           {
-            idAtencion:0,
-            nombreDia:null
-          }
-        ]
-      }
-    ]
+            idAtencion: 0,
+            nombreDia: null,
+          },
+        ],
+      },
+    ],
   });
 
-   const [horariosBkData,setHorariosBkData]= useState<IEditarHorarioArray>({
-    data:
-    [
+  const [horariosBkData, setHorariosBkData] = useState<IEditarHorarioArray>({
+    data: [
       {
         idHorarios: 0,
         horaInicio: "",
@@ -156,15 +151,14 @@ function EditarDatosGeneralesPage() {
         modulo: null,
         servicio: null,
         estado: true,
-        diasAtencion:
-        [
+        diasAtencion: [
           {
-            idAtencion:0,
-            nombreDia:""
-          }
-        ]
-      }
-    ]
+            idAtencion: 0,
+            nombreDia: "",
+          },
+        ],
+      },
+    ],
   });
 
   const [modules, setModules] = useState<IListarModulos[]>([]);
@@ -216,9 +210,7 @@ function EditarDatosGeneralesPage() {
 
   async function cargarModulos() {
     try {
-      const res = await fetch(
-        `${baseURL}/Modulos/getActiveModulos`
-      );
+      const res = await fetch(`${baseURL}/Modulos/getActiveModulos`);
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
       }
@@ -231,9 +223,7 @@ function EditarDatosGeneralesPage() {
 
   async function cargarDatosModulo(id: number) {
     try {
-      const res = await fetch(
-        `${baseURL}/Modulos/getModuloById/${id}`
-      );
+      const res = await fetch(`${baseURL}/Modulos/getModuloById/${id}`);
       if (!res.ok) {
         throw new Error("Error al obtener los datos del modulo.");
       }
@@ -342,10 +332,10 @@ function EditarDatosGeneralesPage() {
       const resData = await res.json();
 
       setHorariosBkData({
-        data:resData.data,
+        data: resData.data,
       });
       setHorariosData({
-        data:resData.data,
+        data: resData.data,
       });
     } catch (error) {
       //errorAlert("Ocurrió un error al traer los datos");
@@ -602,11 +592,14 @@ function EditarDatosGeneralesPage() {
       [campo]: e.target.value,
     });
   };
-      
-      
-  const handleChange5 = (e: ChangeEvent<HTMLInputElement>, id:number ,campo: string) => {
-      setHorariosData((prevData:any) => {
-      const newData = prevData.data.map((item:any) => {
+
+  const handleChange5 = (
+    e: ChangeEvent<HTMLInputElement>,
+    id: number,
+    campo: string
+  ) => {
+    setHorariosData((prevData: any) => {
+      const newData = prevData.data.map((item: any) => {
         if (item.idHorarios === id) {
           // Clona el objeto original y actualiza la propiedad especificada
           return {
@@ -615,18 +608,23 @@ function EditarDatosGeneralesPage() {
           };
         }
         return item;
-        });
-
-        return { data: newData };
       });
+
+      return { data: newData };
+    });
   };
 
-  const handleChange6 = (e: ChangeEvent<HTMLSelectElement>, id: number, campo: string, diaId: number) => {
+  const handleChange6 = (
+    e: ChangeEvent<HTMLSelectElement>,
+    id: number,
+    campo: string,
+    diaId: number
+  ) => {
     setHorariosData((prevData: any) => {
-      const newData = prevData.data.map((item:any) => {
+      const newData = prevData.data.map((item: any) => {
         if (item.idHorarios === id) {
           // Clona el objeto original y actualiza la propiedad especificada
-          const updatedDiasAtencion = item.diasAtencion?.map((dia:any) => {
+          const updatedDiasAtencion = item.diasAtencion?.map((dia: any) => {
             if (dia.idAtencion === diaId) {
               return {
                 ...dia,
@@ -655,7 +653,6 @@ function EditarDatosGeneralesPage() {
     setHorariosData(horariosBkData);
     setUbicacionData(ubicacionBkData);
     clearValidations();
-    
   };
 
   const clearValidations = () => {
@@ -673,7 +670,7 @@ function EditarDatosGeneralesPage() {
     setTextErrorsUbicacion(resetDefaultValFlags(textErrorsUbicacion, ""));
   };
 
- const editarModulo = async (id: number) => {
+  const editarModulo = async (id: number) => {
     const check = checkValidationEdit(flagsNombreModulo);
     const repetitiveModule = modules.find(
       (m: any) =>
@@ -699,16 +696,13 @@ function EditarDatosGeneralesPage() {
       const postModul = {
         nombremodulo: moduloData.nombremodulo,
       };
-      fetch(
-        `${baseURL}/Modulos/updateModulo/${id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postModul),
-        }
-      )
+      fetch(`${baseURL}/Modulos/updateModulo/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postModul),
+      })
         .then((response) => {
           if (response.ok) {
             successAlert("Éxito al editar los datos");
@@ -794,7 +788,7 @@ function EditarDatosGeneralesPage() {
         );
     }
   };
-  
+
   const editarRequisitos = async (idMod: number) => {
     var count = 0;
     requisitosData.data.forEach((req) => {
@@ -818,16 +812,13 @@ function EditarDatosGeneralesPage() {
               },
             ],
           };
-          fetch(
-            `${baseURL}/Requisitos/addRequisito`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(postReq),
-            }
-          )
+          fetch(`${baseURL}/Requisitos/addRequisito`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postReq),
+          })
             .then((response) => {
               if (response.ok) {
                 successAlert("Éxito al editar los datos");
@@ -848,16 +839,13 @@ function EditarDatosGeneralesPage() {
             ],
           };
           console.log(postReq);
-          fetch(
-            `${baseURL}/Requisitos/updateRequisito/${req.identificador}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(postReq),
-            }
-          )
+          fetch(`${baseURL}/Requisitos/updateRequisito/${req.identificador}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postReq),
+          })
             .then((response) => {
               if (response.ok) {
                 successAlert("Éxito al editar los datos");
@@ -909,16 +897,13 @@ function EditarDatosGeneralesPage() {
               estado: true,
             };
             console.log(postRef);
-            fetch(
-              `${baseURL}/Referencia/addReferences`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(postRef),
-              }
-            )
+            fetch(`${baseURL}/Referencia/addReferences`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(postRef),
+            })
               .then((response) => {
                 if (response.ok) {
                   successAlert(
@@ -981,126 +966,136 @@ function EditarDatosGeneralesPage() {
       warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
     }
   };
-  
-  const editarHorarios = async (idMod: number) => {
-    var count =0;
-    horariosData.data.forEach(req => {
-    var aux1:any;
-    var aux2:any;
-    var aux3:any;
-    if(count>=horariosBkData.data.length){
-      aux1=null;
-      aux2=null;
-    }else{
-      aux1=horariosBkData.data[count].horaInicio
-      aux2=horariosBkData.data[count].horaFin
-      aux3=horariosBkData.data[count].diasAtencion[0].nombreDia
-    }
-    if (
-      req.horaInicio !== aux1 ||
-      req.horaFin !== aux2 ||
-      req.diasAtencion[0].nombreDia!==aux3
-    ) {
-      if(req.idHorarios<=0){
 
-        const postHor = {
-            horaInicio: req.horaInicio,
-            horaFin: req.horaFin,
-            idModulo: numId,
-            listAtencion:
-            [
-              {
-                idDia:req.diasAtencion[0].nombreDia==="Lunes"?1
-                :req.diasAtencion[0].nombreDia==="Martes"?2
-                :req.diasAtencion[0].nombreDia==="Miercoles"?3
-                :req.diasAtencion[0].nombreDia==="Jueves"?4
-                :req.diasAtencion[0].nombreDia==="Viernes"?5
-                :req.diasAtencion[0].nombreDia==="Sabado"?6
-                :req.diasAtencion[0].nombreDia==="Domingo"?7
-                :1
-              }
-            ]
-        };
-        console.log(postHor)
-        fetch(
-        `${baseURL}/Horarios/addHorario`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postHor),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-            cargarDatosHorario(idMod);
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
-      }else{
-         const postHor = {
-            horaInicio: req.horaInicio,
-            horaFin: req.horaFin,
-            idModulo: numId,
-            listAtencion:
-            [
-              {
-                id:req.diasAtencion[0].idAtencion,
-                idDia:req.diasAtencion[0].nombreDia==="Lunes"?1
-                :req.diasAtencion[0].nombreDia==="Martes"?2
-                :req.diasAtencion[0].nombreDia==="Miercoles"?3
-                :req.diasAtencion[0].nombreDia==="Jueves"?4
-                :req.diasAtencion[0].nombreDia==="Viernes"?5
-                :req.diasAtencion[0].nombreDia==="Sabado"?6
-                :req.diasAtencion[0].nombreDia==="Domingo"?7
-                :1
-              }
-            ]
-        };
-        fetch(
-        `${baseURL}/Horarios/updateHorarios/${req.idHorarios}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postHor),
-        }
-      )
-        .then((response) => {
-          if (response.ok) {
-            successAlert("Éxito al editar los datos");
-            cargarDatosHorario(idMod);
-          } else {
-            throw new Error("Error al cambiar los datos del servicio");
-          }
-        })
-        .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+  const editarHorarios = async (idMod: number) => {
+    var count = 0;
+    horariosData.data.forEach((req) => {
+      var aux1: any;
+      var aux2: any;
+      var aux3: any;
+      if (count >= horariosBkData.data.length) {
+        aux1 = null;
+        aux2 = null;
+      } else {
+        aux1 = horariosBkData.data[count].horaInicio;
+        aux2 = horariosBkData.data[count].horaFin;
+        aux3 = horariosBkData.data[count].diasAtencion[0].nombreDia;
       }
-    } else {
-      //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
-    }
-    count++;
-  });
+      if (
+        req.horaInicio !== aux1 ||
+        req.horaFin !== aux2 ||
+        req.diasAtencion[0].nombreDia !== aux3
+      ) {
+        if (req.idHorarios <= 0) {
+          const postHor = {
+            horaInicio: req.horaInicio,
+            horaFin: req.horaFin,
+            idModulo: numId,
+            listAtencion: [
+              {
+                idDia:
+                  req.diasAtencion[0].nombreDia === "Lunes"
+                    ? 1
+                    : req.diasAtencion[0].nombreDia === "Martes"
+                    ? 2
+                    : req.diasAtencion[0].nombreDia === "Miercoles"
+                    ? 3
+                    : req.diasAtencion[0].nombreDia === "Jueves"
+                    ? 4
+                    : req.diasAtencion[0].nombreDia === "Viernes"
+                    ? 5
+                    : req.diasAtencion[0].nombreDia === "Sabado"
+                    ? 6
+                    : req.diasAtencion[0].nombreDia === "Domingo"
+                    ? 7
+                    : 1,
+              },
+            ],
+          };
+          console.log(postHor);
+          fetch(`${baseURL}/Horarios/addHorario`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postHor),
+          })
+            .then((response) => {
+              if (response.ok) {
+                successAlert("Éxito al editar los datos");
+                cargarDatosHorario(idMod);
+              } else {
+                throw new Error("Error al cambiar los datos del servicio");
+              }
+            })
+            .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        } else {
+          const postHor = {
+            horaInicio: req.horaInicio,
+            horaFin: req.horaFin,
+            idModulo: numId,
+            listAtencion: [
+              {
+                id: req.diasAtencion[0].idAtencion,
+                idDia:
+                  req.diasAtencion[0].nombreDia === "Lunes"
+                    ? 1
+                    : req.diasAtencion[0].nombreDia === "Martes"
+                    ? 2
+                    : req.diasAtencion[0].nombreDia === "Miercoles"
+                    ? 3
+                    : req.diasAtencion[0].nombreDia === "Jueves"
+                    ? 4
+                    : req.diasAtencion[0].nombreDia === "Viernes"
+                    ? 5
+                    : req.diasAtencion[0].nombreDia === "Sabado"
+                    ? 6
+                    : req.diasAtencion[0].nombreDia === "Domingo"
+                    ? 7
+                    : 1,
+              },
+            ],
+          };
+          fetch(`${baseURL}/Horarios/updateHorarios/${req.idHorarios}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(postHor),
+          })
+            .then((response) => {
+              if (response.ok) {
+                successAlert("Éxito al editar los datos");
+                cargarDatosHorario(idMod);
+              } else {
+                throw new Error("Error al cambiar los datos del servicio");
+              }
+            })
+            .catch(() => errorAlert("Ocurrio un error al editar los datos"));
+        }
+      } else {
+        //warningAlert("No cambio ningún dato, por lo que no se hizo la edición");
+      }
+      count++;
+    });
   };
 
-  const [inputsReq, setInputsReq]:any = useState([]);
-  const [inputPaso, setInputsPaso]:any = useState([]);
-  const [inputsRef, setInputsRef]:any = useState([]);
-  const [inputsHor, setInputsHor]:any = useState([]);
+  const [inputsReq, setInputsReq]: any = useState([]);
+  const [inputPaso, setInputsPaso]: any = useState([]);
+  const [inputsRef, setInputsRef]: any = useState([]);
+  const [inputsHor, setInputsHor]: any = useState([]);
 
   const handleAddRequisitos = () => {
-    var newIdReq = requisitosData.data.length > 0 ? (requisitosData.data[requisitosData.data.length - 1].identificador) : -1;
-    newIdReq=newIdReq>0?(newIdReq+1)*-1:(newIdReq-1);
+    var newIdReq =
+      requisitosData.data.length > 0
+        ? requisitosData.data[requisitosData.data.length - 1].identificador
+        : -1;
+    newIdReq = newIdReq > 0 ? (newIdReq + 1) * -1 : newIdReq - 1;
 
-    const newRequisito:IEditarRequisitosArray = {
-      data:[
+    const newRequisito: IEditarRequisitosArray = {
+      data: [
         {
-        identificador:newIdReq,
+          identificador: newIdReq,
           descripcion: "",
           pasosRequisito: [
             {
@@ -1126,12 +1121,15 @@ function EditarDatosGeneralesPage() {
     }
   };
   const handleAddReferencias = () => {
-    var newIdRef = referenciaData.data.length > 0 ? (referenciaData.data[referenciaData.data.length - 1].identificador) : -1;
-    newIdRef=newIdRef>0?(newIdRef+1)*-1:(newIdRef-1);
+    var newIdRef =
+      referenciaData.data.length > 0
+        ? referenciaData.data[referenciaData.data.length - 1].identificador
+        : -1;
+    newIdRef = newIdRef > 0 ? (newIdRef + 1) * -1 : newIdRef - 1;
     const newReference = {
       identificador: newIdRef,
-      nombre: "", 
-      numero: "", 
+      nombre: "",
+      numero: "",
     };
     referenciaData.data.push(newReference);
     setInputsRef([...inputsRef]);
@@ -1144,47 +1142,49 @@ function EditarDatosGeneralesPage() {
       );
       referenciaData.data.splice(indexAEliminar, 1);
       setInputsRef([...inputsRef]);
-    } 
-  }
+    }
+  };
 
   const handleAddHorarios = () => {
-    var newIdHorarios = horariosData.data.length > 0 ? (horariosData.data[horariosData.data.length - 1].idHorarios) : -1;
-    newIdHorarios=newIdHorarios>0?(newIdHorarios+1)*-1:(newIdHorarios-1);
-    const newHorario:IEditarHorarioArray = {
-      data:
-      [
+    var newIdHorarios =
+      horariosData.data.length > 0
+        ? horariosData.data[horariosData.data.length - 1].idHorarios
+        : -1;
+    newIdHorarios =
+      newIdHorarios > 0 ? (newIdHorarios + 1) * -1 : newIdHorarios - 1;
+    const newHorario: IEditarHorarioArray = {
+      data: [
         {
-           idHorarios: newIdHorarios,
-            horaInicio: "",
-            horaFin: "",
-            modulo: null,
-            servicio: null,
-            estado: true,
-            diasAtencion:
-            [
-              {
-                idAtencion:countHor,
-                nombreDia:null
-              }
-            ]
-        }
-      ]   
+          idHorarios: newIdHorarios,
+          horaInicio: "",
+          horaFin: "",
+          modulo: null,
+          servicio: null,
+          estado: true,
+          diasAtencion: [
+            {
+              idAtencion: countHor,
+              nombreDia: null,
+            },
+          ],
+        },
+      ],
     };
     horariosData.data.push(newHorario.data[0]);
     countHor--;
     setInputsHor([...inputsHor]);
-    console.log(horariosData.data)
-  }
+    console.log(horariosData.data);
+  };
 
-  const handleDeleteHorarios = (id:number) => {
-
-    if(id<0){
-      const indexAEliminar=horariosData.data.findIndex((ex)=>ex.idHorarios===id);
-      horariosData.data.splice(indexAEliminar,1);
+  const handleDeleteHorarios = (id: number) => {
+    if (id < 0) {
+      const indexAEliminar = horariosData.data.findIndex(
+        (ex) => ex.idHorarios === id
+      );
+      horariosData.data.splice(indexAEliminar, 1);
       setInputsHor([...inputsHor]);
     }
-    
-  }
+  };
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.files?.[0];
@@ -1271,7 +1271,7 @@ function EditarDatosGeneralesPage() {
       inputFileVideoUbi.current.value = null;
     }
   };
-  
+
   return (
     <Layout>
       <PageTitle>Editar Pagina Principal - Bienestar Universitario</PageTitle>
@@ -1355,92 +1355,103 @@ function EditarDatosGeneralesPage() {
           </div>
         </div>
       </div>
-    <SectionTitle>Contactos de referencia</SectionTitle>
-    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <Label className="mt-4">
-        {referenciaData.data.map((ref, index) => (
-          <div className="my-3" key={ref.identificador}>
-            <ReferenciaInputs
-              index={index}
-              identificador={ref.identificador}
-              valueNombre={ref.nombre}
-              valueContacto={ref.numero}
-              handle={handleChange3}
-              hadleDelete={handleDeleteReferencias}
-              flag={flagsReferencia[index]}
-              textFlag={textErrorsReferencia[index]}
+      <SectionTitle>Contactos de referencia</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label className="mt-4">
+          {referenciaData.data.map((ref, index) => (
+            <div className="my-3" key={ref.identificador}>
+              <ReferenciaInputs
+                index={index}
+                identificador={ref.identificador}
+                valueNombre={ref.nombre}
+                valueContacto={ref.numero}
+                handle={handleChange3}
+                hadleDelete={handleDeleteReferencias}
+                flag={flagsReferencia[index]}
+                textFlag={textErrorsReferencia[index]}
+              />
+            </div>
+          ))}
+
+          {inputsRef}
+        </Label>
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button size="small" onClick={handleAddReferencias}>
+              +
+            </Button>
+          </div>
+        </div>
+        <div className="flex">
+          <div className="mx-2 mt-4">
+            <Button size="large" onClick={() => editarReferencias(numId)}>
+              Editar
+            </Button>
+          </div>
+          <div className="mx-2 mt-4">
+            <Modal
+              pageRender={
+                <EliminarReferencia
+                  title="Bienestar Universitario"
+                  pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
+                  pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+                />
+              }
+              buttonName="Gestionar Contactos"
             />
           </div>
-        ))}
-
-        {inputsRef}
-      </Label>
-      <div className="flex flex-row-reverse ...">
-        <div>
-          <Button size="small" onClick={handleAddReferencias}>
-            +
-          </Button>
         </div>
       </div>
-      <div className="flex">
-        <div className="mx-2 mt-4">
-          <Button size="large" onClick={() => editarReferencias(numId)}>
-            Editar
-          </Button>
-        </div>
-        <div className="mx-2 mt-4">
-          <Modal
-            pageRender={
-              <EliminarReferencia
-                title="Bienestar Universitario"
-                pathEnable={`Referencia/getReferenciasbyModuloId/${numId}`}
-                pathDisable={`Referencia/getDisabledReferenciasbyModuloId/${numId}`}
+      <SectionTitle>Horarios de Atención</SectionTitle>
+      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <SectionTitle>Asignar un nuevo Horario</SectionTitle>
+        <Label className="mt-4">
+          {horariosData.data.map((ref, index) => (
+            <div className="my-3" key={index}>
+              <HorariosInputs
+                index={index}
+                identificador={ref.idHorarios}
+                valueDia={ref.diasAtencion[0].nombreDia}
+                idAtencion={ref.diasAtencion[0].idAtencion}
+                valueHorarioinicio={ref.horaInicio}
+                valueHorarioFin={ref.horaFin}
+                handle={handleChange5}
+                handleSelect={handleChange6}
+                hadleDelete={handleDeleteHorarios}
               />
-            }
-            buttonName="Gestionar Contactos"
-          />
-        </div>
-      </div>
-    </div>  
-    <SectionTitle>Horarios de Atención</SectionTitle>
-    <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-      <SectionTitle>Asignar un nuevo Horario</SectionTitle>
-      <Label className="mt-4">
-        {
-          horariosData.data.map((ref,index)=>(
-              <div className="my-3" key={index}>
-              <HorariosInputs index={index} identificador={ref.idHorarios} valueDia={ref.diasAtencion[0].nombreDia} idAtencion={ref.diasAtencion[0].idAtencion}
-               valueHorarioinicio={ref.horaInicio} valueHorarioFin={ref.horaFin} handle={handleChange5} handleSelect={handleChange6} hadleDelete={handleDeleteHorarios}/>
-              </div>
-          ))
-        }
-      {inputsHor}
-
-      </Label>
-      <div className="flex flex-row-reverse ...">
-        <div >
-          <Button  size="small" onClick={handleAddHorarios}>
+            </div>
+          ))}
+          {inputsHor}
+        </Label>
+        <div className="flex flex-row-reverse ...">
+          <div>
+            <Button size="small" onClick={handleAddHorarios}>
               +
-          </Button>
+            </Button>
+          </div>
+        </div>
+        <div className="flex">
+          <div className="mx-2 mt-4">
+            <Button size="large" onClick={() => editarHorarios(numId)}>
+              Editar
+            </Button>
+          </div>
+          <div className="mx-2 mt-4">
+            <Modal
+              pageRender={
+                <EliminarHorario
+                  title="Bienestar Universitario"
+                  pathEnable={`Horarios/getHorarioByModuloIdActive/${numId}`}
+                  pathDisable={`Horarios/getHorarioByModuloIdInActive/${numId}`}
+                />
+              }
+              buttonName="Gestionar Horarios"
+            />
+          </div>
         </div>
       </div>
-      <div className="flex">
-        <div className="mx-2 mt-4">
-        <Button size="large" onClick={() => editarHorarios(numId)}>
-          Editar
-        </Button>
-        </div>
-        <div className="mx-2 mt-4">
-          <Modal pageRender={<EliminarHorario 
-          title="Bienestar Universitario"
-          pathEnable={`Horarios/getHorarioByModuloIdActive/${numId}`}
-          pathDisable={`Horarios/getHorarioByModuloIdInActive/${numId}`}
-            />} buttonName="Gestionar Horarios"/>
-        </div>
-      </div>
-    </div>
 
-    <SectionTitle>Ubicación</SectionTitle>
+      <SectionTitle>Ubicación</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <span>Descripción</span>
