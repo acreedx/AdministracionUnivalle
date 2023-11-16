@@ -342,7 +342,7 @@ function Carrera() {
                                   >
                                     {datos.estado
                                       ? "¿Está seguro de eliminar este registro?"
-                                      : "¿Está seguro de recuperar este registro este registro?"}
+                                      : "¿Está seguro de recuperar este registro?"}
                                   </SweetAlert>
                                 )}
                               </div>
