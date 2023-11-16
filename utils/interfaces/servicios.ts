@@ -23,20 +23,20 @@ export interface ICrearServicios {
     serviciosId: number;
   };
 }
-export interface ICrearServicio{
-    nombre: string;
-    moduloId: number;
-    imagenUrl: string | null;
+export interface ICrearServicio {
+  nombre: string;
+  moduloId: number;
+  imagenUrl: string | null;
 }
 export interface IEditarServicio {
   nombre: string;
   imagenUrl: string | null;
 }
-export interface IEditarModulo{
+export interface IEditarModulo {
   nombremodulo: string;
 }
 export interface IEditarUbicacion {
-  identificador:number;
+  identificador: number;
   descripcion: string | null;
   imagen: string | null;
   video: string | null;
@@ -47,34 +47,31 @@ export interface IEditarRequisitos {
 }
 
 export interface IEditarRequisitosArray {
-  data:[
+  data: [
     {
-      identificador:number;
+      identificador: number;
       descripcion: string | null;
-      pasosRequisito:
-      [
+      pasosRequisito: [
         {
           identificador: number;
-          nombre:string | null;
+          nombre: string | null;
         }
-      ]
-    }  
-  ]
+      ];
+    }
+  ];
 }
 
 export interface IEditarCarrera {
   nombre: string | null;
 }
 export interface IEditarReferenciaArray {
-  data:
-  [
+  data: [
     {
       identificador: number;
       nombre: string | null;
       numero: string | null;
     }
-  ]
- 
+  ];
 }
 export interface IEditarReferencia {
   nombre: string | null;
@@ -88,6 +85,16 @@ export interface IListarServicios {
       nombre: string | null;
       modulo: string | null;
       imagen: string;
+    }
+  ];
+}
+
+export interface IListarModulos {
+  data: [
+    {
+      identificador: number;
+      nombre: string;
+      estado: boolean;
     }
   ];
 }

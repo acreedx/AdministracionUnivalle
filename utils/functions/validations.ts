@@ -2,6 +2,14 @@ export function onlyLettersAndNumbers(str: string) {
   return /^[A-Za-z0-9ñáéíóúü ]*$/.test(str);
 }
 
+export function onlyLetters(str: string) {
+  return /^[A-Za-z ]*$/.test(str);
+}
+
+export function validateUbicationString(str: string) {
+  return /^[A-Za-z0-9ñáéíóúü -]*$/.test(str);
+}
+
 export function validateImg(selectedFile?: File) {
   const allowedTypes = ["image/jpeg", "image/png"];
 
@@ -12,6 +20,25 @@ export function validateImg(selectedFile?: File) {
       return 3;
     }
     if (mb > 10) {
+      return 2;
+    }
+  } else {
+    return 0;
+  }
+
+  return 1;
+}
+
+export function validateVideo(selectedFile?: File) {
+  const allowedTypes = ["video/mp4", "video/x-m4v", "video/webm"];
+
+  if (selectedFile != undefined) {
+    let kb = selectedFile.size / 1024;
+    let mb = kb / 1024;
+    if (!allowedTypes.includes(selectedFile.type)) {
+      return 3;
+    }
+    if (mb > 200) {
       return 2;
     }
   } else {
