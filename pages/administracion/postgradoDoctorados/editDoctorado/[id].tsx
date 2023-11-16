@@ -6,7 +6,6 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
-import URL from "../../../../api/apiCarrer";
 import {
   IAddDoctorado,
   IDoctoradoData,
@@ -14,6 +13,7 @@ import {
   convertJSONListDoctorado,
 } from "utils/interfaces/PostGrado/MDD";
 import { GetServerSidePropsContext } from "next";
+import URL from "pages/api/apiCarrer";
 
 interface props {
   id: number;
@@ -42,9 +42,9 @@ function EditDoctorado({ id }: props) {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}/api/Facultad/ListaActivos`)
+      fetch(`${URL}/api/Facultad/ListaActivos`)
         .then((res) => res.json())
-        .then((res) => setDoctorado(convertJSONListDoctorado(res.response)));
+        .then((res) => setDoctorado(convertJSONDoctorado(res.response)));
     }
     doFetch();
   }, []);
@@ -65,8 +65,6 @@ function EditDoctorado({ id }: props) {
 
     doFetch();
   }, []);
-
-
 
   const handleSubmit = async () => {
     if (titulo === "" || titulo === null) {
@@ -161,8 +159,10 @@ function EditDoctorado({ id }: props) {
           </Label>
           <Label className="mt-4">
             <div className="relative text-gray-500 focus-within:text-purple-600">
-              <input className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
-                disabled />
+              <input
+                className="block w-full pr-20 mt-1 text-sm text-black dark:text-gray-300 dark:border-gray-600 dark:bg-gray-700 focus:border-purple-400 focus:outline-none focus:shadow-outline-purple dark:focus:shadow-outline-gray form-input"
+                disabled
+              />
               <button
                 type={"button"}
                 onClick={() => setShowAlert(true)}

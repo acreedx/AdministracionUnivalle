@@ -30,9 +30,8 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 
-import URL from "../../../api/apiCarrer";
-
-import {IDoctorados} from "utils/interfaces/PostGrado/MDD";
+import { IDoctorados } from "utils/interfaces/PostGrado/MDD";
+import URL from "pages/api/apiCarrer";
 
 function Maestria() {
   const router = useRouter();
@@ -89,7 +88,7 @@ function Maestria() {
 
   useEffect(() => {
     setIsLoading(true);
-    getData(`${URL.baseUrl}/api/Carrera/ListaActivos`);
+    getData(`${URL}/api/Carrera/ListaActivos`);
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
   }, [pageTable2]);
@@ -164,7 +163,6 @@ function Maestria() {
               <Button size="large">Agregar Doctorado</Button>
             </Link>
           </div>
-
 
           {dataTable2.length > 0 ? (
             <>

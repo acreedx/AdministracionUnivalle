@@ -3,14 +3,7 @@ import { Input, Label, Select, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
-import {
-  successAlert,
-  errorAlert,
-  warningAlert,
-} from "../../../../../components/alerts";
 import { ToastContainer } from "react-toastify";
-
-import { uploadFile } from "../../../../../firebase/config";
 
 import {
   IAddDoctorado,
@@ -21,7 +14,8 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import URL from "../../../../api/apiCarrer";
+import URL from "pages/api/apiCarrer";
+import { errorAlert, successAlert, warningAlert } from "components/alerts";
 
 function AgregarDoctoradoPage() {
   const router = useRouter();
@@ -38,7 +32,7 @@ function AgregarDoctoradoPage() {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}/api/Facultad/ListaActivos`)
+      fetch(`${URL}/api/Facultad/ListaActivos`)
         .then((res) => res.json())
         .then((res) => setDoctorados(convertJSONListDoctorado(res.response)));
     }
@@ -51,13 +45,16 @@ function AgregarDoctoradoPage() {
       [campo]: e.target.value,
     }));
   };
-  const handleChangeDes = (e: ChangeEvent<HTMLTextAreaElement>, campo: string) => {
+  const handleChangeDes = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    campo: string
+  ) => {
     setDoctorado((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
   };
-  
+
   const addDoctorado = () => {
     if (
       doctorado.titulo != null &&
@@ -71,7 +68,7 @@ function AgregarDoctoradoPage() {
         },
         body: JSON.stringify({
           titulo: doctorado.titulo,
-          modalidad: doctorado.descripcion,
+          modalidad: doctorado.modalidad,
           imagen: doctorado.imagen,
         }),
       })
@@ -108,8 +105,6 @@ function AgregarDoctoradoPage() {
     setImg(null);
     clearImg();
   };
-
- 
 
   return (
     <Layout>
