@@ -48,6 +48,7 @@ function EditarServicio({ id }: props) {
   const [validationMessage, setvalidationMessage] = useState<string>("");
   const [requirements, setRequirements] = useState<IRequirementData[]>([]);
   const [locations, setLocations] = useState<IUbicacionesData[]>([]);
+
   const handleRequirementChange = (index: number, value: string) => {
     const newRequirements = [...requirements];
     newRequirements[index].description = value;

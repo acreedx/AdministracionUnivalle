@@ -21,8 +21,8 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
   return route?.exact
     ? pathname == route?.path
     : route?.path
-      ? pathname.indexOf(route.path) === 0
-      : false;
+    ? pathname.indexOf(route.path) === 0
+    : false;
 }
 
 const routes: IRoute[] = [
@@ -40,18 +40,6 @@ const routes: IRoute[] = [
       {
         path: "/administracion/cajas",
         name: "Listar Servicios",
-      },
-      {
-        path: "/administracion/cajas/horariosubicacion",
-        name: "Contactos",
-      },
-      {
-        path: "/administracion/cajas/crearcontacto",
-        name: "Crear Contacto",
-      },
-      {
-        path: "/administracion/cajas/datosgenerales",
-        name: "Datos Generales",
       },
     ],
   },
