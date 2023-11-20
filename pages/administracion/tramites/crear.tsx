@@ -270,7 +270,7 @@ function CrearTramite() {
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
 
-  const [selectedCategory, setSelectedCategory] = useState("Solicitudes");
+  const [selectedCategory, setSelectedCategory] = useState("6");
 
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
