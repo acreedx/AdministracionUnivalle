@@ -27,6 +27,7 @@ import {
 import { uploadFile } from "../../../firebase/config";
 import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
+import Link from "next/link";
 
 function EditarUsuarioPageModal() {
 
@@ -163,6 +164,7 @@ function EditarUsuarioPageModal() {
   }
   const clearData = () => {
     setUsuarioData(usuarioBkData);
+    setNuevaClaveData({newPassword:""})
   };
 
   async function cargarDatosCargos() {
@@ -335,11 +337,7 @@ function EditarUsuarioPageModal() {
               Editar
             </Button>
           </div>
-          <div>
-            <Button size="large" onClick={clearData}>
-              Limpiar campos
-            </Button>
-          </div>
+          
 
           
         </div>
@@ -383,11 +381,25 @@ function EditarUsuarioPageModal() {
               Editar Contraseña
             </Button>
           </div>
+           
         </div>
           </div>
         </div>
-        
-        
+        <div className="flex flex-col flex-wrap mb-8 space-y-4 justify-around md:flex-row md:items-end md:space-x-4">
+
+        <div>
+            <Button size="large" onClick={clearData}>
+              Limpiar campos
+            </Button>
+          </div>
+         <div>
+          <Link href={{
+            pathname: `/usuarios/listarUsuarios`,
+          }}>
+          <Button size="large">Volver</Button>
+          </Link>
+        </div>
+        </div>
         <ToastContainer />
     </Layout>
   );
