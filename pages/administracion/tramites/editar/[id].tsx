@@ -37,6 +37,7 @@ function ModificarTramite({ id }: props) {
   const [enchargedError, setEnchargedError] = useState<string | null>(null);
   const [cellphoneError, setCellphoneError] = useState<string | null>(null);
 
+  const [durationSelect, setDurationSelect] = useState("");
   var [serviceImg, setImg]: any = useState(null);
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
@@ -45,18 +46,17 @@ function ModificarTramite({ id }: props) {
 
   //Ubicaciones
   const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
-
   const [locationImg, setLocationImage] = useState<string[]>([]);
   const [locationCroquisImg, setLocationCroquisImage] = useState<string[]>([]);
   const [valueNewLocation, setValueNewLocation] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>(['']);
-  const [fileLocationImg, setfileLocationImg]:any = useState<any[]>([]);
-  const [fileCroquisImg, setfileCroquisImg]:any = useState<any[]>([]);
+  const [fileLocationImg, setfileLocationImg]: any = useState<any[]>([]);
+  const [fileCroquisImg, setfileCroquisImg]: any = useState<any[]>([]);
 
   const handleCreateValueNewLocation = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocation = [...valueNewLocation, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setValueNewLocation(updatedValueLocation);
   };
@@ -78,7 +78,7 @@ function ModificarTramite({ id }: props) {
   const handleCreateLocationImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationImg = [...locationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationImage(updatedValueLocationImg);
   };
@@ -100,7 +100,7 @@ function ModificarTramite({ id }: props) {
   const handleCreateLocationCroquisImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationCroquisImg = [...locationCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationCroquisImage(updatedValueLocationCroquisImg);
   };
@@ -122,7 +122,7 @@ function ModificarTramite({ id }: props) {
   const handleCreateFileLocationImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileLocationImg = [...fileLocationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileLocationImg(updatedFileLocationImg);
   };
@@ -144,7 +144,7 @@ function ModificarTramite({ id }: props) {
   const handleCreateFileCroquisImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileCroquisImg = [...fileCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileCroquisImg(updatedFileCroquisImg);
   };
@@ -166,23 +166,23 @@ function ModificarTramite({ id }: props) {
   const handleSetCommonLocationImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationImg(existingLocations[i].locationIMG, index)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
+
   };
   const handleSetCommonLocationCroquisImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationCroquisImg(existingLocations[i].croquis, index)
         //setLocationCroquisImage(existingLocations[i].croquis)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
+
   };
   const agregarLocation = () => {
     setLocations([...locations, '']);
@@ -210,47 +210,44 @@ function ModificarTramite({ id }: props) {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
     }
   };
-  const handleChangeLocationCroquisImgByInput= (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleChangeLocationCroquisImgByInput = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const archivo = e.target.files?.[0];
     handleChangeFileCroquisImg(archivo, index)
     if (archivo) {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationCroquisImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
     }
   };
 
-  
+
 
   const updateLocation = async (serviceId: number) => {
-    if(valueNewLocation.length === ubicaciones.length)
-    {
-      for (let i = 0; i < ubicaciones.length; i++) 
-      {
+    if (valueNewLocation.length === ubicaciones.length) {
+      for (let i = 0; i < ubicaciones.length; i++) {
         const element = ubicaciones[i];
         const location = locationImg[i];
         const croquis = locationCroquisImg[i];
         var imgURL
         var croquisURL
 
-        if(location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
+        if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
         else imgURL = locationImg[i]
-        
-        if(croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+
+        if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
         else croquisURL = locationCroquisImg[i]
 
-        if (location.trim() !== '') 
-        {
+        if (location.trim() !== '') {
           const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
             method: "PUT",
             headers: {
@@ -337,7 +334,6 @@ function ModificarTramite({ id }: props) {
   const [cellphone, setcellphone] = useState("");
 
   const [processingTime, setprocessingTime] = useState("");
-
   const [showAlert, setShowAlert] = useState<boolean>(false);
 
 
@@ -400,18 +396,17 @@ function ModificarTramite({ id }: props) {
   }, []);
 
   useEffect(() => {
-      //console.log(ubicaciones)
-      for (let i = 0; i < ubicaciones.length; i++) {
-        const element = ubicaciones[i];
-        if(!element.description.includes("CROQUIS"))
-        {
-          setLocations(prevValue => [...prevValue, ""])
-          setValueNewLocation(prevValue => [...prevValue, element.description]);
-          setLocationImage(prevValue => [...prevValue, element.img]);
-          setLocationCroquisImage(prevValue => [...prevValue, element.croquis]);
-        }
-        
+    //console.log(ubicaciones)
+    for (let i = 0; i < ubicaciones.length; i++) {
+      const element = ubicaciones[i];
+      if (!element.description.includes("CROQUIS")) {
+        setLocations(prevValue => [...prevValue, ""])
+        setValueNewLocation(prevValue => [...prevValue, element.description]);
+        setLocationImage(prevValue => [...prevValue, element.img]);
+        setLocationCroquisImage(prevValue => [...prevValue, element.croquis]);
       }
+
+    }
   }, [ubicaciones]);
 
 
@@ -554,7 +549,7 @@ function ModificarTramite({ id }: props) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tiempotramite: processingTime,
+          tiempotramite: `${processingTime} ${durationSelect}`,
           serviciosId: id,
         }),
       });
@@ -597,7 +592,10 @@ function ModificarTramite({ id }: props) {
   useEffect(() => {
     if (service?.name) {
       setname(service!.name);
-      setprocessingTime(service!.duration);
+      const [numberPart, selectPart] = service!.duration.split(' ');
+      setprocessingTime(numberPart);
+      setDurationSelect(selectPart);
+
       setencharged(service!.encharged);
       setcellphone(service!.cellphone);
     }
@@ -707,12 +705,25 @@ function ModificarTramite({ id }: props) {
 
           <Label className="mt-4">
             <span>Duracion del tramite</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la duracion del tramite"
-              value={processingTime}
-              onChange={(e) => setprocessingTime(e.target.value)}
-            />
+            <div className="flex justify-start">
+              <Input
+                className="mt-1"
+                placeholder="Ingresa la duracion del tramite"
+                value={processingTime}
+                onChange={(e) => setprocessingTime(e.target.value)}
+              />
+
+              <Select
+                className="mt-1"
+                value={durationSelect}
+                onChange={(e) => setDurationSelect(e.target.value)}
+              >
+                <option value="horas">horas</option>
+                <option value="dias">dias</option>
+                <option value="semanas">semanas</option>
+                <option value="meses">meses</option>
+              </Select>
+            </div>
           </Label>
 
           <Label className="mt-4">
@@ -767,7 +778,7 @@ function ModificarTramite({ id }: props) {
                     type="button"
                     onClick={() => agregarPasoRequisito(requisitoIndex, { idStep: 0, nameStep: '' })}
                   >
-                    <PlusIcon/>
+                    <PlusIcon />
                   </button>
                   <button
                     className="text-white px-2 py-1 rounded-full mr-2"
@@ -841,9 +852,9 @@ function ModificarTramite({ id }: props) {
                     type="button"
                     onClick={() => eliminarLocation(locationIndex)}
                   >
-                    <MinusIcon/>
+                    <MinusIcon />
                   </button>
-                  
+
                   <Input
                     className="mt-1 mb-1"
                     id={locationIndex.toString()}
@@ -853,11 +864,11 @@ function ModificarTramite({ id }: props) {
                     value={valueNewLocation[locationIndex]}
                     onChange={(e) => {
                       handleChangeValueNewLocationByInput(e, locationIndex)
-                      if(!locationImg[locationIndex].includes("data:"))
+                      if (!locationImg[locationIndex].includes("data:"))
                         handleSetCommonLocationImg(e, locationIndex)
-                      if(!locationCroquisImg[locationIndex].includes("data:"))
+                      if (!locationCroquisImg[locationIndex].includes("data:"))
                         handleSetCommonLocationCroquisImg(e, locationIndex)
-                      
+
                       console.log(valueNewLocation)
                       //console.log(locationCroquisImg[locationIndex].includes("data:"))
                       //console.log(fileLocationImg)
@@ -865,18 +876,18 @@ function ModificarTramite({ id }: props) {
                   />
                   <datalist id={"Locations" + locationIndex.toString()}>
                     {existingLocations.map((existingLocation, i) => (
-                      <option 
-                        key={existingLocation.id} 
+                      <option
+                        key={existingLocation.id}
                         value={existingLocation.name}
-                        id={existingLocation.locationIMG 
-                          + ".-.-." + existingLocation.croquis 
+                        id={existingLocation.locationIMG
+                          + ".-.-." + existingLocation.croquis
                           + ".-.-." + existingLocation.name}
                       >
                         ubicacion común
                       </option>
                     ))}
                   </datalist>
-                  
+
                 </div>
 
                 <div className="flex justify-center space-x-10 mb-2">
@@ -887,9 +898,9 @@ function ModificarTramite({ id }: props) {
                       className="mt-1"
                       placeholder="Imagen para ubicación"
                       onChange={(e) => handleChangeLocationImgByInput(e, locationIndex)}
-                      />
+                    />
                   </Label>
-                  
+
                   <Label className="mt-4">
                     <span>Croquis de la ubicación del lugar</span>
                     <Input
@@ -899,11 +910,11 @@ function ModificarTramite({ id }: props) {
                       onChange={(e) => handleChangeLocationCroquisImgByInput(e, locationIndex)}
                     />
                   </Label>
-                  
+
                 </div>
                 <div className="flex justify-center space-x-10 mb-2 h-60 ">
-                  <img className = "" src={locationImg[locationIndex]} width="300rem"/>
-                  <img className = "" src={locationCroquisImg[locationIndex]} width="300rem"/>
+                  <img className="" src={locationImg[locationIndex]} width="300rem" />
+                  <img className="" src={locationCroquisImg[locationIndex]} width="300rem" />
                 </div>
               </div>
             ))}

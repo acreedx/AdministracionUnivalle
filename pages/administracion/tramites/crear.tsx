@@ -9,6 +9,7 @@ import { PlusIcon, MinusIcon } from "icons";
 import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
 import { uploadFile } from "../../../firebase/config";
 import existingLocations from "../../../utils/dataTools/existingLocations";
+import SectionTitle from "example/components/Typography/SectionTitle";
 
 
 
@@ -266,7 +267,10 @@ function CrearTramite() {
 
   const [cellphone, setcellphone] = useState("");
 
-  const [processingTime, setprocessingTime] = useState("");
+
+  const [durationNumber, setDurationNumber] = useState("");
+  const [durationSelect, setDurationSelect] = useState("horas");
+
 
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
 
@@ -334,13 +338,14 @@ function CrearTramite() {
         }),
       });
 
+
       await fetch(`${URLS.baseUrl}${createDurationServiceRoute}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          tiempotramite: processingTime,
+          tiempotramite: `${durationNumber} ${durationSelect}`,
           serviciosId: newServiceId,
         }),
       });
@@ -479,8 +484,10 @@ function CrearTramite() {
   return (
     <Layout>
       <PageTitle>Crear un tramite</PageTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <form id="miFormulario" onSubmit={handleSubmit}>
+      <form id="miFormulario" onSubmit={handleSubmit}>
+        <SectionTitle>Datos generales</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
           <Label>
             <span>Nombre del trámite</span>
             <Input
@@ -516,6 +523,72 @@ function CrearTramite() {
               onChange={(e) => setImg(e.target.files?.[0] || null)}
             />
           </Label>
+          <Label className="mt-4 ">
+            <span>Duracion del tramite</span>
+            <div className="flex justify-start">
+
+              <Input
+                className="mt-1"
+                type="number"
+                min={1}
+                placeholder="Tiempo"
+                onChange={(e) => setDurationNumber(e.target.value)}
+              />
+
+              <Select className="mt-1" onChange={(e) => setDurationSelect(e.target.value)}>
+                <option>
+                  horas
+                </option>
+                <option>
+                  dias
+                </option>
+                <option>
+                  semanas
+                </option>
+                <option>
+                  meses
+                </option>
+
+              </Select>
+
+            </div>
+          </Label>
+          <Label className="mt-4">
+            <span>Encargado</span>
+            <Input
+              className={`mt-1 ${/[^A-Za-z\s]/.test(encharged) ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el nombre completo del encargado"
+              onChange={(e) => setencharged(e.target.value)}
+            />
+            {/[^A-Za-z\s]/.test(encharged) && (
+              <span className="text-red-500">No se permiten números ni caracteres especiales.</span>
+            )}
+          </Label>
+          <Label className="mt-4">
+            <span>Teléfono de referencia</span>
+            <Input
+              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el teléfono de referencia del encargado"
+              value={cellphone}
+              onChange={handleCellphoneChange}
+            />
+            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
+          </Label>
+
+          <Label className="mt-4">
+            <span>Seleccione una categoria de tramite</span>
+            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
+              {categorias.map((categoria, i) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.name}
+                </option>
+              ))}
+            </Select>
+          </Label>
+        </div>
+        <SectionTitle>Requisitos</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
           <Label className="mt-4">
             <div className="flex items-center mt-4">
               <span className="mr-2">Requisitos</span>
@@ -573,49 +646,14 @@ function CrearTramite() {
               </div>
             ))}
           </Label>
+        </div>
 
-          <Label className="mt-4">
-            <span>Duracion del tramite</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la duracion del tramite"
-              onChange={(e) => setprocessingTime(e.target.value)}
-            />
-          </Label>
 
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className={`mt-1 ${/[^A-Za-z\s]/.test(encharged) ? 'border-red-500' : ''}`}
-              placeholder="Ingresa el nombre completo del encargado"
-              onChange={(e) => setencharged(e.target.value)}
-            />
-            {/[^A-Za-z\s]/.test(encharged) && (
-              <span className="text-red-500">No se permiten números ni caracteres especiales.</span>
-            )}
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
-              placeholder="Ingresa el teléfono de referencia del encargado"
-              value={cellphone}
-              onChange={handleCellphoneChange}
-            />
-            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
-          </Label>
 
-          <Label className="mt-4">
-            <span>Seleccione una categoria de tramite</span>
-            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
-              {categorias.map((categoria, i) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.name}
-                </option>
-              ))}
-            </Select>
-          </Label>
 
+
+        <SectionTitle>Ubicaciones</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
 
           <Label className="mt-4">
             <div className="flex items-center mt-4">
@@ -700,33 +738,34 @@ function CrearTramite() {
               </div>
             ))}
           </Label>
+        </div>
 
-          <Label className="mt-4">
-            <div className="relative text-gray-500 focus-within:text-purple-600">
-              <button
-                type={"button"}
-                onClick={() => setShowAlert(true)}
-                className="my-4 mb-6 px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+        <Label className="mt-4">
+          <div className="relative text-gray-500 focus-within:text-purple-600">
+            <button
+              type={"button"}
+              onClick={() => setShowAlert(true)}
+              className="my-4 mb-6 px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+            >
+              Guardar
+            </button>
+            {showAlert && (
+              <SweetAlert
+                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                title="Atención"
+                confirmBtnText="Confirmar"
+                cancelBtnText="Cancelar"
+                showCancel
+                onConfirm={handleAlertConfirm}
+                onCancel={handleAlertCancel}
               >
-                Guardar
-              </button>
-              {showAlert && (
-                <SweetAlert
-                  warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
-                  title="Atención"
-                  confirmBtnText="Confirmar"
-                  cancelBtnText="Cancelar"
-                  showCancel
-                  onConfirm={handleAlertConfirm}
-                  onCancel={handleAlertCancel}
-                >
-                  Confirma todos los datos del nuevo servicio?
-                </SweetAlert>
-              )}
-            </div>
-          </Label>
-        </form>
-      </div>
+                Confirma todos los datos del nuevo servicio?
+              </SweetAlert>
+            )}
+          </div>
+        </Label>
+      </form>
+
     </Layout >
   );
 }
