@@ -15,6 +15,7 @@ import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasD
 import { IStepRequirementData, convertJSONListRequirement } from "utils/demo/stepRequerimentData";
 import { ILocationData, convertJSONListLocation } from "utils/demo/locationData";
 import existingLocations from "../../../../utils/dataTools/existingLocations";
+import Loading from "../loading";
 
 interface props {
   id: number;
@@ -335,8 +336,8 @@ function ModificarTramite({ id }: props) {
 
   const [processingTime, setprocessingTime] = useState("");
   const [showAlert, setShowAlert] = useState<boolean>(false);
-
-
+  const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState(false)
   const router = useRouter();
   const [service, setService] = useState<ITramitesDataEdit>();
 
@@ -414,9 +415,13 @@ function ModificarTramite({ id }: props) {
   const [selectedRequerimentsArray, setSelectedRequerimentsArray] = useState<number[]>([]);
 
   const [selectedStepRequeriment, setSelectedStepRequeriment] = useState<number>(0);
+  const [selectedStepRequerimentsArray, setSelectedStepRequerimentsArray] = useState<number[]>([]);
 
   const handleSubmit = async () => {
+    setShowAlertLoading(true)
+    setIsSuccess(false)
     try {
+
       const selectedCategoryId = selectedCategory;
       await fetch(`${URLS.baseUrl}${updateServiceRoute}${id}`, {
         method: "PUT",
@@ -426,7 +431,6 @@ function ModificarTramite({ id }: props) {
         body: JSON.stringify({
           nombre: name,
           imagenUrl: await uploadFile(serviceImg, "servicios/"),
-          //   imageUrl: "",
           idCategoria: selectedCategoryId,
 
         }),
@@ -461,26 +465,25 @@ function ModificarTramite({ id }: props) {
         }
       }
 
-
-
-      //Filtrado de requisitos existentes en la DB
       const requisitosExistentes = await fetch(`${URLS.baseUrl}${getRequisitosByID}${id}`)
         .then((res) => res.json())
         .then((res) => convertJSONListRequirement(res.data));
-      /*
-            const pasosRequisitosExistentes = await fetch(`${URLS.baseUrl}${getPasosRequisitosByServiceIdRoute}${id}`)
-              .then((res) => res.json())
-              .then((res) => res.data);
-      */
 
       for (const requisito of requisitos) {
-        const pasosRequisitosExistentes = await getPasosRequisitosByRequisitoIdF(requisito.id)
-        console.log(getPasosRequisitosByRequisitoIdF(requisito.id))
+        const pasosRequisitosExistentes = await getPasosRequisitosByRequisitoIdF(requisito.id);
+
         const nuevosPasosParaCrear = requisito.pasosRequisito.filter((nuevoPaso) => {
+          // Si no hay pasos existentes, incluye todos los nuevos pasos
+          if (pasosRequisitosExistentes === null) {
+            return true;
+          }
+
+          // Si hay pasos existentes, verifica si el nuevo paso ya está incluido
           return !pasosRequisitosExistentes.some((pasoExistente: any) => {
             return nuevoPaso.nameStep === pasoExistente.nombre;
           });
         });
+
 
 
         for (const nuevoPaso of nuevosPasosParaCrear) {
@@ -561,14 +564,17 @@ function ModificarTramite({ id }: props) {
           },
         });
       }
-      await fetch(`${URLS.baseUrl}${deleteStepRequerimentRoute}${selectedStepRequeriment}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      for (const selectedPasoRequisitoId of selectedStepRequerimentsArray) {
+        await fetch(`${URLS.baseUrl}${deleteStepRequerimentRoute}${selectedPasoRequisitoId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+      }
 
-      router.push("/administracion/tramites")
+      setIsSuccess(true)
+      //  router.push("/administracion/tramites")
     } catch (error) {
       console.error("Error al hacer el fetch:", error);
     }
@@ -579,16 +585,13 @@ function ModificarTramite({ id }: props) {
     return await fetch(`${URLS.baseUrl}${getPasosRequisitosByRequisitoId}${RequisitoId}`)
       .then((res) => res.json())
       .then((res) => res.data);
-
-
   }
-
-
   const handleAlertConfirm = () => {
-    // handleSubmit();
     setShowAlert(false);
+    setShowAlertLoading(false)
     handleSubmit();
   };
+
   useEffect(() => {
     if (service?.name) {
       setname(service!.name);
@@ -648,6 +651,9 @@ function ModificarTramite({ id }: props) {
 
   const handleAlertCancel = () => {
     setShowAlert(false);
+  };
+  const handleAlertLoadConfirm = () => {
+    router.push("/administracion/tramites")
   };
   return (
     <Layout>
@@ -811,8 +817,10 @@ function ModificarTramite({ id }: props) {
                       className="text-white px-2 py-1 rounded-full mr-2"
                       type="button"
                       onClick={() => {
-                        setSelectedStepRequeriment(requisito.pasosRequisito[pasoIndex].idStep)
+                        setSelectedStepRequeriment(paso.idStep)
                         eliminarPasoRequisito(requisitoIndex, pasoIndex)
+                        setSelectedStepRequerimentsArray((prevArray) => [...prevArray, paso.idStep])
+
                       }
 
                       }
@@ -944,6 +952,33 @@ function ModificarTramite({ id }: props) {
                 ¿Confirma todos los datos del tramite?
               </SweetAlert>
             )}
+            {showAlertLoading && (
+              isSuccess ? (
+                <SweetAlert
+                  success
+                  title="¡Éxito!"
+                  onConfirm={handleAlertLoadConfirm}
+                >
+                  Los datos han sido enviados con éxito.
+                </SweetAlert>
+              ) :
+                (
+                  <SweetAlert
+                    title="Cargando..."
+                    onConfirm={handleAlertConfirm}
+                    confirmBtnText={""}
+                    custom
+                  >
+                    <div className="-my-56">
+                      <Loading />
+                    </div>
+                    Enviando los datos espere....
+                  </SweetAlert>
+                )
+
+            )}
+
+
           </div>
         </Label>
       </form >
