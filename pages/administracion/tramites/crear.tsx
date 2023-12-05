@@ -314,7 +314,6 @@ function CrearTramite() {
       console.log(serviceId)
       await createRequisitos(serviceId);
       await createLocation(serviceId);
-      await createCroqui(serviceId);
 
 
       //  router.push("/administracion/tramites")
@@ -364,6 +363,15 @@ function CrearTramite() {
       }
       else
         imgURL = locationImg[i]
+      const croquis = locationCroquisImg[i];
+      var croquisURL
+      //console.log(location)
+      if (croquis.includes("data:")) {
+        //console.log(fileLocationImg[i])
+        croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+      }
+      else
+        croquisURL = locationCroquisImg[i]
       //console.log(imgURL)
       if (location.trim() !== '') {
         const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
@@ -374,38 +382,7 @@ function CrearTramite() {
           body: JSON.stringify({
             descripcion: valueNewLocation[i],
             imagen: imgURL,
-            video: "",
-            serviciosId: serviceId,
-            estado: true,
-          }),
-        });
-
-        console.log("Respuesta del servidor al crear la ubicacion:", newLocationResponse);
-      }
-    }
-  };
-  const createCroqui = async (serviceId: number) => {
-    //console.log(locationCroquisImg)
-    for (let i = 0; i < locationCroquisImg.length; i++) {
-      const location = locationCroquisImg[i];
-      var imgURL
-      //console.log(location)
-      if (location.includes("data:")) {
-        //console.log(fileLocationImg[i])
-        imgURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
-      }
-      else
-        imgURL = locationCroquisImg[i]
-      if (location.trim() !== '') {
-        const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            descripcion: "CROQUIS" + valueNewLocation[i],
-            imagen: imgURL,
-            video: "",
+            video: croquisURL,
             serviciosId: serviceId,
             estado: true,
           }),
