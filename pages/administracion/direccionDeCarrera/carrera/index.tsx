@@ -30,10 +30,9 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import { useRouter } from "next/router";
 import SearchBar from "components/searchBar";
 
-import URL from "../../../api/apiCarrer";
+import URL from "../../../api/apiCareerDirection";
 
-import { IObjetosPerdidos } from "utils/interfaces/ObjetosPerdidos";
-import {ICarrers} from "utils/interfaces/DireccionDeCarrera/Carreras";
+import { ICarrers } from "utils/interfaces/DireccionDeCarrera/Carreras";
 
 function Carrera() {
   const router = useRouter();
@@ -90,7 +89,7 @@ function Carrera() {
 
   useEffect(() => {
     setIsLoading(true);
-    getData(`${URL.baseUrl}/api/Carrera/ListaActivos`);
+    getData(`${URL.baseUrl}Carrera/ListaActivos`);
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
   }, [pageTable2]);
@@ -98,7 +97,7 @@ function Carrera() {
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `${URL.baseUrl}/api/Carrera/${
+        `${URL.baseUrl}Carrera/${
           action ? "Eliminar" : "Reestablecer"
         }/${selectedObj}`,
         {
@@ -148,9 +147,9 @@ function Carrera() {
   const handleActiveChange = (e: ChangeEvent<HTMLInputElement>) => {
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
-      getData(`${URL.baseUrl}/api/Carrera/ListaActivos`);
+      getData(`${URL.baseUrl}Carrera/ListaActivos`);
     } else if (e.target.value === "inactivos") {
-      getData(`${URL.baseUrl}/api/Carrera/ListaInactivos`);
+      getData(`${URL.baseUrl}Carrera/ListaInactivos`);
     }
   };
 
@@ -165,7 +164,6 @@ function Carrera() {
               <Button size="large">Agregar Carrera</Button>
             </Link>
           </div>
-
 
           {dataTable2.length > 0 ? (
             <>
@@ -344,7 +342,7 @@ function Carrera() {
                                   >
                                     {datos.estado
                                       ? "¿Está seguro de eliminar este registro?"
-                                      : "¿Está seguro de recuperar este registro este registro?"}
+                                      : "¿Está seguro de recuperar este registro?"}
                                   </SweetAlert>
                                 )}
                               </div>

@@ -168,7 +168,13 @@ const EliminarHorario: FC<RefereciaProps> = ({
     <div>
       {!isLoading ? (
         <>
-          <PageTitle>Horarios de Atención - {title}</PageTitle>
+          <PageTitle>Maestrias, Doctorados y Diplomados - PostGrado</PageTitle>
+
+          <div className="mb-8">
+            <Link href="/administracion/postgradoDiplomados/addDiplomado/">
+              <Button size="large">Agregar Diplomado</Button>
+            </Link>
+          </div>
 
           {dataTable2.length > 0 ? (
             <>

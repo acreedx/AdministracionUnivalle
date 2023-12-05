@@ -5,17 +5,12 @@ import PageTitle from "example/components/Typography/PageTitle";
 import { successAlert, errorAlert, warningAlert } from "../alerts";
 import { ToastContainer } from "react-toastify";
 import { uploadFile } from "../../firebase/config";
-
 import { IAddObjPerdido } from "utils/interfaces/ObjetosPerdidos";
-import Link from "next/link";
-import { useRouter } from "next/router";
-import Image from "next/image";
 import { isValidUrl } from "utils/functions/url";
 import {
   onlyLettersAndNumbers,
   resetDefaultValFlags,
   validateImg,
-  checkValidation,
   checkValidationEdit,
 } from "utils/functions/validations";
 
@@ -149,7 +144,9 @@ function EditarObjPerdidoPage(props: { id: number }) {
     }
 
     if (send) {
-      objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
+      if (objPerImg != null && flags.imagen)
+        objPerData.archivo = await uploadFile(objPerImg, "objetosPerdidos/");
+
       fetch(
         `https://apisistemaunivalle.somee.com/api/Publicaciones/UpdatePublicaciones/${id}`,
         {
