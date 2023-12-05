@@ -6,20 +6,24 @@ import Layout from "example/containers/Layout";
 import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
-import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
+import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
 import { uploadFile } from "../../../firebase/config";
 import existingLocations from "../../../utils/dataTools/existingLocations";
 import SectionTitle from "example/components/Typography/SectionTitle";
+import tramitesProvider from "utils/providers/tramitesProvider";
+import LoadingScreen from "example/components/loading-screen";
+import Loading from "./loading";
 
 
 
 function CrearTramite() {
-  //console.log(existingLocations)
 
   const [name, setname] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
   const [requisitoError, setRequisitoError] = useState<boolean>(false);
   const [cellphoneError, setCellphoneError] = useState<string | null>(null);
+  const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const [serviceImg, setImg]: any = useState(null);
   const [locationImg, setLocationImage] = useState<string[]>([]);
@@ -213,9 +217,7 @@ function CrearTramite() {
 
   const agregarRequisito = () => {
     if (agregarNuevoRequisito == true) {
-      // Agregar un nuevo requisito aquí, por ejemplo:
       setRequisitos([...requisitos, '']);
-
     } else {
       setAgregarNuevoRequisito(true)
     }
@@ -264,21 +266,21 @@ function CrearTramite() {
   };
 
   const [encharged, setencharged] = useState("");
-
   const [cellphone, setcellphone] = useState("");
-
-
   const [durationNumber, setDurationNumber] = useState("");
   const [durationSelect, setDurationSelect] = useState("horas");
-
-
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
-
   const [selectedCategory, setSelectedCategory] = useState("6");
-
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
   useEffect(() => {
+    const requisitosToAdd = requisitos.map((requisito, index) => ({
+      descripcion: requisito,
+      pasos: pasoRequisito[index] ? pasoRequisito[index].map(nombre => ({ nombre })) : [],
+
+    }));
+
+    console.log("Format requisitos", requisitosToAdd)
     async function doFetch() {
       fetch(`${URLS.baseUrl}${getActiveCategoriesRoute}`)
         .then((res) => res.json())
@@ -291,70 +293,38 @@ function CrearTramite() {
 
   const router = useRouter();
 
-  // Added Service 
-  const createServiceRoute = "Servicios/addServicio";
-  const createReferenceRoute = "Referencia/addReferences";
-  const createDurationServiceRoute = "Tramites/addTramite";
   const createUbicacionRoute = "Ubicaciones/addUbicaciones";
 
   const moduleId = 3;
-
+  const [loading, setLoading] = useState(true);
   const handleSubmit = async () => {
+    setShowAlertLoading(true)
+    setIsSuccess(false)
     try {
-      const selectedCategoryId = selectedCategory;
-      //console.log(selectedCategoryId)
-      const newService = await fetch(`${URLS.baseUrl}${createServiceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: name,
-          moduloId: moduleId,
-          //imageUrl: "",
-          imagenUrl: await uploadFile(serviceImg, "servicios/"),
-          idCategoria: selectedCategoryId
-        }),
-      });
-      const dataNewService = await newService.json();
-      const newServiceId = dataNewService.data.id;
-      console.log(newServiceId)
-      await createRequisitos(newServiceId);
-
-      await createLocation(newServiceId);
-      await createCroqui(newServiceId);
+      setLoading(true)
+      const serviceId = await tramitesProvider.CreateTramite(
+        name,
+        moduleId,
+        await uploadFile(serviceImg, "servicios/"),
+        selectedCategory,
+        encharged,
+        cellphone,
+        `${durationNumber} ${durationSelect}`,
+      );
+      console.log(serviceId)
+      await createRequisitos(serviceId);
+      await createLocation(serviceId);
+      await createCroqui(serviceId);
 
 
-      await fetch(`${URLS.baseUrl}${createReferenceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: newServiceId,
-          estado: true,
-        }),
-      });
-
-
-      await fetch(`${URLS.baseUrl}${createDurationServiceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tiempotramite: `${durationNumber} ${durationSelect}`,
-          serviciosId: newServiceId,
-        }),
-      });
-      router.push("/administracion/tramites")
+      //  router.push("/administracion/tramites")
+      setIsSuccess(true)
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
+    } finally {
+      setLoading(false)
     }
-  };
-
+  }
   //Added requeriment
   const createRequisitoRoute = "Requisitos/addRequisito";
   const createRequisitos = async (serviceId: number) => {
@@ -450,7 +420,9 @@ function CrearTramite() {
     setShowAlert(false);
     handleSubmit();
   };
-
+  const handleAlertLoadConfirm = () => {
+    router.push("/administracion/tramites")
+  };
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
@@ -481,6 +453,7 @@ function CrearTramite() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+
   return (
     <Layout>
       <PageTitle>Crear un tramite</PageTitle>
@@ -762,6 +735,32 @@ function CrearTramite() {
                 Confirma todos los datos del nuevo servicio?
               </SweetAlert>
             )}
+            {showAlertLoading && (
+              isSuccess ? (
+                <SweetAlert
+                  success
+                  title="¡Éxito!"
+                  onConfirm={handleAlertLoadConfirm}
+                >
+                  Los datos han sido enviados con éxito.
+                </SweetAlert>
+              ) :
+                (
+                  <SweetAlert
+                    title="Cargando..."
+                    onConfirm={handleAlertConfirm}
+                    confirmBtnText={""}
+                    custom
+                  >
+                    <div className="-my-56">
+                      <Loading />
+                    </div>
+                    Enviando los datos espere....
+                  </SweetAlert>
+                )
+
+            )}
+
           </div>
         </Label>
       </form>
@@ -769,5 +768,6 @@ function CrearTramite() {
     </Layout >
   );
 }
+
 
 export default CrearTramite;
