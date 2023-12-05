@@ -132,9 +132,9 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        `https://apisistemaunivalle.somee.com/api/`,
+        `https://apisistemaunivalle.somee.com/api/Permisos/deletePermiso/${selectedObj}`,
         {
-          method: "PUT",
+          method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
@@ -207,9 +207,8 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
   return (
     <Layout>
       <PageTitle>Editar Permisos del Usuario</PageTitle>
+      <SectionTitle>Datos Generales del usuario</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        
-        <SectionTitle>Datos Generales del usuario</SectionTitle>
         <div>
          <div className="flex">
             <Label className="mb-2 flex-1 mr-4">
@@ -283,15 +282,15 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
           </div>
         </div>
       </div>
+      <SectionTitle>Permisos Otorgados</SectionTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800"> 
-        <SectionTitle>Permisos Otorgados</SectionTitle>
         <div>
           <TableContainer className="mb-8">
             <Table>
               <TableHeader>
                 <tr>
                   <TableCell className=" font-extrabold text-sm">Nombre del modulo</TableCell>
-                  {/* <TableCell>Quitar</TableCell> */}
+                  <TableCell>Quitar</TableCell>
                 </tr>
               </TableHeader>
               <TableBody>
@@ -302,7 +301,7 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
                         <p>{datos.modulo}</p>
                       </div>
                     </TableCell>
-                    {/* <TableCell>
+                    <TableCell>
                       <div>
                        <Button
                           layout="link"
@@ -351,7 +350,7 @@ const handleChange5 = (e: ChangeEvent<HTMLSelectElement>, campo: string) => {
                           </SweetAlert>
                         )}
                       </div>
-                    </TableCell> */}
+                    </TableCell>
                   </TableRow>
                 ))
                 }

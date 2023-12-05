@@ -1,7 +1,13 @@
 import React, { useState, useRef, ChangeEvent, useEffect } from "react";
-import { Input, Label, Select, Textarea } from "@roketid/windmill-react-ui";
+import { HelperText, Input, Label, Select, Textarea } from "@roketid/windmill-react-ui";
 import { Button } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
+import {
+  checkValidation,
+  onlyLettersAndNumbers,
+  resetDefaultValFlags,
+  validateImg,
+} from "utils/functions/validations";
 import Layout from "example/containers/Layout";
 import {
   successAlert,
@@ -21,12 +27,12 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import SectionTitle from "example/components/Typography/SectionTitle";
-import URL from "../../../../api/apiCarrer";
+import URL_API from "../../../../api/apiCareerDirection";
 
-function AgregarcarrerPage() {
+function AddCarrerPage() {
   const router = useRouter();
   const inputFileImg: any = useRef(null);
-  const [objPerImg, setImg]: any = useState(null);
+  const [img, setImg]: any = useState(null);
   const [carrer, setCarrer] = useState<IAddCarrer>({
     titulo: "",
     descripcion: "",
@@ -34,7 +40,25 @@ function AgregarcarrerPage() {
     duracion: 0,
     planDeEstudios: "",
     imagen: "",
-    facultadId: 0
+    facultadId: 0,
+  });
+  const [flags, setFlags] = useState({
+    titulo: undefined,
+    descripcion: undefined,
+    tituloOtorgado: undefined,
+    duracion: undefined,
+    planDeEstudios: undefined,
+    imagen: undefined,
+    facultadId: undefined,
+  });
+  const [textErrors, setTextErrors] = useState({
+    titulo: "",
+    descripcion: "",
+    tituloOtorgado: "",
+    duracion: 0,
+    planDeEstudios: "",
+    imagen: "",
+    facultadId: 0,
   });
 
   const [faculties, setFaculties] = useState<IFacultiesData[]>([]);
@@ -42,7 +66,7 @@ function AgregarcarrerPage() {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}/api/Facultad/ListaActivos`)
+      fetch(`${URL_API.baseUrl}Facultad/ListaActivos`)
         .then((res) => res.json())
         .then((res) => setFaculties(convertJSONListFaculty(res.response)));
     }
@@ -55,13 +79,58 @@ function AgregarcarrerPage() {
       [campo]: e.target.value,
     }));
   };
-  const handleChangeDes = (e: ChangeEvent<HTMLTextAreaElement>, campo: string) => {
+  const handleChangeDes = (
+    e: ChangeEvent<HTMLTextAreaElement>,
+    campo: string
+  ) => {
     setCarrer((prevData: any) => ({
       ...prevData,
       [campo]: e.target.value,
     }));
   };
-  
+  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.files?.[0];
+
+    let valid: any = true;
+    let validText = "";
+
+    let imgRes = validateImg(value);
+
+    if (imgRes == 0) {
+      valid = undefined;
+    } else if (imgRes === 2 || imgRes === 3) {
+      valid = false;
+    }
+
+    if (imgRes == 1) {
+      setImg(value);
+    } else {
+      clearImg();
+    }
+
+    validText =
+      imgRes === 1
+        ? "Imagen válida"
+        : imgRes === 2
+        ? "Solo se permite imágenes con tamaño menor a 10MB"
+        : imgRes === 3
+        ? "Solo se permiten imágenes jpg y png"
+        : "";
+
+    setFlags((prev) => ({ ...prev, imagen: valid }));
+    setTextErrors((prev) => ({
+      ...prev,
+      imagen: validText,
+    }));
+  };
+
+  const uploadFiles = async () => {
+    carrer.imagen = "";
+    if (img != null) {
+      carrer.imagen = await uploadFile(img, "carreras/");
+    }
+    addCarrer();
+  };
 
   const addCarrer = () => {
     if (
@@ -72,7 +141,7 @@ function AgregarcarrerPage() {
       carrer.planDeEstudios != null &&
       carrer.imagen != null
     ) {
-      fetch(`${URL.baseUrl}/api/Carrera/Guardar`, {
+      fetch(`${URL_API.baseUrl}Carrera/Guardar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -103,6 +172,10 @@ function AgregarcarrerPage() {
       warningAlert("Rellene todos los campos");
     }
   };
+  const clearValidations = () => {
+    setFlags(resetDefaultValFlags(flags, undefined));
+    setTextErrors(resetDefaultValFlags(textErrors, ""));
+  };
 
   const clearImg = () => {
     if (inputFileImg.current) {
@@ -122,9 +195,8 @@ function AgregarcarrerPage() {
     });
     setImg(null);
     clearImg();
+    clearValidations();
   };
-
- 
 
   return (
     <Layout>
@@ -182,14 +254,40 @@ function AgregarcarrerPage() {
             onChange={(e) => handleChange(e, "planDeEstudios")}
           />
         </Label>
-        <Label className="mt-3">
-          <span>URL de la imagen</span>
+        <Label className="mt-4">
+          <span className=" text-lg">
+            Imagen de referencia para la carrera
+          </span>
+          <div className="text-center mb-5">
+            <div className="flex items-center justify-center space-x-4">
+              <div className="flex flex-col items-center space-y-2">
+                <span>Imagen</span>
+                <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={
+                      img === null
+                        ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                        : URL.createObjectURL(img)
+                    }
+                    alt="Imagen nueva"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
           <Input
-            value={carrer.imagen}
+            ref={inputFileImg}
+            valid={flags.imagen}
+            type="file"
             className="mt-1"
-            placeholder="Ingrese la URL de la imagen."
-            onChange={(e) => handleChange(e, "imagen")}
+            placeholder="Imagen para la carrera"
+            accept="image/jpeg, image/png"
+            onChange={(e) => handleImageChange(e)}
           />
+          {flags.imagen != null && (
+            <HelperText valid={flags.imagen}>{textErrors.imagen}</HelperText>
+          )}
         </Label>
         <Label className="mt-4">
           <span>Seleccione una Facultad</span>
@@ -220,7 +318,7 @@ function AgregarcarrerPage() {
         </div>
 
         <div>
-          <Button size="large" onClick={addCarrer}>
+          <Button size="large" onClick={uploadFiles}>
             Registrar
           </Button>
         </div>
@@ -230,4 +328,4 @@ function AgregarcarrerPage() {
   );
 }
 
-export default AgregarcarrerPage;
+export default AddCarrerPage;

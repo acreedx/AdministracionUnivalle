@@ -18,9 +18,11 @@ function CrearCategoria() {
   const createCategoryRoute = "Categoria/addCategoria"
 
   const handleSubmit = async () => {
-    if (name == null || description == null) {
+    if (!name || !description) {
+      setShowAlert(true);
       return;
     }
+
     await fetch(`${URL.baseUrl}${createCategoryRoute}`, {
       method: "POST",
       headers: {
@@ -31,12 +33,22 @@ function CrearCategoria() {
         descripcion: description,
       }),
     });
-    router.back();
+    router.push("/administracion/tramites/categorias/");
   };
 
+
   const handleAlertConfirm = () => {
+    if (!name || !description) {
+      // Los campos están vacíos, muestra un mensaje de error.
+      setShowAlert(false); // Cierra la alerta actual
+      alert("Por favor, complete todos los campos antes de confirmar.");
+      return;
+    }
+
+    // Si los campos están llenos, continúa con la creación.
     handleSubmit();
   };
+
 
   const handleAlertCancel = () => {
     setShowAlert(false);

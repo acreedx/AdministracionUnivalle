@@ -6,7 +6,7 @@ import SweetAlert from "react-bootstrap-sweetalert";
 import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
-import URL from "../../../../api/apiCarrer";
+import URL_API from "../../../../api/apiCareerDirection";
 import {
   ICarrersData,
   IFacultiesData,
@@ -14,6 +14,7 @@ import {
   convertJSONListFaculty,
 } from "utils/interfaces/DireccionDeCarrera/Carreras";
 import { GetServerSidePropsContext } from "next";
+import { uploadFile } from "../../../../../firebase/config";
 
 interface props {
   id: number;
@@ -37,8 +38,9 @@ function EditCarrer({ id }: props) {
   const [tituloOtorgado, setTituloOtorgado] = useState("");
   const [duracion, setDuracion] = useState(0);
   const [planDeEstudios, setPlanDeEstudios] = useState("");
-  const [imagen, setImagen] = useState("");
+  let [imagen, setImagen] = useState("");
   const [facultadId, setFacultadId] = useState(0);
+  const [img, setImg]: any = useState(null);
 
   const [selectedFaculty, setSelectedFaculty] = useState("");
   const [faculties, setFaculties] = useState<IFacultiesData[]>([]);
@@ -48,7 +50,7 @@ function EditCarrer({ id }: props) {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}/api/Facultad/ListaActivos`)
+      fetch(`${URL_API.baseUrl}Facultad/ListaActivos`)
         .then((res) => res.json())
         .then((res) => setFaculties(convertJSONListFaculty(res.response)));
     }
@@ -57,7 +59,7 @@ function EditCarrer({ id }: props) {
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}/api/Carrera/Obtener/${id}`)
+      fetch(`${URL_API.baseUrl}Carrera/Obtener/${id}`)
         .then((res) => res.json())
         .then((res) => {
           const carrerData = convertJSONCarrer(res.response);
@@ -71,8 +73,6 @@ function EditCarrer({ id }: props) {
 
     doFetch();
   }, []);
-
-
 
   const handleSubmit = async () => {
     if (titulo === "" || titulo === null) {
@@ -100,10 +100,9 @@ function EditCarrer({ id }: props) {
       setShowAlertValidation(true);
       return;
     }
-    if (imagen === "" || imagen === null) {
-      setValidationMessage("Debe rellenar el campo de Imagen");
-      setShowAlertValidation(true);
-      return;
+    
+    if (img != null) {
+      imagen = await uploadFile(img, "carreras/");
     }
     if (facultadId === 0 || facultadId === null) {
       setValidationMessage("Debe rellenar el campo de Facultad ID");
@@ -111,7 +110,7 @@ function EditCarrer({ id }: props) {
       return;
     }
 
-    await fetch(`${URL.baseUrl}/api/Carrera/Editar`, {
+    await fetch(`${URL_API.baseUrl}Carrera/Editar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -214,13 +213,48 @@ function EditCarrer({ id }: props) {
               onChange={(e) => setPlanDeEstudios(e.target.value)}
             />
           </Label>
-          <Label className="mt-4">
-            <span>URL de la Imagen</span>
+          
+          <Label>
+            <span className=" text-lg">
+              Imagen de referencia para la Facultad
+            </span>
+            <div className="text-center">
+              <div className="flex items-center justify-center space-x-4">
+                <div className="flex flex-col items-center space-y-2">
+                  <span>Imagen Actual</span>
+                  <div className="w-64 h-64 border-2 my-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={
+                        imagen === ""
+                          ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                          : imagen
+                      }
+                      alt="Imagen Actual"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center space-y-2">
+                  <span>Nueva Imagen</span>
+                  <div className="w-64 h-64 border-2 border-gray-500 rounded-lg overflow-hidden">
+                    <img
+                      className="w-full h-full object-cover"
+                      src={
+                        img === null
+                          ? "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/2560px-Placeholder_view_vector.svg.png"
+                          : URL.createObjectURL(img)
+                      }
+                      alt="Imagen Nueva"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
             <Input
+              type="file"
               className="mt-1"
-              placeholder="Ingresa la URL de la imagen"
-              value={imagen}
-              onChange={(e) => setImagen(e.target.value)}
+              placeholder="Imagen de la facultad"
+              onChange={(e) => setImg(e.target.files?.[0] || null)}
             />
           </Label>
           <Label className="mt-4">
@@ -268,7 +302,7 @@ function EditCarrer({ id }: props) {
           onConfirm={handleAlertConfirm}
           onCancel={handleAlertCancel}
         >
-          Esta seguro que desea actualizar este servicio?
+          Esta seguro que desea actualizar esta carrera?
         </SweetAlert>
       )}
       {showAlertValidation && (

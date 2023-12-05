@@ -95,7 +95,7 @@ const EliminarReferencia: FC<RefereciaProps> = ({
   useEffect(() => {
     setIsLoading(true);
     getData(
-      `http://apisistemaunivalle.somee.com/api/${pathEnable}`
+      `https://apisistemaunivalle.somee.com/api/${pathEnable}`
     );
     setActiveInactive("activos");
     setTimeout(() => setIsLoading(false), 1000);
@@ -104,7 +104,7 @@ const EliminarReferencia: FC<RefereciaProps> = ({
   const handleSubmit = async (action: boolean) => {
     try {
       const response = await fetch(
-        `http://apisistemaunivalle.somee.com/api/Referencia/${
+        `https://apisistemaunivalle.somee.com/api/Referencia/${
           action ? "DeleteReferences" : "RestoreReferences"
         }/${selectedObj}`,
         {
@@ -155,11 +155,11 @@ const EliminarReferencia: FC<RefereciaProps> = ({
     setActiveInactive(e.target.value);
     if (e.target.value === "activos") {
       getData(
-        `http://apisistemaunivalle.somee.com/api/${pathEnable}`
+        `https://apisistemaunivalle.somee.com/api/${pathEnable}`
       );
     } else if (e.target.value === "inactivos") {
       getData(
-        `http://apisistemaunivalle.somee.com/api/${pathDisable}`
+        `https://apisistemaunivalle.somee.com/api/${pathDisable}`
       );
     }
   };

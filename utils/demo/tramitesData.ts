@@ -18,7 +18,7 @@ function convertJSONService(data: any) {
   const convertedData: ITramitesData = {
     id: data.id,
     name: data.nombre,
-    image: data.imagenUrl,
+    image: data.imagen,
 
     enchargedId:
       data.referencia && data.referencia[0] ? data.referencia[0].id : null,

@@ -25,6 +25,7 @@ import {
 import { uploadFile } from "../../../firebase/config";
 import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
+import Link from "next/link";
 
 function RegistrarUsuarioPageModal() {
   const [ciValid, setCiValid] = useState<boolean | undefined>(undefined);
@@ -266,8 +267,9 @@ function RegistrarUsuarioPageModal() {
 
   return (
     <Layout>
+      <PageTitle>Registrar Usuario</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <PageTitle>Registrar Usuario</PageTitle>
+        
         <SectionTitle>Datos Generales del usuario</SectionTitle>
 
         <div>
@@ -371,7 +373,13 @@ function RegistrarUsuarioPageModal() {
               Limpiar campos
             </Button>
           </div>
-
+          <div>
+          <Link href={{
+            pathname: `/usuarios/listarUsuarios`,
+          }}>
+          <Button size="large">Volver</Button>
+          </Link>
+        </div>    
           
         </div>
         <ToastContainer />

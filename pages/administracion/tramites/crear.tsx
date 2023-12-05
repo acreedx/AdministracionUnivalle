@@ -6,32 +6,37 @@ import Layout from "example/containers/Layout";
 import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
-import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
+import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
 import { uploadFile } from "../../../firebase/config";
 import existingLocations from "../../../utils/dataTools/existingLocations";
-import { IconBase } from "react-icons/lib";
+import SectionTitle from "example/components/Typography/SectionTitle";
+import tramitesProvider from "utils/providers/tramitesProvider";
+import LoadingScreen from "example/components/loading-screen";
+import Loading from "./loading";
+
 
 
 function CrearTramite() {
-  //console.log(existingLocations)
 
   const [name, setname] = useState("");
   const [nameError, setNameError] = useState<string | null>(null);
   const [requisitoError, setRequisitoError] = useState<boolean>(false);
   const [cellphoneError, setCellphoneError] = useState<string | null>(null);
+  const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const [serviceImg, setImg]: any = useState(null);
   const [locationImg, setLocationImage] = useState<string[]>([]);
   const [locationCroquisImg, setLocationCroquisImage] = useState<string[]>([]);
   const [valueNewLocation, setValueNewLocation] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>(['']);
-  const [fileLocationImg, setfileLocationImg]:any = useState<any[]>([]);
-  const [fileCroquisImg, setfileCroquisImg]:any = useState<any[]>([]);
+  const [fileLocationImg, setfileLocationImg]: any = useState<any[]>([]);
+  const [fileCroquisImg, setfileCroquisImg]: any = useState<any[]>([]);
 
   const handleCreateValueNewLocation = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocation = [...valueNewLocation, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setValueNewLocation(updatedValueLocation);
   };
@@ -53,7 +58,7 @@ function CrearTramite() {
   const handleCreateLocationImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationImg = [...locationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationImage(updatedValueLocationImg);
   };
@@ -75,7 +80,7 @@ function CrearTramite() {
   const handleCreateLocationCroquisImg = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocationCroquisImg = [...locationCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setLocationCroquisImage(updatedValueLocationCroquisImg);
   };
@@ -97,7 +102,7 @@ function CrearTramite() {
   const handleCreateFileLocationImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileLocationImg = [...fileLocationImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileLocationImg(updatedFileLocationImg);
   };
@@ -119,7 +124,7 @@ function CrearTramite() {
   const handleCreateFileCroquisImg = (value: any) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedFileCroquisImg = [...fileCroquisImg, value];
-    
+
     // Actualizar el estado con la nueva copia del array
     setfileCroquisImg(updatedFileCroquisImg);
   };
@@ -141,23 +146,22 @@ function CrearTramite() {
   const handleSetCommonLocationImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationImg(existingLocations[i].locationIMG, index)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
   };
   const handleSetCommonLocationCroquisImg = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     for (let i = 0; i < existingLocations.length; i++) {
       const element = existingLocations[i].name;
-      if(e.target.value == element){
+      if (e.target.value == element) {
         handleChangeLocationCroquisImg(existingLocations[i].croquis, index)
         //setLocationCroquisImage(existingLocations[i].croquis)
         console.log(locationCroquisImg)
-      } 
+      }
     }
-      
+
   };
   const agregarLocation = () => {
     setLocations([...locations, '']);
@@ -185,20 +189,20 @@ function CrearTramite() {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
     }
   };
-  const handleChangeLocationCroquisImgByInput= (e: ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleChangeLocationCroquisImgByInput = (e: ChangeEvent<HTMLInputElement>, index: number) => {
     const archivo = e.target.files?.[0];
     handleChangeFileCroquisImg(archivo, index)
     if (archivo) {
       const lector = new FileReader();
       lector.onload = (e) => {
         const result = e.target?.result
-        if(result)
+        if (result)
           handleChangeLocationCroquisImg(result as string, index);
       };
       lector.readAsDataURL(archivo);
@@ -213,9 +217,7 @@ function CrearTramite() {
 
   const agregarRequisito = () => {
     if (agregarNuevoRequisito == true) {
-      // Agregar un nuevo requisito aquí, por ejemplo:
       setRequisitos([...requisitos, '']);
-
     } else {
       setAgregarNuevoRequisito(true)
     }
@@ -246,17 +248,19 @@ function CrearTramite() {
   };
   const handleRequisitoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const inputValue = e.target.value;
-    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
-    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
-    if (!containsInvalidChars) {
-      const nuevosRequisistos = [...requisitos];
-      nuevosRequisistos[index] = inputValue;
-      setRequisitos(nuevosRequisistos);
-      setRequisitoError(false); // Limpia el estado de error si no contiene caracteres no válidos.
+    // Utiliza una expresión regular para verificar si contiene solo letras, números y punto.
+    const containsValidChars = /^[a-zA-Z0-9.,]*$/.test(inputValue);
+
+    if (containsValidChars) {
+      const nuevosRequisitos = [...requisitos];
+      nuevosRequisitos[index] = inputValue;
+      setRequisitos(nuevosRequisitos);
+      setRequisitoError(false); // Limpia el estado de error si contiene caracteres válidos.
     } else {
       setRequisitoError(true); // Establece el estado de error si contiene caracteres no válidos.
     }
   };
+
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
@@ -264,18 +268,21 @@ function CrearTramite() {
   };
 
   const [encharged, setencharged] = useState("");
-
   const [cellphone, setcellphone] = useState("");
-
-  const [processingTime, setprocessingTime] = useState("");
-
+  const [durationNumber, setDurationNumber] = useState("");
+  const [durationSelect, setDurationSelect] = useState("horas");
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
-
-  const [selectedCategory, setSelectedCategory] = useState("");
-
+  const [selectedCategory, setSelectedCategory] = useState("6");
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
   useEffect(() => {
+    const requisitosToAdd = requisitos.map((requisito, index) => ({
+      descripcion: requisito,
+      pasos: pasoRequisito[index] ? pasoRequisito[index].map(nombre => ({ nombre })) : [],
+
+    }));
+
+    console.log("Format requisitos", requisitosToAdd)
     async function doFetch() {
       fetch(`${URLS.baseUrl}${getActiveCategoriesRoute}`)
         .then((res) => res.json())
@@ -288,68 +295,51 @@ function CrearTramite() {
 
   const router = useRouter();
 
-  // Added Service 
-  const createServiceRoute = "Servicios/addServicio";
-  const createReferenceRoute = "Referencia/addReferences";
-  const createDurationServiceRoute = "Tramites/addTramite";
   const createUbicacionRoute = "Ubicaciones/addUbicaciones";
 
   const moduleId = 3;
-
+  const [loading, setLoading] = useState(true);
   const handleSubmit = async () => {
+    // Validar que los campos obligatorios estén completos
+    if (
+      name.trim() === "" ||
+      serviceImg === null ||
+      cellphone.trim() === "" ||
+      durationNumber.trim() === "" ||
+      selectedCategory === "" ||
+      encharged.trim() === ""
+    ) {
+      alert("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
+
+    setShowAlertLoading(true);
+    setIsSuccess(false);
+
     try {
-      const selectedCategoryId = selectedCategory;
-      //console.log(selectedCategoryId)
-      const newService = await fetch(`${URLS.baseUrl}${createServiceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: name,
-          moduloId: moduleId,
-          imageUrl: "",
-          //      imagenUrl: await uploadFile(serviceImg, "servicios/"),
-          idCategoria: selectedCategoryId
-        }),
-      });
-      const dataNewService = await newService.json();
-      const newServiceId = dataNewService.data.id;
-      console.log(newServiceId)
-      await createRequisitos(newServiceId);
+      setLoading(true);
+      const serviceId = await tramitesProvider.CreateTramite(
+        name,
+        moduleId,
+        await uploadFile(serviceImg, "servicios/"),
+        selectedCategory,
+        encharged,
+        cellphone,
+        `${durationNumber} ${durationSelect}`
+      );
+      console.log(serviceId);
+      await createRequisitos(serviceId);
+      await createLocation(serviceId);
 
-      await createLocation(newServiceId);
-      await createCroqui(newServiceId);
-
-
-      await fetch(`${URLS.baseUrl}${createReferenceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nombre: encharged,
-          numerocel: cellphone,
-          serviciosId: newServiceId,
-          estado: true,
-        }),
-      });
-
-      await fetch(`${URLS.baseUrl}${createDurationServiceRoute}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          tiempotramite: processingTime,
-          serviciosId: newServiceId,
-        }),
-      });
-      router.push("/administracion/tramites")
+      //  router.push("/administracion/tramites")
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   //Added requeriment
   const createRequisitoRoute = "Requisitos/addRequisito";
@@ -380,17 +370,25 @@ function CrearTramite() {
 
   const createLocation = async (serviceId: number) => {
     //console.log(locationImg)
-    for (let i = 0; i < locationImg.length; i++){
+    for (let i = 0; i < locationImg.length; i++) {
       const location = locationImg[i];
       //console.log(location)
       var imgURL
-      if(location.includes("data:"))
-      {
+      if (location.includes("data:")) {
         //console.log(fileLocationImg[i])
         imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
       }
       else
         imgURL = locationImg[i]
+      const croquis = locationCroquisImg[i];
+      var croquisURL
+      //console.log(location)
+      if (croquis.includes("data:")) {
+        //console.log(fileLocationImg[i])
+        croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+      }
+      else
+        croquisURL = locationCroquisImg[i]
       //console.log(imgURL)
       if (location.trim() !== '') {
         const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
@@ -401,39 +399,7 @@ function CrearTramite() {
           body: JSON.stringify({
             descripcion: valueNewLocation[i],
             imagen: imgURL,
-            video: "",
-            serviciosId: serviceId,
-            estado: true,
-          }),
-        });
-
-        console.log("Respuesta del servidor al crear la ubicacion:", newLocationResponse);
-      }
-    }
-  };
-  const createCroqui = async (serviceId: number) => {
-    //console.log(locationCroquisImg)
-    for (let i = 0; i < locationCroquisImg.length; i++){
-      const location = locationCroquisImg[i];
-      var imgURL
-      //console.log(location)
-      if(location.includes("data:"))
-      {
-        //console.log(fileLocationImg[i])
-        imgURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
-      }
-      else
-        imgURL = locationCroquisImg[i]
-      if (location.trim() !== '') {
-        const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            descripcion: "CROQUIS"+valueNewLocation[i],
-            imagen: imgURL,
-            video: "",
+            video: croquisURL,
             serviciosId: serviceId,
             estado: true,
           }),
@@ -448,10 +414,12 @@ function CrearTramite() {
     setShowAlert(false);
     handleSubmit();
   };
-
+  const handleAlertLoadConfirm = () => {
+    router.push("/administracion/tramites")
+  };
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
+    const containsInvalidChars = /[^a-zA-Z\s\d.]/.test(inputValue);
 
     if (containsInvalidChars) {
       setNameError("No se permiten números o caracteres especiales.");
@@ -479,11 +447,14 @@ function CrearTramite() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+
   return (
     <Layout>
       <PageTitle>Crear un tramite</PageTitle>
-      <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
-        <form id="miFormulario" onSubmit={handleSubmit}>
+      <form id="miFormulario" onSubmit={handleSubmit}>
+        <SectionTitle>Datos generales</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
           <Label>
             <span>Nombre del trámite</span>
             <Input
@@ -494,7 +465,7 @@ function CrearTramite() {
             />
           </Label>
           {nameError && <span className="text-red-500">{nameError}</span>}
-          
+
 
           <Label className="mt-4">
             <span className=" text-lg">Imagen de referencia para el servicio</span>
@@ -514,11 +485,93 @@ function CrearTramite() {
             </div>
             <Input
               type="file"
+              accept=".png, .jpg, .jpeg"
               className="mt-1"
               placeholder="Imagen para el servicio"
-              onChange={(e) => setImg(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  const fileName = selectedFile.name;
+                  const validExtensions = /\.(png|jpg|jpeg)$/i; // Expresión regular para verificar la extensión
+
+                  if (validExtensions.test(fileName)) {
+                    setImg(selectedFile);
+                  } else {
+                    alert("Por favor, seleccione un archivo de imagen con extensión .png, .jpg o .jpeg");
+                  }
+                } else {
+                  setImg(null);
+                }
+              }}
             />
+
           </Label>
+          <Label className="mt-4 ">
+            <span>Duracion del tramite</span>
+            <div className="flex justify-start">
+
+              <Input
+                className="mt-1"
+                type="number"
+                min={1}
+                placeholder="Tiempo"
+                onChange={(e) => setDurationNumber(e.target.value)}
+              />
+
+              <Select className="mt-1" onChange={(e) => setDurationSelect(e.target.value)}>
+                <option>
+                  horas
+                </option>
+                <option>
+                  dias
+                </option>
+                <option>
+                  semanas
+                </option>
+                <option>
+                  meses
+                </option>
+
+              </Select>
+
+            </div>
+          </Label>
+          <Label className="mt-4">
+            <span>Encargado</span>
+            <Input
+              className={`mt-1 ${/[^A-Za-z\s]/.test(encharged) ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el nombre completo del encargado"
+              onChange={(e) => setencharged(e.target.value)}
+            />
+            {/[^A-Za-z\s]/.test(encharged) && (
+              <span className="text-red-500">No se permiten números ni caracteres especiales.</span>
+            )}
+          </Label>
+          <Label className="mt-4">
+            <span>Teléfono de referencia</span>
+            <Input
+              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
+              placeholder="Ingresa el teléfono de referencia del encargado"
+              value={cellphone}
+              onChange={handleCellphoneChange}
+            />
+            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
+          </Label>
+
+          <Label className="mt-4">
+            <span>Seleccione una categoria de tramite</span>
+            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
+              {categorias.map((categoria, i) => (
+                <option key={categoria.id} value={categoria.id}>
+                  {categoria.name}
+                </option>
+              ))}
+            </Select>
+          </Label>
+        </div>
+        <SectionTitle>Requisitos</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+
           <Label className="mt-4">
             <div className="flex items-center mt-4">
               <span className="mr-2">Requisitos</span>
@@ -576,49 +629,14 @@ function CrearTramite() {
               </div>
             ))}
           </Label>
+        </div>
 
-          <Label className="mt-4">
-            <span>Duracion del tramite</span>
-            <Input
-              className="mt-1"
-              placeholder="Ingresa la duracion del tramite"
-              onChange={(e) => setprocessingTime(e.target.value)}
-            />
-          </Label>
 
-          <Label className="mt-4">
-            <span>Encargado</span>
-            <Input
-              className={`mt-1 ${/[^A-Za-z\s]/.test(encharged) ? 'border-red-500' : ''}`}
-              placeholder="Ingresa el nombre completo del encargado"
-              onChange={(e) => setencharged(e.target.value)}
-            />
-            {/[^A-Za-z\s]/.test(encharged) && (
-              <span className="text-red-500">No se permiten números ni caracteres especiales.</span>
-            )}
-          </Label>
-          <Label className="mt-4">
-            <span>Teléfono de referencia</span>
-            <Input
-              className={`mt-1 ${cellphoneError ? 'border-red-500' : ''}`}
-              placeholder="Ingresa el teléfono de referencia del encargado"
-              value={cellphone}
-              onChange={handleCellphoneChange}
-            />
-            {cellphoneError && <span className="text-red-500">{cellphoneError}</span>}
-          </Label>
 
-          <Label className="mt-4">
-            <span>Seleccione una categoria de tramite</span>
-            <Select className="mt-1" onChange={(e) => setSelectedCategory(e.target.value)}>
-              {categorias.map((categoria, i) => (
-                <option key={categoria.id} value={categoria.id}>
-                  {categoria.name}
-                </option>
-              ))}
-            </Select>
-          </Label>
 
+
+        <SectionTitle>Ubicaciones</SectionTitle>
+        <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
 
           <Label className="mt-4">
             <div className="flex items-center mt-4">
@@ -636,9 +654,9 @@ function CrearTramite() {
                     type="button"
                     onClick={() => eliminarLocation(locationIndex)}
                   >
-                    <MinusIcon/>
+                    <MinusIcon />
                   </button>
-                  
+
                   <Input
                     className="mt-1 mb-1"
                     id={locationIndex.toString()}
@@ -648,9 +666,9 @@ function CrearTramite() {
                     value={valueNewLocation[locationIndex]}
                     onChange={(e) => {
                       handleChangeValueNewLocationByInput(e, locationIndex)
-                      if(!locationImg[locationIndex].includes("data:"))
+                      if (!locationImg[locationIndex].includes("data:"))
                         handleSetCommonLocationImg(e, locationIndex)
-                      if(!locationCroquisImg[locationIndex].includes("data:"))
+                      if (!locationCroquisImg[locationIndex].includes("data:"))
                         handleSetCommonLocationCroquisImg(e, locationIndex)
                       //console.log(locationImg)
                       //console.log(locationCroquisImg[locationIndex].includes("data:"))
@@ -659,19 +677,19 @@ function CrearTramite() {
                   />
                   <datalist id={"Locations" + locationIndex.toString()}>
                     {existingLocations.map((existingLocation, i) => (
-                      <option 
-                        key={existingLocation.id} 
+                      <option
+                        key={existingLocation.id}
                         value={existingLocation.name}
                         id={
-                          existingLocation.locationIMG 
-                          + ".-.-." + existingLocation.croquis 
+                          existingLocation.locationIMG
+                          + ".-.-." + existingLocation.croquis
                           + ".-.-." + existingLocation.name}
                       >
                         ubicacion común
                       </option>
                     ))}
                   </datalist>
-                  
+
                 </div>
 
                 <div className="flex justify-center space-x-10 mb-2">
@@ -682,9 +700,9 @@ function CrearTramite() {
                       className="mt-1"
                       placeholder="Imagen para ubicación"
                       onChange={(e) => handleChangeLocationImgByInput(e, locationIndex)}
-                      />
+                    />
                   </Label>
-                  
+
                   <Label className="mt-4">
                     <span>Croquis de la ubicación del lugar</span>
                     <Input
@@ -694,44 +712,73 @@ function CrearTramite() {
                       onChange={(e) => handleChangeLocationCroquisImgByInput(e, locationIndex)}
                     />
                   </Label>
-                  
+
                 </div>
                 <div className="flex justify-center space-x-10 mb-2 h-60 ">
-                  <img className = "" src={locationImg[locationIndex]} width="300rem"/>
-                  <img className = "" src={locationCroquisImg[locationIndex]} width="300rem"/>
+                  <img className="" src={locationImg[locationIndex]} width="300rem" />
+                  <img className="" src={locationCroquisImg[locationIndex]} width="300rem" />
                 </div>
               </div>
             ))}
           </Label>
+        </div>
+        
 
-          <Label className="mt-4">
-            <div className="relative text-gray-500 focus-within:text-purple-600">
-              <button
-                type={"button"}
-                onClick={() => setShowAlert(true)}
-                className="my-4 mb-6 px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+        <Label className="mt-4">
+          <div className="relative text-gray-500 focus-within:text-purple-600">
+            <button
+              type={"button"}
+              onClick={() => setShowAlert(true)}
+              className="my-4 mb-6 px-3 py-1 text-sm font-medium leading-5 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+            >
+              Guardar
+            </button>
+            {showAlert && (
+              <SweetAlert
+                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                title="Atención"
+                confirmBtnText="Confirmar"
+                cancelBtnText="Cancelar"
+                showCancel
+                onConfirm={handleAlertConfirm}
+                onCancel={handleAlertCancel}
               >
-                Guardar
-              </button>
-              {showAlert && (
+                Confirma todos los datos del nuevo servicio?
+              </SweetAlert>
+            )}
+            {showAlertLoading && (
+              isSuccess ? (
                 <SweetAlert
-                  warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
-                  title="Atención"
-                  confirmBtnText="Confirmar"
-                  cancelBtnText="Cancelar"
-                  showCancel
-                  onConfirm={handleAlertConfirm}
-                  onCancel={handleAlertCancel}
+                  success
+                  title="¡Éxito!"
+                  onConfirm={handleAlertLoadConfirm}
                 >
-                  Confirma todos los datos del nuevo servicio?
+                  Los datos han sido enviados con éxito.
                 </SweetAlert>
-              )}
-            </div>
-          </Label>
-        </form>
-      </div>
+              ) :
+                (
+                  <SweetAlert
+                    title="Cargando..."
+                    onConfirm={handleAlertConfirm}
+                    confirmBtnText={""}
+                    custom
+                  >
+                    <div className="-my-56">
+                      <Loading />
+                    </div>
+                    Enviando los datos espere....
+                  </SweetAlert>
+                )
+
+            )}
+
+          </div>
+        </Label>
+      </form>
+
     </Layout >
   );
 }
+
 
 export default CrearTramite;

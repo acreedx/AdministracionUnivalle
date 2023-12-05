@@ -20,7 +20,7 @@ import {
   Input,
   Label,
 } from "@roketid/windmill-react-ui";
-import { EditIcon, TrashIcon, MenuIcon } from "icons";
+import { EditIcon, TrashIcon, MenuIcon, RestoreIcon } from "icons";
 //import { ICajasData, convertJSONListService } from "utils/demo/cajasData";
 import { ITramitesData, convertJSONListService } from "utils/demo/tramitesData";
 import URL from "utils/demo/api";
@@ -144,8 +144,8 @@ function Tramites() {
             Registrar un nuevo tramite
           </Button>
         </Link>
-      </div> 
-      
+      </div>
+
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
@@ -173,126 +173,126 @@ function Tramites() {
                   return servicio;
                 }
               })
-            .map((servicio, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      < Avatar
-                        className="hidden mr-3 md:block"
-                        src={servicio.image}
-                        size="large"
-                      />
+              .map((servicio, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        < Avatar
+                          className="hidden mr-3 md:block"
+                          src={servicio.image}
+                          size="large"
+                        />
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
 
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.name}</p>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.name}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
+                  </TableCell>
 
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.encharged}</p>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.encharged}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.cellphone}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.cellphone}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.duration}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.duration}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.categoryId}</p>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{servicio.categoryId}</p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    type={servicio.status == "success" ? "success" : "danger"}
-                  >
-                    {servicio.status == "success" ? "Activo" : "Inactivo"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      type={servicio.status == "success" ? "success" : "danger"}
+                    >
+                      {servicio.status == "success" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
 
-                  <div className="flex items-center space-x-4">
-                    {state === "activos" ? (
-                      <>
-                        <Link
-                          href={`/administracion/tramites/editar/[id]`}
-                          as={`/administracion/tramites/editar/${servicio.id}`}
-                        >
-                          <Button layout="link" size="small" aria-label="Edit">
-                            <EditIcon className="w-5 h-5" aria-hidden="true" />
+                    <div className="flex items-center space-x-4">
+                      {state === "activos" ? (
+                        <>
+                          <Link
+                            href={`/administracion/tramites/editar/[id]`}
+                            as={`/administracion/tramites/editar/${servicio.id}`}
+                          >
+                            <Button layout="link" size="small" aria-label="Edit">
+                              <EditIcon className="w-5 h-5" aria-hidden="true" />
+                            </Button>
+                          </Link>
+                          <Button
+                            layout="link"
+                            size="small"
+                            aria-label="Delete"
+                            type="button"
+                            onClick={() => {
+                              setShowAlert(true);
+                              setSelectedService(servicio.id);
+                            }}
+                          >
+                            <TrashIcon className="w-5 h-5" aria-hidden="true" />
                           </Button>
-                        </Link>
+                        </>
+                      ) : (
+
                         <Button
                           layout="link"
                           size="small"
                           aria-label="Delete"
-                          type="button"
+                          type={"button"}
                           onClick={() => {
                             setShowAlert(true);
                             setSelectedService(servicio.id);
                           }}
                         >
-                          <TrashIcon className="w-5 h-5" aria-hidden="true" />
+                          <Badge className="w-5 h-5" aria-hidden="true" />
+
                         </Button>
-                      </>
-                    ) : (
-
-                      <Button
-                        layout="link"
-                        size="small"
-                        aria-label="Delete"
-                        type={"button"}
-                        onClick={() => {
-                          setShowAlert(true);
-                          setSelectedService(servicio.id);
-                        }}
-                      >
-                        <Badge className="w-5 h-5" aria-hidden="true" />
-
-                      </Button>
-                    )}
+                      )}
 
 
-                    {showAlert && (
-                      <SweetAlert
-                        warning
-                        title="Atención"
-                        confirmBtnText="Confirmar"
-                        cancelBtnText="Cancelar"
-                        showCancel
-                        onConfirm={handleAlertConfirm}
-                        onCancel={handleAlertCancel}
-                      >
-                        {state == "activos" ? "¿Estás seguro de eliminar este Trámite?" : "¿Estás seguro de restaurar este Trámite?"}
-                      </SweetAlert>
-                    )}
-                  </div>
+                      {showAlert && (
+                        <SweetAlert
+                          warning
+                          title="Atención"
+                          confirmBtnText="Confirmar"
+                          cancelBtnText="Cancelar"
+                          showCancel
+                          onConfirm={handleAlertConfirm}
+                          onCancel={handleAlertCancel}
+                        >
+                          {state == "activos" ? "¿Estás seguro de eliminar este Trámite?" : "¿Estás seguro de restaurar este Trámite?"}
+                        </SweetAlert>
+                      )}
+                    </div>
 
-                </TableCell>
-              </TableRow>
-            ))}
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
         <TableFooter>

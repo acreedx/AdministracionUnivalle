@@ -14,7 +14,7 @@ export interface IAddPermiso{
   modulo: string | null;
 }
 export interface IEditarClave{
-    clave:string;
+    newPassword:string;
 }
 export interface IListarUsuario{
   data:
