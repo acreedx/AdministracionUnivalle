@@ -248,17 +248,19 @@ function CrearTramite() {
   };
   const handleRequisitoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const inputValue = e.target.value;
-    // Utiliza una expresión regular para verificar si contiene números o caracteres especiales.
-    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
-    if (!containsInvalidChars) {
-      const nuevosRequisistos = [...requisitos];
-      nuevosRequisistos[index] = inputValue;
-      setRequisitos(nuevosRequisistos);
-      setRequisitoError(false); // Limpia el estado de error si no contiene caracteres no válidos.
+    // Utiliza una expresión regular para verificar si contiene solo letras, números y punto.
+    const containsValidChars = /^[a-zA-Z0-9.,]*$/.test(inputValue);
+
+    if (containsValidChars) {
+      const nuevosRequisitos = [...requisitos];
+      nuevosRequisitos[index] = inputValue;
+      setRequisitos(nuevosRequisitos);
+      setRequisitoError(false); // Limpia el estado de error si contiene caracteres válidos.
     } else {
       setRequisitoError(true); // Establece el estado de error si contiene caracteres no válidos.
     }
   };
+
   const handlePasoRequisitoChange = (e: any, requisitoIndex: number, pasoIndex: number) => {
     const nuevosPasosRequisitos = [...pasoRequisito];
     nuevosPasosRequisitos[requisitoIndex][pasoIndex] = e.target.value;
@@ -298,10 +300,24 @@ function CrearTramite() {
   const moduleId = 3;
   const [loading, setLoading] = useState(true);
   const handleSubmit = async () => {
-    setShowAlertLoading(true)
-    setIsSuccess(false)
+    // Validar que los campos obligatorios estén completos
+    if (
+      name.trim() === "" ||
+      serviceImg === null ||
+      cellphone.trim() === "" ||
+      durationNumber.trim() === "" ||
+      selectedCategory === "" ||
+      encharged.trim() === ""
+    ) {
+      alert("Por favor, completa todos los campos obligatorios.");
+      return;
+    }
+
+    setShowAlertLoading(true);
+    setIsSuccess(false);
+
     try {
-      setLoading(true)
+      setLoading(true);
       const serviceId = await tramitesProvider.CreateTramite(
         name,
         moduleId,
@@ -309,21 +325,22 @@ function CrearTramite() {
         selectedCategory,
         encharged,
         cellphone,
-        `${durationNumber} ${durationSelect}`,
+        `${durationNumber} ${durationSelect}`
       );
-      console.log(serviceId)
+      console.log(serviceId);
       await createRequisitos(serviceId);
       await createLocation(serviceId);
 
-
       //  router.push("/administracion/tramites")
-      setIsSuccess(true)
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
+
+
   //Added requeriment
   const createRequisitoRoute = "Requisitos/addRequisito";
   const createRequisitos = async (serviceId: number) => {
@@ -402,7 +419,7 @@ function CrearTramite() {
   };
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
-    const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
+    const containsInvalidChars = /[^a-zA-Z\s\d.]/.test(inputValue);
 
     if (containsInvalidChars) {
       setNameError("No se permiten números o caracteres especiales.");
@@ -468,10 +485,26 @@ function CrearTramite() {
             </div>
             <Input
               type="file"
+              accept=".png, .jpg, .jpeg"
               className="mt-1"
               placeholder="Imagen para el servicio"
-              onChange={(e) => setImg(e.target.files?.[0] || null)}
+              onChange={(e) => {
+                const selectedFile = e.target.files?.[0];
+                if (selectedFile) {
+                  const fileName = selectedFile.name;
+                  const validExtensions = /\.(png|jpg|jpeg)$/i; // Expresión regular para verificar la extensión
+
+                  if (validExtensions.test(fileName)) {
+                    setImg(selectedFile);
+                  } else {
+                    alert("Por favor, seleccione un archivo de imagen con extensión .png, .jpg o .jpeg");
+                  }
+                } else {
+                  setImg(null);
+                }
+              }}
             />
+
           </Label>
           <Label className="mt-4 ">
             <span>Duracion del tramite</span>
@@ -689,6 +722,7 @@ function CrearTramite() {
             ))}
           </Label>
         </div>
+        
 
         <Label className="mt-4">
           <div className="relative text-gray-500 focus-within:text-purple-600">
