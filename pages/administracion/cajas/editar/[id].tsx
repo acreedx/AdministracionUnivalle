@@ -120,7 +120,7 @@ function EditarServicio({ id }: props) {
           encharged,
           cellphone
         );
-        locations.map(async (e, index) => {
+        /*locations.map(async (e, index) => {
           if (serviceImgArray[index] == null) {
             await ubicacionesProvider.UpdateSingleUbicacion(
               e.name,
@@ -140,8 +140,8 @@ function EditarServicio({ id }: props) {
               imgUrlNew
             );
           }
-        });
-        await ubicacionesProvider.UpdateUbicaciones(id, locations);
+        });*/
+        await ubicacionesProvider.UpdateUbicaciones(id, locations, serviceImgArray);
         setShowAlert(false);
         setShowAlertValidation(false);
         router.back();
