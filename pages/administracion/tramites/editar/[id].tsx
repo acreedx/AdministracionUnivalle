@@ -46,7 +46,9 @@ function ModificarTramite({ id }: props) {
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
   //Ubicaciones
+  const createUbicacionRoute = "Ubicaciones/addUbicaciones";
   const updateUbicacionRoute = "Ubicaciones/updateUbicaciones/";
+  const deleteUbicacionRoute = "Ubicaciones/deleteUbicacion/";
   const [locationImg, setLocationImage] = useState<string[]>([]);
   const [locationCroquisImg, setLocationCroquisImage] = useState<string[]>([]);
   const [valueNewLocation, setValueNewLocation] = useState<string[]>([]);
@@ -187,6 +189,8 @@ function ModificarTramite({ id }: props) {
   };
   const agregarLocation = () => {
     setLocations([...locations, '']);
+    console.log(valueNewLocation.length);
+    console.log(ubicaciones.length);
     handleCreateValueNewLocation("")
     handleCreateLocationImg("")
     handleCreateLocationCroquisImg("")
@@ -197,6 +201,8 @@ function ModificarTramite({ id }: props) {
     const nuevasLocation = [...locations];
     nuevasLocation.splice(locationIndex, 1);
     console.log("location a eliminar: ", locationIndex)
+    console.log(valueNewLocation.length);
+    console.log(ubicaciones.length);
     setLocations(nuevasLocation);
     handleDeleteElementNewLocation(locationIndex)
     handleDeleteLocationImg(locationIndex)
@@ -234,39 +240,123 @@ function ModificarTramite({ id }: props) {
 
 
   const updateLocation = async (serviceId: number) => {
-    if (valueNewLocation.length === ubicaciones.length) {
+    if (valueNewLocation.length <= ubicaciones.length) {
       for (let i = 0; i < ubicaciones.length; i++) {
+        
         const element = ubicaciones[i];
-        const location = locationImg[i];
-        const croquis = locationCroquisImg[i];
-        var imgURL
-        var croquisURL
-
-        if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
-        else imgURL = locationImg[i]
-
-        if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
-        else croquisURL = locationCroquisImg[i]
-
-        if (location.trim() !== '') {
-          const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
+        
+        if(i+1 > valueNewLocation.length)
+        {
+          console.log("a")
+          const newDeleteLocationResponse = await fetch(`${URLS.baseUrl}${deleteUbicacionRoute}${element.id}`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              descripcion: valueNewLocation[i],
-              imagen: imgURL,
-              video: croquisURL,
-              serviciosId: serviceId,
-              estado: true,
-            }),
+            body: ""
           });
-
-          console.log("Respuesta del servidor al actualizar la ubicacion:", newLocationResponse);
+          console.log("Respuesta del servidor al actualizar la ubicacion:", newDeleteLocationResponse);
+        }
+        else 
+        {
+          const location = locationImg[i];
+          const croquis = locationCroquisImg[i];
+          var imgURL
+          var croquisURL
+  
+          if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
+          else imgURL = locationImg[i]
+  
+          if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+          else croquisURL = locationCroquisImg[i]
+          if (location.trim() !== '') 
+          {
+            const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                descripcion: valueNewLocation[i],
+                imagen: imgURL,
+                video: croquisURL,
+                serviciosId: serviceId,
+                estado: true,
+              }),
+            });
+  
+            console.log("Respuesta del servidor al actualizar la ubicacion:", newLocationResponse);
+          }
         }
       }
       //setUbicacionesActualizadas((prev) => [...prev, ...nuevasUbicaciones]);
+    }
+    else
+    {
+      for (let i = 0; i < valueNewLocation.length; i++) {
+        if(i < ubicaciones.length)
+        {
+          const element = ubicaciones[i];
+          const location = locationImg[i];
+          const croquis = locationCroquisImg[i];
+          var imgURL
+          var croquisURL
+  
+          if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
+          else imgURL = locationImg[i]
+  
+          if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+          else croquisURL = locationCroquisImg[i]
+          if (location.trim() !== '') 
+          {
+            const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                descripcion: valueNewLocation[i],
+                imagen: imgURL,
+                video: croquisURL,
+                serviciosId: serviceId,
+                estado: true,
+              }),
+            });
+  
+            console.log("Respuesta del servidor al actualizar la ubicacion:", newLocationResponse);
+          }
+        }
+        else 
+        {
+          const location = locationImg[i];
+          var imgURL
+          if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
+          else imgURL = locationImg[i]
+          const croquis = locationCroquisImg[i];
+          var croquisURL
+          if (croquis.includes("data:")) {
+            croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
+          }
+          else
+            croquisURL = locationCroquisImg[i]
+          if (location.trim() !== '') {
+            const newLocationResponse = await fetch(`${URLS.baseUrl}${createUbicacionRoute}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                descripcion: valueNewLocation[i],
+                imagen: imgURL,
+                video: croquisURL,
+                serviciosId: serviceId,
+                estado: true,
+              }),
+            });
+            console.log("Respuesta del servidor al crear la ubicacion:", newLocationResponse);
+          }
+        }
+      }
     }
   };
 
@@ -437,6 +527,8 @@ function ModificarTramite({ id }: props) {
       });
 
       await updateLocation(id);
+      
+      
 
       for (const requisito of requisitos) {
         if (requisito.description.trim() !== '') {
@@ -877,7 +969,8 @@ function ModificarTramite({ id }: props) {
                       if (!locationCroquisImg[locationIndex].includes("data:"))
                         handleSetCommonLocationCroquisImg(e, locationIndex)
 
-                      console.log(valueNewLocation)
+                      //console.log(valueNewLocation)
+                      
                       //console.log(locationCroquisImg[locationIndex].includes("data:"))
                       //console.log(fileLocationImg)
                     }}
