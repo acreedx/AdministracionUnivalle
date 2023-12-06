@@ -33,6 +33,8 @@ import MindIcon from "./mind.svg";
 import PlusIcon from "./plus.svg";
 import MinusIcon from "./minus.svg";
 import RestoreIcon from "./restore.svg";
+import XIcon from "./x.svg";
+import CheckIcon from "./check.svg";
 
 export {
   BienestarIcon,
@@ -70,6 +72,8 @@ export {
   PlusIcon,
   MinusIcon,
   RestoreIcon,
+  XIcon,
+  CheckIcon,
 };
 
 interface IIcon {
