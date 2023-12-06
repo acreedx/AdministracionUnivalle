@@ -1,20 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { Input, Label } from "@roketid/windmill-react-ui";
 import PageTitle from "example/components/Typography/PageTitle";
 import Layout from "example/containers/Layout";
 import URL from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
-
+import { ICategoriasData, convertJSONListCategory } from "utils/demo/categoriasData";
 function CrearCategoria() {
   const [name, setname] = useState("");
-
   const [description, setDescription] = useState("");
   const [hasError, setHasError] = useState<boolean>(false);
+  const [textError, setTextError] = useState("");
+
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [nameError, setNameError] = useState<boolean>(false);
+  const [categories, setCategories] = useState<ICategoriasData[]>([]);
   const router = useRouter();
-
+  const route = "Categoria/getActiveCategorias";
   const createCategoryRoute = "Categoria/addCategoria"
 
   const handleSubmit = async () => {
@@ -35,7 +37,14 @@ function CrearCategoria() {
     });
     router.push("/administracion/tramites/categorias/");
   };
-
+  useEffect(() => {
+    async function doFetch() {
+      fetch(`${URL.baseUrl}${route}`)
+        .then((res) => res.json())
+        .then((res) => setCategories(convertJSONListCategory(res.data)));
+    }
+    doFetch();
+  }, []);
 
   const handleAlertConfirm = () => {
     if (!name || !description) {
@@ -53,14 +62,23 @@ function CrearCategoria() {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
+
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
-    if (!containsInvalidChars) {
+    const categoryExists = categories.some((category) => category.name === inputValue);
+    console.log(categoryExists)
+    if (!containsInvalidChars && categoryExists == false) {
       setname(inputValue);
-      setNameError(false); // Limpiar el error si no contiene caracteres no válidos.
+      setNameError(false);
+      setTextError("");
     } else {
-      setNameError(true); // Establecer el estado de error si contiene caracteres no válidos.
+      setNameError(true);
+      setTextError("No se permiten números o caracteres especiales.");
+      if (categoryExists) {
+        setTextError("El nombre de la categoría ya está en uso. Por favor, elige otro nombre.");
+      }
     }
   };
 
@@ -94,7 +112,7 @@ function CrearCategoria() {
               value={name}
             />
             {nameError && (
-              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+              <span className="text-red-500">{textError}.</span>
             )}
           </Label>
           <Label className="mt-4">

@@ -7,7 +7,7 @@ import Layout from "example/containers/Layout";
 import Link from "next/link";
 import { Button } from "@roketid/windmill-react-ui";
 import URL from "utils/demo/api";
-import { ICategoriasData, convertJSONCategory } from "utils/demo/categoriasData";
+import { ICategoriasData, convertJSONCategory, convertJSONListCategory } from "utils/demo/categoriasData";
 import { GetServerSidePropsContext } from "next";
 
 interface props {
@@ -24,13 +24,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
 function EditarCategoria({ id }: props) {
   const route = "Categoria/getCategoriaById/";
+  const routeActiveCategories = "Categoria/getActiveCategorias";
+
   const router = useRouter();
   const [showAlert, setShowAlert] = useState<boolean>(false);
   const [service, setService] = useState<ICategoriasData>();
-  const [nameError, setNameError] = useState<boolean>(false); // Estado de error para el campo de nombre
+  const [nameError, setNameError] = useState<boolean>(false);
+  const [textError, setTextError] = useState("");
   const [descriptionError, setDescriptionError] = useState<boolean>(false);
   const [name, setname] = useState("");
   const [description, setdescription] = useState("");
+  const [categories, setCategories] = useState<ICategoriasData[]>([]);
+
 
   useEffect(() => {
 
@@ -51,8 +56,17 @@ function EditarCategoria({ id }: props) {
         console.error("Error en la solicitud a la API:", error);
       }
     }
-    doFetch()
+
+    async function ListCategories() {
+      fetch(`${URL.baseUrl}${routeActiveCategories}`)
+        .then((res) => res.json())
+        .then((res) => setCategories(convertJSONListCategory(res.data)));
+    }
+    doFetch();
+    ListCategories();
   }, []);
+
+
 
   const updateServiceRoute = "Categoria/updateCategoria/";
 
@@ -88,15 +102,23 @@ function EditarCategoria({ id }: props) {
   const handleAlertCancel = () => {
     setShowAlert(false);
   };
-  
+
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
-    if (!containsInvalidChars) {
+    const isSameAsExisting = service?.name === inputValue;
+    const categoryExists = categories.some((category) => category.name === inputValue);
+    console.log(categoryExists)
+    if (!containsInvalidChars && !categoryExists || isSameAsExisting) {
       setname(inputValue);
-      setNameError(false); // Limpiar el error si no contiene caracteres no válidos.
+      setNameError(false);
+      setTextError("");
     } else {
-      setNameError(true); // Establecer el estado de error si contiene caracteres no válidos.
+      setNameError(true);
+      setTextError("No se permiten números o caracteres especiales.");
+      if (categoryExists && !isSameAsExisting) {
+        setTextError("El nombre de la categoría ya está en uso. Por favor, elige otro nombre.");
+      }
     }
   };
 
@@ -137,7 +159,7 @@ function EditarCategoria({ id }: props) {
               onChange={(e) => handleNameChange(e)}
             />
             {nameError && (
-              <span className="text-red-500">No se permiten números o caracteres especiales.</span>
+              <span className="text-red-500">{textError}</span>
             )}
           </Label>
 

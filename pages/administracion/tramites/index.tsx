@@ -66,6 +66,7 @@ function Tramites() {
     );
   }, [pageTable]);
 
+
   const handleSubmit = async () => {
     await fetch(`${URL.baseUrl}${deleteServiceRoute}${selectedService}`, {
       method: "PUT",
@@ -97,7 +98,12 @@ function Tramites() {
   const handleActiveChange = (e: any) => {
     setState(e.target.value);
   };
-
+  function truncateText(text: String, maxLength: number) {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    }
+    return text;
+  }
   return (
     <Layout>
       <PageTitle>Tramites</PageTitle>
@@ -191,7 +197,7 @@ function Tramites() {
                   <TableCell>
                     <div className="flex items-center text-sm">
                       <div>
-                        <p className="font-semibold">{servicio.name}</p>
+                        <p className="font-semibold">{truncateText(servicio.name, 20)}</p>
                       </div>
                     </div>
                   </TableCell>
@@ -199,7 +205,7 @@ function Tramites() {
                   <TableCell>
                     <div className="flex items-center text-sm">
                       <div>
-                        <p className="font-semibold">{servicio.encharged}</p>
+                        <p className="font-semibold">{truncateText(servicio.encharged, 10)}</p>
                       </div>
                     </div>
                   </TableCell>

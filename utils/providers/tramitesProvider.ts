@@ -1,7 +1,27 @@
 import URL from "utils/demo/api";
+import { ITramitesData, convertJSONListService } from "utils/demo/tramitesData";
 
 class TramitesProvider {
   private createServiceRoute: string = "Servicios/addTramite";
+  private listTramiteRoute: string = "Servicios/getTramiteByModuleActive/";
+  private moduleName: string = "Tramites"
+  private tramites: ITramitesData[] = [];
+
+  public async TramitesList(): Promise<ITramitesData[]> {
+    this.tramites = [];
+    await fetch(`${URL.baseUrl}${this.listTramiteRoute}${this.moduleName}`)
+      .then((res) => res.json())
+      .catch((e: any) => {
+        throw e;
+      })
+      .then((res) => {
+        this.tramites = convertJSONListService(res.data);
+      })
+      .catch((e: any) => {
+        throw e;
+      });
+    return this.tramites;
+  }
   public async CreateTramite(
     nombre: string,
     moduloId: number,

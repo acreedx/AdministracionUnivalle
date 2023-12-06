@@ -7,7 +7,7 @@ import URLS from "utils/demo/api";
 import SweetAlert from "react-bootstrap-sweetalert";
 import { PlusIcon, MinusIcon } from "icons";
 import { GetServerSidePropsContext } from "next";
-//import { ITramitesData, convertJSONService } from "utils/demo/tramitesData";
+import { ITramitesData, convertJSONListService } from "utils/demo/tramitesData";
 import { ITramitesDataEdit, convertJSONService } from "utils/demo/tramitesDataEdit";
 import { uploadFile } from "../../../../firebase/config";
 import SectionTitle from "example/components/Typography/SectionTitle";
@@ -37,13 +37,14 @@ function ModificarTramite({ id }: props) {
   const [requisitoError, setRequisitoError] = useState<boolean>(false);
   const [enchargedError, setEnchargedError] = useState<string | null>(null);
   const [cellphoneError, setCellphoneError] = useState<string | null>(null);
-
   const [durationSelect, setDurationSelect] = useState("");
+  const [services, setServices] = useState<ITramitesData[]>([]);
   var [serviceImg, setImg]: any = useState(null);
-
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
+  const routeTramitesActives = "Servicios/getTramiteByModuleActive/";
+  const moduleName = "Tramites";
 
   //Ubicaciones
   const createUbicacionRoute = "Ubicaciones/addUbicaciones";
@@ -242,11 +243,10 @@ function ModificarTramite({ id }: props) {
   const updateLocation = async (serviceId: number) => {
     if (valueNewLocation.length <= ubicaciones.length) {
       for (let i = 0; i < ubicaciones.length; i++) {
-        
+
         const element = ubicaciones[i];
-        
-        if(i+1 > valueNewLocation.length)
-        {
+
+        if (i + 1 > valueNewLocation.length) {
           console.log("a")
           const newDeleteLocationResponse = await fetch(`${URLS.baseUrl}${deleteUbicacionRoute}${element.id}`, {
             method: "PUT",
@@ -257,20 +257,18 @@ function ModificarTramite({ id }: props) {
           });
           console.log("Respuesta del servidor al actualizar la ubicacion:", newDeleteLocationResponse);
         }
-        else 
-        {
+        else {
           const location = locationImg[i];
           const croquis = locationCroquisImg[i];
           var imgURL
           var croquisURL
-  
+
           if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
           else imgURL = locationImg[i]
-  
+
           if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
           else croquisURL = locationCroquisImg[i]
-          if (location.trim() !== '') 
-          {
+          if (location.trim() !== '') {
             const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
               method: "PUT",
               headers: {
@@ -284,31 +282,28 @@ function ModificarTramite({ id }: props) {
                 estado: true,
               }),
             });
-  
+
             console.log("Respuesta del servidor al actualizar la ubicacion:", newLocationResponse);
           }
         }
       }
       //setUbicacionesActualizadas((prev) => [...prev, ...nuevasUbicaciones]);
     }
-    else
-    {
+    else {
       for (let i = 0; i < valueNewLocation.length; i++) {
-        if(i < ubicaciones.length)
-        {
+        if (i < ubicaciones.length) {
           const element = ubicaciones[i];
           const location = locationImg[i];
           const croquis = locationCroquisImg[i];
           var imgURL
           var croquisURL
-  
+
           if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
           else imgURL = locationImg[i]
-  
+
           if (croquis.includes("data:")) croquisURL = await uploadFile(fileCroquisImg[i], "ubicacionesTramites/")
           else croquisURL = locationCroquisImg[i]
-          if (location.trim() !== '') 
-          {
+          if (location.trim() !== '') {
             const newLocationResponse = await fetch(`${URLS.baseUrl}${updateUbicacionRoute}${element.id}`, {
               method: "PUT",
               headers: {
@@ -322,12 +317,11 @@ function ModificarTramite({ id }: props) {
                 estado: true,
               }),
             });
-  
+
             console.log("Respuesta del servidor al actualizar la ubicacion:", newLocationResponse);
           }
         }
-        else 
-        {
+        else {
           const location = locationImg[i];
           var imgURL
           if (location.includes("data:")) imgURL = await uploadFile(fileLocationImg[i], "ubicacionesTramites/")
@@ -441,14 +435,19 @@ function ModificarTramite({ id }: props) {
         });
     }
     doFetch();
-
-
     async function fetchData() {
       fetch(`${URLS.baseUrl}${getActiveCategoriesRoute}`)
         .then((res) => res.json())
         .then((res) => setCategorias(convertJSONListCategory(res.data)));
     }
     fetchData();
+
+    async function ListTramites() {
+      fetch(`${URLS.baseUrl}${routeTramitesActives}${moduleName}`)
+        .then((res) => res.json())
+        .then((res) => setServices(convertJSONListService(res.data)));
+    }
+    ListTramites();
   }, []);
 
 
@@ -527,8 +526,8 @@ function ModificarTramite({ id }: props) {
       });
 
       await updateLocation(id);
-      
-      
+
+
 
       for (const requisito of requisitos) {
         if (requisito.description.trim() !== '') {
@@ -695,7 +694,24 @@ function ModificarTramite({ id }: props) {
       setcellphone(service!.cellphone);
     }
   }, [service]);
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    const isSameAsExisting = service?.name === inputValue;
+    const tramiteExists = services.some((tramite) => tramite.name === inputValue);
 
+    if (!containsInvalidChars && !tramiteExists || isSameAsExisting) {
+      setname(inputValue);
+      setNameError("");
+    } else {
+      setNameError("No se permiten números o caracteres especiales.");
+      if (tramiteExists && !isSameAsExisting) {
+        setNameError("El nombre del tramite ya está en uso. Por favor, elige otro nombre.");
+      }
+    }
+  };
+
+  /*
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const containsInvalidChars = /[^a-zA-Z\s]/.test(inputValue);
@@ -710,6 +726,7 @@ function ModificarTramite({ id }: props) {
 
     setname(inputValue);
   };
+*/
 
   const handleEnchargedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
@@ -970,7 +987,7 @@ function ModificarTramite({ id }: props) {
                         handleSetCommonLocationCroquisImg(e, locationIndex)
 
                       //console.log(valueNewLocation)
-                      
+
                       //console.log(locationCroquisImg[locationIndex].includes("data:"))
                       //console.log(fileLocationImg)
                     }}
