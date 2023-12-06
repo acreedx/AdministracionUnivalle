@@ -1,3 +1,4 @@
+import { uploadFile } from "../../firebase/config";
 import URL from "utils/demo/api";
 import { IUbicacionesData } from "utils/demo/ubicacionesData";
 
@@ -74,7 +75,8 @@ class UbicacionesProvider {
   }
   public async UpdateUbicaciones(
     serviciosId: Number,
-    ubicaciones: IUbicacionesData[]
+    ubicaciones: IUbicacionesData[],
+    serviceImgArray: any[]
   ) {
     const ubicacionesList: IUbicacionesData[] = await this.GetUbicacionesList(
       serviciosId
@@ -84,15 +86,31 @@ class UbicacionesProvider {
         this.CreateSingleUbicacion(e.name, e.imagen, serviciosId);
       }
     });
-    ubicacionesList.forEach((elements) => {
-      ubicaciones.forEach((element) => {
+    ubicacionesList.map((elements, index) => {
+      ubicaciones.map(async (element, index) => {
         if (elements.id == element.id) {
-          this.UpdateSingleUbicacion(
-            elements.name,
-            serviciosId,
-            element.id,
-            element.imagen
-          );
+          if(serviceImgArray[index] == null) 
+          {
+            this.UpdateSingleUbicacion(
+              elements.name,
+              serviciosId,
+              element.id,
+              element.imagen
+            );
+          }
+          else
+          {
+            const imgUrlNews: string = await uploadFile(
+              serviceImgArray[index],
+              "ubicaciones/imagenes/"
+            );
+            this.UpdateSingleUbicacion(
+              elements.name,
+              serviciosId,
+              element.id,
+              imgUrlNews
+            );
+          }
         }
       });
     });

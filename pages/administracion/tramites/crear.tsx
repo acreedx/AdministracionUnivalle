@@ -13,6 +13,7 @@ import SectionTitle from "example/components/Typography/SectionTitle";
 import tramitesProvider from "utils/providers/tramitesProvider";
 import LoadingScreen from "example/components/loading-screen";
 import Loading from "./loading";
+import { ITramitesData, convertJSONListService } from "utils/demo/tramitesData";
 
 
 
@@ -24,7 +25,6 @@ function CrearTramite() {
   const [cellphoneError, setCellphoneError] = useState<string | null>(null);
   const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState(false)
-
   const [serviceImg, setImg]: any = useState(null);
   const [locationImg, setLocationImage] = useState<string[]>([]);
   const [locationCroquisImg, setLocationCroquisImage] = useState<string[]>([]);
@@ -32,7 +32,9 @@ function CrearTramite() {
   const [locations, setLocations] = useState<string[]>(['']);
   const [fileLocationImg, setfileLocationImg]: any = useState<any[]>([]);
   const [fileCroquisImg, setfileCroquisImg]: any = useState<any[]>([]);
-
+  const [services, setServices] = useState<ITramitesData[]>([]);
+  const routeTramitesActives = "Servicios/getTramiteByModuleActive/";
+  const moduleName = "Tramites";
   const handleCreateValueNewLocation = (value: string) => {
     // Crear una nueva copia del array y agregar el nuevo valor
     const updatedValueLocation = [...valueNewLocation, value];
@@ -289,6 +291,13 @@ function CrearTramite() {
         .then((res) => setCategorias(convertJSONListCategory(res.data)));
     }
     doFetch();
+
+    async function ListTramites() {
+      fetch(`${URLS.baseUrl}${routeTramitesActives}${moduleName}`)
+        .then((res) => res.json())
+        .then((res) => setServices(convertJSONListService(res.data)));
+    }
+    ListTramites();
   }, []);
 
   const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -300,7 +309,7 @@ function CrearTramite() {
   const moduleId = 3;
   const [loading, setLoading] = useState(true);
   const handleSubmit = async () => {
-    // Validar que los campos obligatorios estén completos
+
     if (
       name.trim() === "" ||
       serviceImg === null ||
@@ -417,6 +426,26 @@ function CrearTramite() {
   const handleAlertLoadConfirm = () => {
     router.push("/administracion/tramites")
   };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    const inputValue = e.target.value;
+    const containsInvalidChars = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(inputValue);
+    const tramiteExists = services.some((tramite) => tramite.name === inputValue);
+
+    if (!containsInvalidChars && !tramiteExists) {
+      setname(inputValue);
+      setNameError("");
+    } else {
+      setNameError("No se permiten números o caracteres especiales.");
+
+      if (tramiteExists) {
+        setNameError("El nombre del tramite ya está en uso. Por favor, elige otro nombre.");
+      }
+    }
+  };
+
+  /*
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const containsInvalidChars = /[^a-zA-Z\s\d.]/.test(inputValue);
@@ -429,7 +458,7 @@ function CrearTramite() {
 
     setname(inputValue);
   };
-
+*/
   const handleCellphoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     // Utiliza una expresión regular para verificar si solo contiene dígitos.
@@ -722,7 +751,7 @@ function CrearTramite() {
             ))}
           </Label>
         </div>
-        
+
 
         <Label className="mt-4">
           <div className="relative text-gray-500 focus-within:text-purple-600">

@@ -36,7 +36,7 @@ function Categorias() {
 
   const resultsPerPage = 10;
 
-  
+
 
   useEffect(() => {
     async function doFetch() {
@@ -99,6 +99,12 @@ function Categorias() {
   const handleActiveChange = (e: any) => {
     setState(e.target.value);
   };
+  function truncateText(text: String, maxLength: number) {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + '...';
+    }
+    return text;
+  }
   return (
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
@@ -118,29 +124,29 @@ function Categorias() {
         <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
           <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
             <Label radio>
-            <Input
-              type="radio"
-              value="activos"
-              name="activeInactive"
-              checked={state === 'activos'}
-              onChange={(e) => handleActiveChange(e)}
-            />
-            <span className="ml-2">Activos</span>
-          </Label>
-          <Label radio>
-            <Input
-              type="radio"
-              value="inactivos"
-              name="activeInactive"
-              checked={state === 'inactivos'}
-              onChange={(e) => handleActiveChange(e)}
-            />
-            <span className="ml-2">Inactivos</span>
-          </Label>
+              <Input
+                type="radio"
+                value="activos"
+                name="activeInactive"
+                checked={state === 'activos'}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Activos</span>
+            </Label>
+            <Label radio>
+              <Input
+                type="radio"
+                value="inactivos"
+                name="activeInactive"
+                checked={state === 'inactivos'}
+                onChange={(e) => handleActiveChange(e)}
+              />
+              <span className="ml-2">Inactivos</span>
+            </Label>
           </CardBody>
         </Card>
       </div>
-      
+
 
       <div className="mb-1">
         <Link href={`/administracion/tramites/categorias/crear`}>
@@ -149,7 +155,7 @@ function Categorias() {
           </Button>
         </Link>
       </div>
-      
+
       <TableContainer className="my-8">
         <Table>
           <TableHeader>
@@ -182,7 +188,7 @@ function Categorias() {
                 <TableCell>
                   <div className="flex items-center text-sm">
                     <div>
-                      <p className="font-semibold">{categoria.description}</p>
+                      <p className="font-semibold">{truncateText(categoria.description, 20)}</p>
                     </div>
                   </div>
                 </TableCell>
