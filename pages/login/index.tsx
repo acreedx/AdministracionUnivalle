@@ -22,7 +22,7 @@ function LoginPage() {
       const userData = await loginUser(ciUsuario, clave);
       console.log("Inicio de sesión exitoso. Datos del usuario:", userData);
       localStorage.setItem("userData", JSON.stringify(userData));
-      router.push("/example");
+      router.push("/home");
     } catch (error: any) {
       console.error("Error al iniciar sesión:", error.message);
       setCiUsuario('');
