@@ -37,6 +37,8 @@ function Biblioteca() {
   const [selectedLibro, setSelectedLibro] = useState<IBibliotecaData | null>(
     null
   );
+  const [selectedLibroForEdit, setSelectedLibroForEdit] =
+    useState<IBibliotecaData | null>(null);
 
   const fetchData = async () => {
     const query = await fetch(`${URL.baseUrl}Libro/Lista`);
@@ -62,6 +64,12 @@ function Biblioteca() {
 
   const handleAlertCancel = () => {
     setShowAlert(false);
+  };
+
+  const handleEditarClick = (libro: IBibliotecaData) => {
+    setSelectedLibroForEdit(libro);
+    // Redirige a la página de edición con el ID del libro
+    router.push(`/servicios/biblioteca/editar/${libro.idLibro}`);
   };
 
   const handleCambiarEstado = async (idLibro: number) => {
@@ -210,7 +218,12 @@ function Biblioteca() {
                 <TableCell>
                   <div className="flex items-center space-x-4">
                     {/* Agrega aquí tus enlaces y botones de acciones */}
-                    <Button layout="link" size="small" aria-label="Editar">
+                    <Button
+                      layout="link"
+                      size="small"
+                      aria-label="Editar"
+                      onClick={() => handleEditarClick(libro)}
+                    >
                       <EditIcon className="w-5 h-5" aria-hidden="true" />
                     </Button>
                     <Button
