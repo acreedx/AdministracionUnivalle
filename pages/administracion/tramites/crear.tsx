@@ -251,7 +251,8 @@ function CrearTramite() {
   const handleRequisitoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const inputValue = e.target.value;
     // Utiliza una expresión regular para verificar si contiene solo letras, números y punto.
-    const containsValidChars = /^[a-zA-Z0-9.,]*$/.test(inputValue);
+    //const containsValidChars = /^[a-zA-Z0-9.,]*$/.test(inputValue);
+    const containsValidChars = /^[a-zA-Z0-9.,\s]*$/.test(inputValue);
 
     if (containsValidChars) {
       const nuevosRequisitos = [...requisitos];
