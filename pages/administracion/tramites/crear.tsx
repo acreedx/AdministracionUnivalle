@@ -274,7 +274,7 @@ function CrearTramite() {
   const [durationNumber, setDurationNumber] = useState("");
   const [durationSelect, setDurationSelect] = useState("horas");
   const [categorias, setCategorias] = useState<ICategoriasData[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("6");
+  const [selectedCategory, setSelectedCategory] = useState("19");
   const getActiveCategoriesRoute = "Categoria/getActiveCategorias"
 
   useEffect(() => {
@@ -327,6 +327,8 @@ function CrearTramite() {
 
     try {
       setLoading(true);
+
+      console.log(name, moduleId, encharged, selectedCategory, cellphone)
       const serviceId = await tramitesProvider.CreateTramite(
         name,
         moduleId,
@@ -340,7 +342,7 @@ function CrearTramite() {
       await createRequisitos(serviceId);
       await createLocation(serviceId);
 
-      //  router.push("/administracion/tramites")
+
       setIsSuccess(true);
     } catch (error) {
       console.error("Error al crear el servicio y requisitos:", error);

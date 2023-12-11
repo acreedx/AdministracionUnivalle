@@ -39,7 +39,6 @@ function Categorias() {
   const [pageTable, setPageTable] = useState(1);
   const [categories, setCategories] = useState<ICategoriasData[]>([]);
   const [displayedCategories, setDisplayedCategories] = useState<ICategoriasData[]>([])
-  //const totalResults = services.length;
 
 
 
@@ -73,7 +72,7 @@ function Categorias() {
 
     // Establecer las categorías a mostrar en la tabla según la página actual y el filtro
     setDisplayedCategories(filteredCategories.slice(startIndex, endIndex));
-  }, [pageTable, searchTerm, categories]); // Dependencias: incluye searchTerm y categories
+  }, [pageTable, searchTerm, categories]);
 
   /*
     useEffect(() => {
