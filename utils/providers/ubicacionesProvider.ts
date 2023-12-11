@@ -55,7 +55,6 @@ class UbicacionesProvider {
     ubicacionId: Number,
     imagen: string
   ) {
-    console.log(ubicacionId);
     fetch(`${URL.baseUrl}${this.UpdateUbicacionesRoute}${ubicacionId}`, {
       method: "PUT",
       headers: {
@@ -81,31 +80,33 @@ class UbicacionesProvider {
     const ubicacionesList: IUbicacionesData[] = await this.GetUbicacionesList(
       serviciosId
     );
-    ubicaciones.forEach((e) => {
+    ubicaciones.map(async (e, index) => {
       if (e.id == 0) {
-        this.CreateSingleUbicacion(e.name, e.imagen, serviciosId);
+        const imgUrlNew: string = await uploadFile(
+          serviceImgArray[index],
+          "ubicaciones/imagenes/"
+        );
+        console.log(imgUrlNew);
+        await this.CreateSingleUbicacion(e.name, imgUrlNew, serviciosId);
       }
     });
     ubicacionesList.map((elements, index) => {
       ubicaciones.map(async (element, index) => {
         if (elements.id == element.id) {
-          if(serviceImgArray[index] == null) 
-          {
+          if (serviceImgArray[index] == null) {
             this.UpdateSingleUbicacion(
-              elements.name,
+              element.name,
               serviciosId,
               element.id,
               element.imagen
             );
-          }
-          else
-          {
+          } else {
             const imgUrlNews: string = await uploadFile(
               serviceImgArray[index],
               "ubicaciones/imagenes/"
             );
             this.UpdateSingleUbicacion(
-              elements.name,
+              element.name,
               serviciosId,
               element.id,
               imgUrlNews
@@ -132,6 +133,9 @@ class UbicacionesProvider {
       throw e;
     });
   }
+  compareById = (a: IUbicacionesData, b: IUbicacionesData): number => {
+    return a.id - b.id;
+  };
   public async GetUbicacionesList(
     serviceId: Number
   ): Promise<IUbicacionesData[]> {
@@ -153,7 +157,11 @@ class UbicacionesProvider {
             };
             this.ubicacionesList.push(ubicacionTemp);
           });
+          this.ubicacionesList.sort(this.compareById);
         }
+      })
+      .catch((e: any) => {
+        throw e;
       });
     return this.ubicacionesList;
   }
