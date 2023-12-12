@@ -25,6 +25,11 @@ import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
 import SweetAlert from "react-bootstrap-sweetalert";
+
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Tramites"];
+
 function Categorias() {
   const router = useRouter();
   // * Modificar ruta segun la api * 
@@ -305,4 +310,4 @@ useEffect(() => {
   );
 }
 
-export default Categorias;
+export default withAuthorization(Categorias,{requiredPermissions});

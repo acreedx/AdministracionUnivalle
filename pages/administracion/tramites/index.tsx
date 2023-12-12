@@ -27,6 +27,11 @@ import URL from "utils/demo/api";
 import Layout from "example/containers/Layout";
 
 import SweetAlert from "react-bootstrap-sweetalert";
+
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Tramites"];
+
 function Tramites() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
@@ -340,4 +345,4 @@ function Tramites() {
   );
 }
 
-export default Tramites;
+export default withAuthorization(Tramites,{requiredPermissions});

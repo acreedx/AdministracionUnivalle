@@ -27,9 +27,9 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
 
 const routes: IRoute[] = [
   {
-    path: "/example", // the url
+    path: "/home", // the url
     icon: "HomeIcon", // the component being exported from icons/index.js
-    name: "Dashboard", // name that appear in Sidebar
+    name: "Inicio", // name that appear in Sidebar
     exact: true,
   },
   {
@@ -81,6 +81,7 @@ const routes: IRoute[] = [
     ],
   },
   {
+    path: "/servicios/cafeteria",
     icon: "PagesIcon",
     name: "Servicios",
     routes: [
@@ -93,73 +94,9 @@ const routes: IRoute[] = [
         path: "/servicios/biblioteca",
         name: "Biblioteca",
       },
-      {
-        path: "/example/create-account",
-        name: "Create account",
-      },
-      {
-        path: "/example/forgot-password",
-        name: "Forgot password",
-      },
     ],
   },
-  {
-    path: "/example/forms",
-    icon: "FormsIcon",
-    name: "Forms",
-  },
-  {
-    path: "/example/cards",
-    icon: "CardsIcon",
-    name: "Cards",
-  },
-  {
-    path: "/example/charts",
-    icon: "ChartsIcon",
-    name: "Charts",
-  },
-  {
-    path: "/example/buttons",
-    icon: "ButtonsIcon",
-    name: "Buttons",
-  },
-  {
-    path: "/example/modals",
-    icon: "ModalsIcon",
-    name: "Modals",
-  },
-  {
-    path: "/example/tables",
-    icon: "TablesIcon",
-    name: "Tables",
-  },
-  {
-    icon: "PagesIcon",
-    name: "Pages",
-    routes: [
-      // submenu
-      {
-        path: "/example/login",
-        name: "Login",
-      },
-      {
-        path: "/example/create-account",
-        name: "Create account",
-      },
-      {
-        path: "/example/forgot-password",
-        name: "Forgot password",
-      },
-      {
-        path: "/example/404",
-        name: "404",
-      },
-      {
-        path: "/example/blank",
-        name: "Blank",
-      },
-    ],
-  },
+
   {
     path: "/usuarios",
     icon: "PeopleIcon",
@@ -215,7 +152,7 @@ const routes: IRoute[] = [
   {
     path: "/gabinetePsicoPedagogico",
     icon: "MindIcon",
-    name: "Gabinete Psico-Pedagogico",
+    name: "Gabinete Pedagogico",
     routes: [
       {
         path: "/gabinetePsicoPedagogico/datosGenerales/14",

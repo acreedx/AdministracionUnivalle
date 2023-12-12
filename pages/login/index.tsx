@@ -22,7 +22,7 @@ function LoginPage() {
       const userData = await loginUser(ciUsuario, clave);
       console.log("Inicio de sesión exitoso. Datos del usuario:", userData);
       localStorage.setItem("userData", JSON.stringify(userData));
-      router.push("/example");
+      router.push("/home");
     } catch (error: any) {
       console.error("Error al iniciar sesión:", error.message);
       setCiUsuario('');
@@ -77,13 +77,7 @@ function LoginPage() {
                 Ingresar
               </Button>
 
-              <p className="mt-1">
-                <Link href="/example/create-account">
-                  <a className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline">
-                    Crear cuenta Univalle
-                  </a>
-                </Link>
-              </p>
+              
             </div>
           </main>
         </div>

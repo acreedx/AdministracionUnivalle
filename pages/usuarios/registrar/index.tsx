@@ -27,6 +27,10 @@ import { useRouter } from "next/router";
 import { ToastContainer } from "react-toastify";
 import Link from "next/link";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Usuarios"];
+
 function RegistrarUsuarioPageModal() {
   const [ciValid, setCiValid] = useState<boolean | undefined>(undefined);
   const [CiText, setCiValidText] = useState<string>("");
@@ -387,4 +391,4 @@ function RegistrarUsuarioPageModal() {
   );
 }
 
-export default RegistrarUsuarioPageModal;
+export default withAuthorization(RegistrarUsuarioPageModal,{requiredPermissions});

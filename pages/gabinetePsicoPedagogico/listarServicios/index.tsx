@@ -33,6 +33,10 @@ import SearchBar from "components/searchBar";
 import Modal from "../../../components/modal";
 import RegistrarPage from "../registrar/index";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Gabinete Psico-Pedagógico"];
+
 function GabinetePsicoPedagogico() {
   const router = useRouter();
 
@@ -173,7 +177,7 @@ function GabinetePsicoPedagogico() {
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar objeto perdido"
+                      placeHolder="Buscar servicio por nombre"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
@@ -362,4 +366,4 @@ function GabinetePsicoPedagogico() {
   );
 }
 
-export default GabinetePsicoPedagogico;
+export default withAuthorization(GabinetePsicoPedagogico,{requiredPermissions});

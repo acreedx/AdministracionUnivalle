@@ -64,6 +64,10 @@ export async function getServerSideProps(context: any) {
   };
 }
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Clínica Odontológica"];
+
 function EditarDatosGeneralesPage() {
   const baseURL = "https://apisistemaunivalle.somee.com/api";
   var countReq = -1;
@@ -1575,4 +1579,4 @@ function EditarDatosGeneralesPage() {
   );
 }
 
-export default EditarDatosGeneralesPage;
+export default withAuthorization(EditarDatosGeneralesPage,{requiredPermissions});

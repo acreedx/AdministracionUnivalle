@@ -20,6 +20,10 @@ import { useRouter } from "next/router";
 import { EditIcon, TrashIcon, MenuIcon, PlusIcon } from "icons";
 import SweetAlert from "react-bootstrap-sweetalert";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
+
 function Horariosubicacion() {
   {
     /* Variables */

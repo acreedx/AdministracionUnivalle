@@ -34,6 +34,10 @@ import Modal from "../../../components/modal";
 import RegistrarPage from "../registrar/index";
 import RegistrarServicioPageModal from "../registrar";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Bienestar Universitario"];
+
 function BienestarUniversitario() {
   const router = useRouter();
 
@@ -171,7 +175,7 @@ function BienestarUniversitario() {
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar objeto perdido"
+                      placeHolder="Buscar servicio por nombre"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
@@ -360,4 +364,4 @@ function BienestarUniversitario() {
   );
 }
 
-export default BienestarUniversitario;
+export default withAuthorization(BienestarUniversitario,{requiredPermissions});

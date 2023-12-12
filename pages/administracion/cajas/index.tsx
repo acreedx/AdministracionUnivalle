@@ -26,6 +26,10 @@ import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
 import SearchBar from "components/searchBar";
 import servicesProvider from "../../../utils/providers/servicesProvider";
+import { isAuthenticated } from "utils/auth/auth";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 import { errorAlert } from "components/alerts";
 
 function Cajas() {
@@ -332,4 +336,4 @@ function Cajas() {
   );
 }
 
-export default Cajas;
+export default withAuthorization(Cajas, { requiredPermissions });

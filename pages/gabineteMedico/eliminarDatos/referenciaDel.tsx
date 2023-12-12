@@ -176,7 +176,7 @@ const EliminarReferencia: FC<RefereciaProps> = ({
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar objeto perdido"
+                      placeHolder="Buscar contacto"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
