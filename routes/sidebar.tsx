@@ -27,9 +27,9 @@ export function routeIsActive(pathname: String, route: IRoute): boolean {
 
 const routes: IRoute[] = [
   {
-    path: "/example", // the url
+    path: "/home", // the url
     icon: "HomeIcon", // the component being exported from icons/index.js
-    name: "Dashboard", // name that appear in Sidebar
+    name: "Menu", // name that appear in Sidebar
     exact: true,
   },
   {
@@ -81,6 +81,7 @@ const routes: IRoute[] = [
     ],
   },
   {
+    path: "/servicios/cafeteria",
     icon: "PagesIcon",
     name: "Servicios",
     routes: [
@@ -215,7 +216,7 @@ const routes: IRoute[] = [
   {
     path: "/gabinetePsicoPedagogico",
     icon: "MindIcon",
-    name: "Gabinete Psico-Pedagogico",
+    name: "Gabinete Pedagogico",
     routes: [
       {
         path: "/gabinetePsicoPedagogico/datosGenerales/14",

@@ -115,7 +115,7 @@ function AgregarObjPerdidoPage() {
           body: JSON.stringify({
             titulo: objPerdido.titulo,
             archivo: objPerdido.archivo,
-            serviciosId: 1,
+            serviciosId: 237,
             estado: true,
           }),
         }
