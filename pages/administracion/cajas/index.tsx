@@ -116,7 +116,7 @@ function Cajas() {
         </>
       ) : (
         <>
-          {services.length < 1 ? (
+          {servicesOriginal.length < 1 ? (
             <>
               <SectionTitle>No hay servicios registrados</SectionTitle>
             </>

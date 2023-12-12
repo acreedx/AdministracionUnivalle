@@ -102,20 +102,26 @@ function CrearServicio() {
     }
   };
   function ValidateForm() {
-    if (name == "" || name == null) {
-      setvalidationMessage("Debe rellenar el campo de Nombre");
+    if (name == "" || name == null || name.trim() === "") {
+      setvalidationMessage("Debe rellenar el campo de Nombre del servicio");
       setShowAlertValidation(true);
       setformIsValid(false);
       return;
     }
-    if (encharged == "" || encharged == null) {
-      setvalidationMessage("Debe rellenar el campo de Encargado");
+    if (serviceImg == null) {
+      setvalidationMessage("Debe escoger una imagen de referencia");
       setShowAlertValidation(true);
       setformIsValid(false);
       return;
     }
-    if (cellphone == "" || cellphone == null) {
-      setvalidationMessage("Debe rellenar el campo de Teléfono");
+    if (encharged == "" || encharged == null || encharged.trim() === "") {
+      setvalidationMessage("Debe rellenar el campo de Encargado del servicio");
+      setShowAlertValidation(true);
+      setformIsValid(false);
+      return;
+    }
+    if (cellphone == "" || cellphone == null || cellphone.trim() === "") {
+      setvalidationMessage("Debe rellenar el campo de Teléfono de referencia");
       setShowAlertValidation(true);
       setformIsValid(false);
       return;
@@ -127,11 +133,16 @@ function CrearServicio() {
       <PageTitle>Crear un nuevo servicio</PageTitle>
       <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
-          <span>Nombre del servicio</span>
+          <span>Nombre del servicio *</span>
           <Input
             className="mt-1"
             placeholder="Ingresa el nombre del servicio"
-            onChange={(e) => setname(e.target.value)}
+            value={name}
+            onChange={(e) => {
+              if (/^[a-zA-Z\s]{0,30}$/.test(e.target.value)) {
+                setname(e.target.value);
+              }
+            }}
           />
         </Label>
         <Label className="mt-4">
@@ -160,20 +171,31 @@ function CrearServicio() {
           onChange={(e) => setImg(e.target.files?.[0] || null)}
         />
         <Label className="mt-4">
-          <span>Encargado</span>
+          <span>Encargado *</span>
           <Input
             className="mt-1"
+            type="text"
             placeholder="Ingresa el encargado del servicio"
-            onChange={(e) => setencharged(e.target.value)}
+            value={encharged}
+            onChange={(e) => {
+              if (/^[a-zA-Z\s]{0,30}$/.test(e.target.value)) {
+                setencharged(e.target.value);
+              }
+            }}
           />
         </Label>
         <Label className="mt-4">
-          <span>Teléfono de referencia</span>
+          <span>Teléfono de referencia *</span>
           <Input
-            type="number"
+            type="text"
             className="mt-1"
             placeholder="Ingresa el teléfono de referencia"
-            onChange={(e) => setcellphone(e.target.value)}
+            value={cellphone}
+            onChange={(e) => {
+              if (/^\d{0,8}$/.test(e.target.value)) {
+                setcellphone(e.target.value);
+              }
+            }}
           />
         </Label>
       </div>
@@ -312,10 +334,11 @@ function CrearServicio() {
           confirmBtnText="Confirmar"
           cancelBtnText="Cancelar"
           showCancel
-          onConfirm={() => {
+          onConfirm={async () => {
             handleSubmit();
           }}
           onCancel={() => {
+            setShowAlertValidation(false);
             setShowAlert(false);
           }}
         >
@@ -327,7 +350,7 @@ function CrearServicio() {
           error // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
           title="Atención"
           confirmBtnText="Ok"
-          onConfirm={() => {
+          onConfirm={async () => {
             setShowAlertValidation(false);
             setShowAlert(false);
           }}
