@@ -23,6 +23,9 @@ import response, {
   convertJSONListRequirement,
 } from "utils/demo/requirementData";
 import { GetServerSidePropsContext } from "next";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 
 interface props {
   id: number;

@@ -33,6 +33,10 @@ import SearchBar from "components/searchBar";
 import Modal from '../../../components/modal'
 import RegistrarPage from '../registrar/index'
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Gabinete Médico"];
+
 function BienestarUniversitario() {
   const router = useRouter();
 
@@ -357,4 +361,4 @@ function BienestarUniversitario() {
   );
 }
 
-export default BienestarUniversitario;
+export default withAuthorization(BienestarUniversitario,{requiredPermissions});

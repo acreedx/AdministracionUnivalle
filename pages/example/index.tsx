@@ -12,7 +12,7 @@ import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
-import { isAuthenticated } from "utils/auth/auth";
+import withAuthorization from 'components/withAuthorization'
 
 import {
   TableBody,
@@ -46,17 +46,10 @@ import {
   Legend,
 } from 'chart.js'
 
+
+const requiredPermissions = ["Tramites","Cafeteria","Clínica Odontológica","Bienestar Universitario","Gabinete Psico-Pedagógico","Cajas", "Gabinete Médico"];
+
 function Dashboard() {
-
-  const router = useRouter();
-
-  //Autentificacion
-  useEffect(() => {
-    const usuarioAutenticado = isAuthenticated();
-    if (!usuarioAutenticado) {
-      router.push("/login");
-    }
-  }, []);
 
   Chart.register(
     ArcElement,
@@ -205,4 +198,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard
+export default withAuthorization(Dashboard,{requiredPermissions});

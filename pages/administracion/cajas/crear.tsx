@@ -13,6 +13,9 @@ import ubicacionesProvider from "../../../utils/providers/ubicacionesProvider";
 import servicesProvider from "../../../utils/providers/servicesProvider";
 import requirementsProvider from "../../../utils/providers/requirementsProvider";
 import { IUbicacionesData } from "utils/demo/ubicacionesData";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 
 function CrearServicio() {
   const [name, setname] = useState("");

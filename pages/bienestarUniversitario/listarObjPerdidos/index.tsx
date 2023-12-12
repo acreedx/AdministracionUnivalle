@@ -35,6 +35,10 @@ import ModalEdit from "../../../components/modalEdit";
 import AgregarObjPerdidoPage from "components/bienestarUniversitario/agregarObjPerdido";
 import EditarObjPerdidoPage from "components/bienestarUniversitario/editarObjPerdido";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Bienestar Universitario"];
+
 function ObjetosPerdidos() {
   const router = useRouter();
 
@@ -375,4 +379,4 @@ function ObjetosPerdidos() {
   );
 }
 
-export default ObjetosPerdidos;
+export default withAuthorization(ObjetosPerdidos, { requiredPermissions });

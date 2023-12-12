@@ -34,6 +34,10 @@ import URL from "../../../api/apiCareerDirection";
 
 import { ICarrers } from "utils/interfaces/DireccionDeCarrera/Carreras";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Direccion de carrera"];
+
 function Carrera() {
   const router = useRouter();
 
@@ -381,4 +385,4 @@ function Carrera() {
   );
 }
 
-export default Carrera;
+export default withAuthorization(Carrera,{requiredPermissions});

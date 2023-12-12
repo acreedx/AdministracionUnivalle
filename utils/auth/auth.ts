@@ -1,3 +1,5 @@
+import { getModulesByUserCI } from "pages/api/user";
+
 interface UserData {
   data: {
     ciUsuario: string;
@@ -8,8 +10,7 @@ interface UserData {
   success: boolean;
 }
 
-export const isAuthenticated = (): boolean => {
-
+export const isAuthenticated = async (): Promise<boolean> => {
   if (typeof window === "undefined") {
     return false;
   }
@@ -19,6 +20,7 @@ export const isAuthenticated = (): boolean => {
   if (userDataString) {
     try {
       const userData: UserData = JSON.parse(userDataString);
+
       if (
         userData &&
         userData.data &&
@@ -26,6 +28,19 @@ export const isAuthenticated = (): boolean => {
         userData.data.length > 0 &&
         userData.data[0].ciUsuario
       ) {
+        // Obtener el ciUsuario del localStorage
+        const ciUsuario = userData.data[0].ciUsuario;
+
+        // Llamar a la función para obtener los módulos
+        try {
+          const modules = await getModulesByUserCI(ciUsuario);
+
+          // Almacenar los módulos en el localStorage
+          localStorage.setItem("userModules", JSON.stringify(modules));
+        } catch (error) {
+          console.error("Error al obtener módulos:", error);
+        }
+
         return true;
       } else {
         return false;
@@ -35,6 +50,7 @@ export const isAuthenticated = (): boolean => {
       return false;
     }
   }
+
   return false;
 };
 
