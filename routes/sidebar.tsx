@@ -90,6 +90,10 @@ const routes: IRoute[] = [
         name: "Cafeteria",
       },
       {
+        path: "/servicios/biblioteca",
+        name: "Biblioteca",
+      },
+      {
         path: "/example/create-account",
         name: "Create account",
       },

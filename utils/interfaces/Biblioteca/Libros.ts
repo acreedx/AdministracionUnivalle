@@ -34,6 +34,9 @@ export interface IAddBook {
   imagen: File | null; // Cambiamos el tipo a File
 }
 
+export interface IApiBookResponse extends IAddBook {
+  ruta: string;
+}
 // Functions to convert JSON data
 function convertJSONBook(data: any): IBookData {
   const convertedData: IBookData = {
