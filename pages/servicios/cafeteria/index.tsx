@@ -26,6 +26,10 @@ import URLS from "utils/demo/api";
 
 const response2 = response.concat([]);
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cafeteria"];
+
 
 function Cafeteria() {
 
@@ -200,4 +204,4 @@ function Cafeteria() {
   );
 }
 
-export default Cafeteria;
+export default withAuthorization(Cafeteria,{requiredPermissions});

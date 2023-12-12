@@ -26,8 +26,13 @@ import Layout from "example/containers/Layout";
 import SweetAlert from "react-bootstrap-sweetalert";
 import SearchBar from "components/searchBar";
 import servicesProvider from "../../../utils/providers/servicesProvider";
+import { isAuthenticated } from "utils/auth/auth";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 
 function Cajas() {
+
   const router = useRouter();
   const [state, setState] = useState("");
   const resultsPerPage = 10;
@@ -60,6 +65,8 @@ function Cajas() {
       )
     );
   }, [pageTable]);
+
+  
 
   const handleSubmitDesactivate = async () => {
     await servicesProvider.DeleteService(selectedService);
@@ -284,4 +291,4 @@ function Cajas() {
   );
 }
 
-export default Cajas;
+export default withAuthorization(Cajas,{requiredPermissions});

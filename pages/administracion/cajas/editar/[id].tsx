@@ -19,6 +19,9 @@ import requirementsProvider from "../../../../utils/providers/requirementsProvid
 import ubicacionesProvider from "../../../../utils/providers/ubicacionesProvider";
 import referencesProvider from "../../../../utils/providers/referencesProvider";
 import { IUbicacionesData } from "utils/demo/ubicacionesData";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 
 interface props {
   id: number;

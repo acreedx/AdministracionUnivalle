@@ -22,6 +22,10 @@ export async function getServerSideProps(context: any) {
   };
 }
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
+
 function EditarDatosGeneralesPage() {
   const [ubicacionVideo, setUVideo]: any = useState(null);
   const [referenciaData, setReferenciaData] = useState<string[]>([]);

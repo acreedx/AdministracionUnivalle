@@ -9,6 +9,9 @@ import { Button } from "@roketid/windmill-react-ui";
 import URL from "utils/demo/api";
 import { ICajasData, convertJSONService } from "utils/demo/cajasData";
 import { GetServerSidePropsContext } from "next";
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Cajas"];
 
 interface props {
   id: number;

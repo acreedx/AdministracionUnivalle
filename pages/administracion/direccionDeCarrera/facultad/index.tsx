@@ -34,6 +34,10 @@ import URL from "../../../api/apiCareerDirection";
 
 import { IFaculties } from "utils/interfaces/DireccionDeCarrera/Facultades";
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Direccion de carrera"];
+
 function Facultad() {
   const router = useRouter();
 
@@ -361,4 +365,4 @@ function Facultad() {
   );
 }
 
-export default Facultad;
+export default withAuthorization(Facultad,{requiredPermissions});

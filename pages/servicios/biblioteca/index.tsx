@@ -28,6 +28,10 @@ import response, { IBibliotecaData } from "utils/demo/bibliotecaData";
 
 const response2 = response.concat([]);
 
+import withAuthorization from "components/withAuthorization";
+
+const requiredPermissions = ["Biblioteca"];
+
 function Biblioteca() {
   const [pageTable2, setPageTable2] = useState(1);
   const [dataTable2, setLibros] = useState<IBibliotecaData[]>([]);
@@ -284,4 +288,4 @@ function Biblioteca() {
   );
 }
 
-export default Biblioteca;
+export default withAuthorization(Biblioteca,{requiredPermissions});

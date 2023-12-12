@@ -77,13 +77,7 @@ function LoginPage() {
                 Ingresar
               </Button>
 
-              <p className="mt-1">
-                <Link href="/example/create-account">
-                  <a className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline">
-                    Crear cuenta Univalle
-                  </a>
-                </Link>
-              </p>
+              
             </div>
           </main>
         </div>
