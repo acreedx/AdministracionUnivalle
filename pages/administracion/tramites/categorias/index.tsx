@@ -38,44 +38,71 @@ function Categorias() {
   const routeInactives = "Categoria/getDeletedCategorias";
   const deleteCategoryRoute = "Categoria/deleteCategoria/";
   const restoreCategoryRoute = "Categoria/restoreCategoria/";
-
   const resultsPerPage = 10;
+  const [selectedCategory, setSelectedCategory] = useState<number>(0);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [pageTable, setPageTable] = useState(1);
+  const [categories, setCategories] = useState<ICategoriasData[]>([]);
+  const [displayedCategories, setDisplayedCategories] = useState<ICategoriasData[]>([])
 
 
 
   useEffect(() => {
     async function doFetch() {
-      fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}`)
-        .then((res) => res.json())
-        .then((res) => setCategories(convertJSONListCategory(res.data)));
+      try {
+        const res = await fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}`);
+        const data = await res.json();
+        setCategories(convertJSONListCategory(data.data));
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
     doFetch();
   }, [state]);
 
-  const [selectedCategory, setSelectedCategory] = useState<number>(0);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [pageTable, setPageTable] = useState(1);
-  const [services, setCategories] = useState<ICategoriasData[]>([]);
-  const totalResults = services.length;
-
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredCategories = services.filter((categoria) =>
-    categoria.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   function onPageChangeTable2(p: number) {
     setPageTable(p);
   }
-
   useEffect(() => {
-    setCategories(
-      services.slice(
-        (pageTable - 1) * resultsPerPage,
-        pageTable * resultsPerPage
-      )
+    // Filtrar las categorías cada vez que cambie el término de búsqueda o la lista de categorías
+    const filteredCategories = categories.filter((categoria) =>
+      categoria.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [pageTable]);
 
+    // Calcular el inicio y final de los datos de la página actual
+    const startIndex = (pageTable - 1) * resultsPerPage;
+    const endIndex = startIndex + resultsPerPage;
+
+    // Establecer las categorías a mostrar en la tabla según la página actual y el filtro
+    setDisplayedCategories(filteredCategories.slice(startIndex, endIndex));
+  }, [pageTable, searchTerm, categories]);
+
+  /*
+    useEffect(() => {
+      setCategories(
+        services.slice(
+          (pageTable - 1) * resultsPerPage,
+          pageTable * resultsPerPage
+        )
+      );
+    }, [pageTable]);
+  */
+
+  /*
+useEffect(() => {
+  const startIndex = (pageTable - 1) * resultsPerPage;
+  const endIndex = startIndex + resultsPerPage;
+  // Solo ejecuta esto si los servicios han cambiado y la página es diferente.
+  if (services.length && totalResults !== filteredCategories.length) {
+    setCategories(
+      filteredCategories.slice(startIndex, endIndex)
+    );
+  }
+  // Asegúrate de incluir todas las dependencias necesarias aquí.
+}, [pageTable, filteredCategories]);
+*/
   const handleSubmit = async () => {
     await fetch(`${URL.baseUrl}${deleteCategoryRoute}${selectedCategory}`, {
       method: "PUT",
@@ -110,6 +137,7 @@ function Categorias() {
     }
     return text;
   }
+  const totalResults = categories.length;
   return (
     <Layout>
       <PageTitle>TRAMITES</PageTitle>
@@ -173,7 +201,7 @@ function Categorias() {
             </tr>
           </TableHeader>
           <TableBody>
-            {filteredCategories.map((categoria, i) => (
+            {displayedCategories.map((categoria, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">

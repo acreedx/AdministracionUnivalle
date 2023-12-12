@@ -41,27 +41,18 @@ function Tramites() {
   const routeInactives = "Servicios/getTramiteByModuleInactive/";
   const deleteServiceRoute = "Servicios/deleteServicio/";
   const moduleName = "Tramites";
-  const resultsPerPage = 10;
-
-  useEffect(() => {
-    async function doFetch() {
-      fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}${moduleName}`)
-        .then((res) => res.json())
-        .then((res) => setServices(convertJSONListService(res.data)));
-    }
-    doFetch();
-  }, [state]);
-
-  const [selectedService, setSelectedService] = useState<number>(0);
-  const [showAlert, setShowAlert] = useState<boolean>(false);
-  const [pageTable, setPageTable] = useState(1);
-  const [services, setServices] = useState<ITramitesData[]>([]);
-  const totalResults = services.length;
-  const restoreServiceRoute = "Servicios/restoreServicio/";
-  function onPageChangeTable2(p: number) {
-    setPageTable(p);
-  }
-
+  const resultsPerPage = 10; // TODO Cambiar a 10
+  const [displayedTramites, setDisplayedTramites] = useState<ITramitesData[]>([])
+  /*
+   useEffect(() => {
+      async function doFetch() {
+        fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}${moduleName}`)
+          .then((res) => res.json())
+          .then((res) => setServices(convertJSONListService(res.data)));
+      }
+      doFetch();
+    }, [state]);
+  
   useEffect(() => {
     setServices(
       services.slice(
@@ -70,6 +61,41 @@ function Tramites() {
       )
     );
   }, [pageTable]);
+   useEffect(() => {
+      const getData = async () => {
+        const query = await fetch(`${URLS.baseUrl}Publicaciones/getPublicacionesbyModuloId/4`);
+        const response:any= await query.json();
+        //console.log(response)
+        setTotal(response.data.length);
+        setMenuinfo(response.data.slice((pageTable2 - 1) * resultsPerPage, pageTable2 * resultsPerPage));
+        //console.log(response.data)
+      }
+      getData();
+    }, [pageTable2]);
+  */
+  const [pageTable, setPageTable] = useState(1);
+  useEffect(() => {
+    const getData = async () => {
+      const query = await fetch(`${URL.baseUrl}${state == "activos" ? route : routeInactives}${moduleName}`)
+        .then((res) => res.json())
+        .then((res) => setServices(convertJSONListService(res.data.slice((pageTable - 1) * resultsPerPage, pageTable * resultsPerPage))))
+
+    }
+    getData();
+  }, [state, pageTable]);
+
+  const [selectedService, setSelectedService] = useState<number>(0);
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+
+  const [services, setServices] = useState<ITramitesData[]>([]);
+  const totalResults = services.length;
+  const restoreServiceRoute = "Servicios/restoreServicio/";
+
+  function onPageChangeTable2(p: number) {
+    setPageTable(p);
+  }
+
+
 
 
   const handleSubmit = async () => {

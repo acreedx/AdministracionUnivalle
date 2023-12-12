@@ -30,18 +30,24 @@ import { isAuthenticated } from "utils/auth/auth";
 import withAuthorization from "components/withAuthorization";
 
 const requiredPermissions = ["Cajas"];
+import { errorAlert } from "components/alerts";
 
 function Cajas() {
-
   const router = useRouter();
   const [state, setState] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const resultsPerPage = 10;
   const [services, setServices] = useState<ICajasData[]>([]);
   const [servicesOriginal, setServicesOriginal] = useState<ICajasData[]>([]);
   useEffect(() => {
     async function doFetch() {
-      setServices(await servicesProvider.ServicesList());
-      setServicesOriginal(await servicesProvider.ServicesList());
+      try {
+        setServices(await servicesProvider.ServicesList());
+        setServicesOriginal(await servicesProvider.ServicesList());
+      } catch (e: any) {
+        errorAlert(e);
+      }
+      setIsLoading(true);
     }
     doFetch();
   }, []);
@@ -65,8 +71,6 @@ function Cajas() {
       )
     );
   }, [pageTable]);
-
-  
 
   const handleSubmitDesactivate = async () => {
     await servicesProvider.DeleteService(selectedService);
@@ -106,151 +110,192 @@ function Cajas() {
           <Button size="large">Registrar servicio</Button>
         </Link>
       </div>
-      <SectionTitle>Listado de servicios de cajas</SectionTitle>
-      <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
-        <Card className="shadow-md sm:w-3/4">
-          <CardBody>
-            <SearchBar
-              placeHolder="Buscar servicio de cajas"
-              searchFunction={(e: any) => {
-                filterServices(e);
-              }}
-              cleanFunction={() => {
-                filterServices("");
-              }}
-            />
-          </CardBody>
-        </Card>
-        <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
-          <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
-            <Label radio>
-              <Input
-                type="radio"
-                value="success"
-                name="activeInactive"
-                checked={state === "success"}
-                onChange={(e) => handleActiveChange(e)}
-              />
-              <span className="ml-2">Activos</span>
-            </Label>
-            <Label radio>
-              <Input
-                type="radio"
-                value="danger"
-                name="activeInactive"
-                checked={state === "danger"}
-                onChange={(e) => handleActiveChange(e)}
-              />
-              <span className="ml-2">Inactivos</span>
-            </Label>
-          </CardBody>
-        </Card>
-      </div>
-      <TableContainer className="mb-8">
-        <Table>
-          <TableHeader>
-            <tr>
-              <TableCell>Imagen</TableCell>
-              <TableCell>Servicio</TableCell>
-              <TableCell>Encargado</TableCell>
-              <TableCell>Telefono de Referencia</TableCell>
-              <TableCell>Estado</TableCell>
-              <TableCell>Editar</TableCell>
-              <TableCell>Manejo</TableCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-            {services.map((servicio, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <Avatar
-                        className="hidden mr-3 md:block"
-                        src={servicio.imagenUrl}
-                        size="large"
+      {isLoading == false ? (
+        <>
+          <SectionTitle>Cargando servicios...</SectionTitle>
+        </>
+      ) : (
+        <>
+          {services.length < 1 ? (
+            <>
+              <SectionTitle>No hay servicios registrados</SectionTitle>
+            </>
+          ) : (
+            <>
+              <SectionTitle>Listado de servicios de cajas</SectionTitle>
+              <div className="flex w-full gap-2 justify-between mb-8 flex-col sm:flex-row">
+                <Card className="shadow-md sm:w-3/4">
+                  <CardBody>
+                    <SearchBar
+                      placeHolder="Buscar servicio de cajas"
+                      searchFunction={(e: any) => {
+                        filterServices(e);
+                      }}
+                      cleanFunction={() => {
+                        filterServices("");
+                      }}
+                    />
+                  </CardBody>
+                </Card>
+                <Card className="shadow-md sm:w-1/4 flex flex-col justify-center items-center">
+                  <CardBody className="flex justify-center items-start gap-y-2 gap-x-4 flex-row sm:flex-col lg:flex-row">
+                    <Label radio>
+                      <Input
+                        type="radio"
+                        value="success"
+                        name="activeInactive"
+                        checked={state === "success"}
+                        onChange={(e) => handleActiveChange(e)}
                       />
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.name}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.encharged}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{servicio.cellphone}</p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    type={servicio.status == "success" ? "success" : "danger"}
-                  >
-                    {servicio.status == "success" ? "Activo" : "Inactivo"}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  {servicio.status == "success" ? (
-                    <div className="flex items-center space-x-4">
-                      <Link
-                        href={`/administracion/cajas/editar/[id]`}
-                        as={`/administracion/cajas/editar/${servicio.id}`}
-                      >
-                        <Button layout="link" size="small" aria-label="Edit">
-                          <EditIcon className="w-5 h-5" aria-hidden="true" />
-                        </Button>
-                      </Link>
-                    </div>
-                  ) : (
-                    <div></div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {servicio.status == "success" ? (
-                    <Button
-                      layout="link"
-                      size="small"
-                      aria-label="Delete"
-                      type={"button"}
-                      onClick={() => {
-                        setShowAlertElimination(true);
-                        setSelectedService(servicio.id);
-                      }}
-                    >
-                      <TrashIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                  ) : (
-                    <Button
-                      layout="link"
-                      size="small"
-                      aria-label="Delete"
-                      type={"button"}
-                      onClick={() => {
-                        setShowAlertActivate(true);
-                        setSelectedService(servicio.id);
-                      }}
-                    >
-                      <PlusIcon className="w-5 h-5" aria-hidden="true" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                      <span className="ml-2">Activos</span>
+                    </Label>
+                    <Label radio>
+                      <Input
+                        type="radio"
+                        value="danger"
+                        name="activeInactive"
+                        checked={state === "danger"}
+                        onChange={(e) => handleActiveChange(e)}
+                      />
+                      <span className="ml-2">Inactivos</span>
+                    </Label>
+                  </CardBody>
+                </Card>
+              </div>
+
+              <TableContainer className="mb-8">
+                <Table>
+                  <TableHeader>
+                    <tr>
+                      <TableCell>Imagen</TableCell>
+                      <TableCell>Servicio</TableCell>
+                      <TableCell>Encargado</TableCell>
+                      <TableCell>Telefono de Referencia</TableCell>
+                      <TableCell>Estado</TableCell>
+                      <TableCell>Editar</TableCell>
+                      <TableCell>Manejo</TableCell>
+                    </tr>
+                  </TableHeader>
+                  <TableBody>
+                    {services.map((servicio, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <div className="flex items-center text-sm">
+                            <div>
+                              <Avatar
+                                className="hidden mr-3 md:block"
+                                src={servicio.imagenUrl}
+                                size="large"
+                              />
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center text-sm">
+                            <div>
+                              <p className="font-semibold">{servicio.name}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center text-sm">
+                            <div>
+                              <p className="font-semibold">
+                                {servicio.encharged}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center text-sm">
+                            <div>
+                              <p className="font-semibold">
+                                {servicio.cellphone}
+                              </p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            type={
+                              servicio.status == "success"
+                                ? "success"
+                                : "danger"
+                            }
+                          >
+                            {servicio.status == "success"
+                              ? "Activo"
+                              : "Inactivo"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {servicio.status == "success" ? (
+                            <div className="flex items-center space-x-4">
+                              <Link
+                                href={`/administracion/cajas/editar/[id]`}
+                                as={`/administracion/cajas/editar/${servicio.id}`}
+                              >
+                                <Button
+                                  layout="link"
+                                  size="small"
+                                  aria-label="Edit"
+                                >
+                                  <EditIcon
+                                    className="w-5 h-5"
+                                    aria-hidden="true"
+                                  />
+                                </Button>
+                              </Link>
+                            </div>
+                          ) : (
+                            <div></div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {servicio.status == "success" ? (
+                            <Button
+                              layout="link"
+                              size="small"
+                              aria-label="Delete"
+                              type={"button"}
+                              onClick={() => {
+                                setShowAlertElimination(true);
+                                setSelectedService(servicio.id);
+                              }}
+                            >
+                              <TrashIcon
+                                className="w-5 h-5"
+                                aria-hidden="true"
+                              />
+                            </Button>
+                          ) : (
+                            <Button
+                              layout="link"
+                              size="small"
+                              aria-label="Delete"
+                              type={"button"}
+                              onClick={() => {
+                                setShowAlertActivate(true);
+                                setSelectedService(servicio.id);
+                              }}
+                            >
+                              <PlusIcon
+                                className="w-5 h-5"
+                                aria-hidden="true"
+                              />
+                            </Button>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </>
+          )}
+        </>
+      )}
+
       {/*Alerta 1 - Activar Servicio*/}
       {showAlertActivate && (
         <SweetAlert
@@ -291,4 +336,4 @@ function Cajas() {
   );
 }
 
-export default withAuthorization(Cajas,{requiredPermissions});
+export default withAuthorization(Cajas, { requiredPermissions });
