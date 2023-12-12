@@ -15,16 +15,19 @@ import {
   TableContainer,
   Badge,
   Avatar,
+  Card,
+  CardBody,
   Button,
   Pagination,
+  Input,
+  Label,
 } from "@roketid/windmill-react-ui";
 import { EditIcon, TrashIcon, MenuIcon } from "icons";
 import Layout from "example/containers/Layout";
 import { route } from "next/dist/server/router";
-import response, { ICafeteriaData } from "utils/demo/cafeteriaData";
+import { ICafeteriaData } from "utils/demo/cafeteriaData";
 import URLS from "utils/demo/api";
 
-const response2 = response.concat([]);
 
 import withAuthorization from "components/withAuthorization";
 
@@ -34,10 +37,12 @@ const requiredPermissions = ["Cafeteria"];
 function Cafeteria() {
 
   const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState("");
   const [pageTable2, setPageTable2] = useState(1);
   const [dataTable2, setMenuinfo] = useState<ICafeteriaData[]>([]);
   const [TotalResult,setTotal]= useState(Number);
   const resultsPerPage = 10;
+  const [state, setState] = useState("activos");
   function onPageChangeTable2(p: number) {
     setPageTable2(p);
   }
@@ -115,13 +120,26 @@ function Cafeteria() {
     }*/
     router.reload();
   }
+  const handleActiveChange = (e: any) => {
+    setState(e.target.value);
+  };
 
   return (
     <Layout>
       <PageTitle>Menu Cafeteria</PageTitle>
-
+      <Card className="shadow-md sm:w-3/4">
+        <CardBody>
+          <input
+            type="text"
+            placeholder="Buscar..."
+            className="mb-4 p-2 border border-gray-600 bg-gray-700 text-white w-full rounded"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </CardBody>
+      </Card>
+      
       <div>
-        <Button > <Link href={'/servicios/cafeteria/create'}>Crear</Link></Button>
+        <Button > <Link href={'/servicios/cafeteria/create'}>Registrar nuevo producto</Link></Button>
       </div>
 
       <TableContainer className="mb-8 mt-4">
@@ -137,7 +155,18 @@ function Cafeteria() {
             </tr>
           </TableHeader>
           <TableBody>
-            {dataTable2.map((menu:any, i) => (
+            {
+            dataTable2
+            .filter((producto) => {
+                if (searchTerm === "") {
+                  return producto;
+                } else if (
+                  producto.titulo?.toLowerCase().includes(searchTerm.toLowerCase())
+                ){
+                  return producto;
+                }
+              })
+            .map((menu:any, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">

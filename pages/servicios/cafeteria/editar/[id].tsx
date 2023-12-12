@@ -14,6 +14,9 @@ import {uploadFile} from "../../../../firebase/config"
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext } from "next";
 import URLS from "utils/demo/api";
+import SweetAlert from "react-bootstrap-sweetalert";
+import Loading from "../loading";
+
 
 interface props {
   id: number;
@@ -39,6 +42,10 @@ function EditarProducto({ id }: props) {
     "Ensalada"
   ]
   const router = useRouter();
+
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState(false)
 
   const [serviceImg, setImg]:any = useState(null);
 
@@ -153,6 +160,7 @@ function EditarProducto({ id }: props) {
         ]
       }),
     });
+    setIsSuccess(true);
     router.back();
   };
 
@@ -215,14 +223,11 @@ function EditarProducto({ id }: props) {
     alert("El campo 'Precio' no puede estar vacío");
     return false;
   }
-  if (precio < 0) {
-  alert("El precio no puede ser un número negativo");
+  if (precio <= 0) {
+  alert("El precio no puede ser menor o igual a cero");
   return false;
   }
-  if (!productoData.archivo) {
-    alert("Por favor, añada una imagen de referencia del producto");
-    return false;
-  }
+  
   // Continuar con más validaciones si son necesarias
 
   return true;
@@ -233,14 +238,31 @@ function EditarProducto({ id }: props) {
     if(!validarFormulario()){
       return;
     }
-    productoData.archivo= null;
+    setShowAlertLoading(true);
+    setIsSuccess(false);
     if(serviceImg != null)
     {
       productoData.archivo = await uploadFile(serviceImg,"menuCafeteria/");
-    } 
+    }
+    else
+    {
+      productoData.archivo = service!.archivo
+    }
     
     handleSubmit();
   }
+  const handleAlertConfirm = () => {
+    setShowAlert(false);
+    subirArchivos();
+  };
+  const handleAlertCancel = () => {
+    setShowAlert(false);
+  };
+
+  const handleAlertLoadConfirm = () => {
+    router.push("/servicios/cafeteria")
+  };
+
   return (
     <Layout>
       <PageTitle>Editar producto</PageTitle>
@@ -313,8 +335,46 @@ function EditarProducto({ id }: props) {
 
           <div className='flex justify-items-start gap-4'>
             <div className='mt-8'>
-              <Button onClick={subirArchivos}>Guardar</Button>
+              <Button onClick={() => setShowAlert(true)}>Guardar</Button>
             </div>
+            {showAlert && (
+              <SweetAlert
+                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                title="Atención"
+                confirmBtnText="Confirmar"
+                cancelBtnText="Cancelar"
+                showCancel
+                onConfirm={handleAlertConfirm}
+                onCancel={handleAlertCancel}
+              >
+                Confirma todos los datos actualizados del producto?
+              </SweetAlert>
+            )}
+            {showAlertLoading && (
+              isSuccess ? (
+                <SweetAlert
+                  success
+                  title="¡Éxito!"
+                  onConfirm={handleAlertLoadConfirm}
+                >
+                  Los datos han sido enviados con éxito.
+                </SweetAlert>
+              ) :
+                (
+                  <SweetAlert
+                    title="Cargando..."
+                    onConfirm={handleAlertConfirm}
+                    confirmBtnText={""}
+                    custom
+                  >
+                    <div className="-my-56">
+                      <Loading />
+                    </div>
+                    Enviando los datos espere....
+                  </SweetAlert>
+                )
+
+            )}
             <div className='mt-8'>
               <Button>  <Link href={'/servicios/cafeteria'} > Regresar </Link></Button>
             </div>

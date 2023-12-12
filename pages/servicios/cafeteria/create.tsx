@@ -15,14 +15,19 @@ import { ToastContainer } from "react-toastify";
 import {uploadFile} from "../../../firebase/config"
 import { useRouter } from "next/router";
 import URLS from "utils/demo/api";
+import SweetAlert from "react-bootstrap-sweetalert";
+import Loading from "./loading";
 
 function Forms() {
   const router = useRouter();
+  const [showAlert, setShowAlert] = useState<boolean>(false);
+  const [showAlertLoading, setShowAlertLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState(false)
   const [serviceImg, setImg]:any = useState(null);
 
   const [productoData, setproductoData] = useState<ICrearproducto>({
     archivo: "",
-    serviciosId: 43,
+    serviciosId: 259,
     titulo: "",
     id_modulo: 4,
     estado:true,
@@ -145,6 +150,7 @@ function Forms() {
     })
       .then((response) => {
         if (response.ok) {
+          setIsSuccess(true);
           console.log(response);
           successAlert("Éxito al registrar los datos");
           router.back();
@@ -161,7 +167,7 @@ function Forms() {
     return false;
   }
    if (!productoData.descripcionPublicacion || productoData.descripcionPublicacion[0].contenido === "") {
-    alert("Debe seleccionar una 'Categoria'");
+    alert("Debe seleccionar una Categoria");
     return false;
   }
   if (!productoData.descripcionPublicacion[2].contenido.trim()) {
@@ -172,8 +178,8 @@ function Forms() {
     alert("El campo 'Precio' no puede estar vacío");
     return false;
   }
-  if (parseFloat(productoData.descripcionPublicacion[1].contenido) < 0) {
-  alert("El precio no puede ser un número negativo");
+  if (parseFloat(productoData.descripcionPublicacion[1].contenido) <= 0) {
+  alert("El precio no puede ser menor o igaul a cero");
   return false;
   }
   if (!serviceImg) {
@@ -189,6 +195,8 @@ function Forms() {
     if(!validarFormulario()){
       return;
     }
+    setShowAlertLoading(true);
+    setIsSuccess(false);
     productoData.archivo= null;
     if(serviceImg != null)
     {
@@ -196,6 +204,17 @@ function Forms() {
     } 
     registrarProducto();
   }
+  const handleAlertConfirm = () => {
+    setShowAlert(false);
+    subirArchivos();
+  };
+  const handleAlertCancel = () => {
+    setShowAlert(false);
+  };
+
+  const handleAlertLoadConfirm = () => {
+    router.push("/servicios/cafeteria")
+  };
   return (
     <Layout>
       <PageTitle>Registrar un nuevo producto</PageTitle>
@@ -259,8 +278,46 @@ function Forms() {
 
           <div className='flex justify-items-start gap-4'>
             <div className='mt-8'>
-              <Button onClick={subirArchivos}>Guardar</Button>
+              <Button onClick={() => setShowAlert(true)}>Guardar</Button>
             </div>
+            {showAlert && (
+              <SweetAlert
+                warning // Puedes personalizar el tipo de alerta (success, error, warning, etc.)
+                title="Atención"
+                confirmBtnText="Confirmar"
+                cancelBtnText="Cancelar"
+                showCancel
+                onConfirm={handleAlertConfirm}
+                onCancel={handleAlertCancel}
+              >
+                Confirma todos los datos del nuevo producto?
+              </SweetAlert>
+            )}
+            {showAlertLoading && (
+              isSuccess ? (
+                <SweetAlert
+                  success
+                  title="¡Éxito!"
+                  onConfirm={handleAlertLoadConfirm}
+                >
+                  Los datos han sido enviados con éxito.
+                </SweetAlert>
+              ) :
+                (
+                  <SweetAlert
+                    title="Cargando..."
+                    onConfirm={handleAlertConfirm}
+                    confirmBtnText={""}
+                    custom
+                  >
+                    <div className="-my-56">
+                      <Loading />
+                    </div>
+                    Enviando los datos espere....
+                  </SweetAlert>
+                )
+
+            )}
             <div className='mt-8'>
               <Button>  <Link href={'/servicios/cafeteria'} > Regresar </Link></Button>
             </div>
