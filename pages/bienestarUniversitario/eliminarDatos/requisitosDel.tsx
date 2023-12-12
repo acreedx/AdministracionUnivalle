@@ -175,7 +175,7 @@ const EliminarRequisitos: FC<RequisitosProps> = ({
                 <Card className="shadow-md sm:w-3/4">
                   <CardBody>
                     <SearchBar
-                      placeHolder="Buscar objeto perdido"
+                      placeHolder="Buscar requisito"
                       searchFunction={searchObjs}
                       cleanFunction={cleanMissObjects}
                     />
